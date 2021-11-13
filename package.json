@@ -20,9 +20,9 @@
   "dependencies": {
     "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
+    "@material-ui/icons": "^4.11.2",
     "@mui/material": "^5.1.0",
     "cors": "^2.8.5",
-    "eslint": "^8.2.0",
     "express": "^4.17.1",
     "nodemon": "^2.0.15",
     "react-copy-to-clipboard": "^5.0.4",
