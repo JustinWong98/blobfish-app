@@ -1,14 +1,19 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { SocketContext } from '../SocketContext.js';
 import { FaceMesh } from '@mediapipe/face_mesh';
+import * as Facemesh from '@mediapipe/face_mesh';
+import * as cam from '@mediapipe/camera_utils';
+import { Visibility } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   video: {
     width: '550px',
+    height: '412px',
     [theme.breakpoints.down('xs')]: {
       width: '300px',
+      heigth: '225px',
     },
   },
   gridContainer: {
@@ -72,11 +77,52 @@ const useStyles = makeStyles((theme) => ({
 //   }
 //   canvasCtx.restore();
 // }
+const Canvas = ({ canvasRef, styles }) => {
+  return (
+    <canvas
+      ref={canvasRef}
+      className={styles.video}
+      style={{
+        zindex: 10,
+      }}
+    ></canvas>
+  );
+};
+const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
+  return (
+    <Paper
+      className={(styles.paper, styles.video)}
+      style={{ position: 'relative', padding: '10px' }}
+    >
+      <Typography variant="h5" gutterBottom>
+        {name || ''}
+      </Typography>
+
+      <Grid item xs={12} md={12}>
+        <video
+          playsInline
+          muted
+          ref={videoRef}
+          autoPlay
+          className={styles.video}
+          style={{ position: 'absolute' }}
+        />
+        <Canvas
+          canvasRef={canvasRef}
+          styles={styles}
+          style={{ position: 'absolute' }}
+        />
+      </Grid>
+    </Paper>
+  );
+};
 
 function VideoPlayer() {
   const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } =
     useContext(SocketContext);
   const classes = useStyles();
+  const myCanvas = useRef();
+  const userCanvas = useRef();
 
   const faceMesh = new FaceMesh({
     locateFile: (file) => {
@@ -93,30 +139,25 @@ function VideoPlayer() {
   });
   // faceMesh.onResults(onResults);
 
-  const VideoFrame = ({ videoRef }) => {
-    return (
-      <Paper className={classes.paper}>
-        <Typography variant="h5" gutterBottom>
-          {name || ''}
-        </Typography>
-        <Grid item xs={12} md={12}>
-          <video
-            playsInline
-            muted
-            ref={videoRef}
-            autoPlay
-            className={classes.video}
-          />
-        </Grid>
-      </Paper>
-    );
-  };
-
   return (
     <div>
       <Grid container className={classes.gridContainer}>
-        {stream && <VideoFrame videoRef={myVideo} />}
-        {callAccepted && !callEnded && <VideoFrame videoRef={userVideo} />}
+        {stream && (
+          <VideoFrame
+            name={name}
+            videoRef={myVideo}
+            canvasRef={myCanvas}
+            styles={classes}
+          />
+        )}
+        {callAccepted && !callEnded && (
+          <VideoFrame
+            name={call.name}
+            videoRef={userVideo}
+            canvasRef={userCanvas}
+            styles={classes}
+          />
+        )}
       </Grid>
     </div>
   );
