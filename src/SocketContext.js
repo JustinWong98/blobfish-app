@@ -31,33 +31,11 @@ const ContextProvider = ({ children }) => {
   const socketRef = useRef()
 
   useEffect(() => {
-<<<<<<< HEAD:client/src/SocketContext.js
-    socketRef.current = io.connect('/')
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-=======
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
->>>>>>> 58cd42b3619717d3ece075f3faededd78f73a25f:src/SocketContext.js
       .then((currentStream) => {
         setStream(currentStream);
         myVideo.current.srcObject = currentStream;
-        socketRef.current.emit('joinedRoom')
-        socketRef.current.on('allUsers', (users) => {
-          const peers = [];
-          users.forEach(userID => {
-            const peer = createPeer(userID, myVideo.current.id, stream);
-            peersRef.current.push({
-              peerID: userID,
-              peer,
-            })
-            peers.push(peer);
-            setPeers(peers);
-          })
-            socketRef.current.on("receiving returned signal", payload => {
-                const item = peersRef.current.find(p => p.peerID === payload.id);
-                item.peer.signal(payload.signal);
-            });
-        })
     }, []);
 
     socket.on('me', (id) => setMe(id));
