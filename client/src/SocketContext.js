@@ -13,19 +13,39 @@ const ContextProvider = ({children}) => {
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [name, setName] = useState('');
+  const [peers, setPeers] = useState([]);
+  const peersRef = useRef([]);
 
   // use a ref to populate video iframe with the src of stream
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
+  const socketRef = useRef()
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    socketRef.current = io.connect('/')
+    .navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
-
         myVideo.current.srcObject = currentStream;
-      });
+        socketRef.current.emit('joinedRoom')
+        socketRef.current.on('allUsers', (users) => {
+          const peers = [];
+          users.forEach(userID => {
+            const peer = createPeer(userID, myVideo.current.id, stream);
+            peersRef.current.push({
+              peerID: userID,
+              peer,
+            })
+            peers.push(peer);
+            setPeers(peers);
+          })
+            socketRef.current.on("receiving returned signal", payload => {
+                const item = peersRef.current.find(p => p.peerID === payload.id);
+                item.peer.signal(payload.signal);
+            });
+        })
+    }, []);
 
     socket.on('me', (id) => setMe(id));
 
@@ -78,6 +98,36 @@ const ContextProvider = ({children}) => {
 
     window.location.reload();
   };
+
+ const createPeer = (userToSignal, callerID, stream) => {
+        const peer = new Peer({
+            initiator: true,
+            trickle: false,
+            stream,
+        });
+
+        peer.on("signal", signal => {
+            socketRef.current.emit("sending signal", { userToSignal, callerID, signal })
+        })
+
+        return peer;
+    }
+
+    const addPeer = (incomingSignal, callerID, stream) => {
+        const peer = new Peer({
+            initiator: false,
+            trickle: false,
+            stream,
+        })
+
+        peer.on("signal", signal => {
+            socketRef.current.emit("returning signal", { signal, callerID })
+        })
+
+        peer.signal(incomingSignal);
+
+        return peer;
+    }
 
   return (
     <SocketContext.Provider value={{
