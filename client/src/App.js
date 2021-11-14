@@ -7,6 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import VideoPlayer from './components/VideoPlayer.jsx';
 import Options from './components/Options.jsx';
 import Notifications from './components/Notifications.jsx';
+import Sidebar from './components/Sidebar.jsx'
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -42,7 +43,9 @@ function App() {
         <Typography variant = 'h2' align = 'center'> Blobfish Chat</Typography>
       </AppBar>
       <VideoPlayer />
-      <Options />
+      <Sidebar>
+        <Notifications />
+      </Sidebar>
     </div>
   );
 }

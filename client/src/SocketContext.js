@@ -4,7 +4,7 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext()
 // change to url of deployed server later
-const socket = io('http://localhost:3004')
+const socket = io('http://localhost:3002')
 
 const ContextProvider = ({children}) => {
   const [stream, setStream] = useState();
@@ -24,7 +24,7 @@ const ContextProvider = ({children}) => {
 
   useEffect(() => {
     socketRef.current = io.connect('/')
-    .navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+    navigator.mediaDevices.getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         setStream(currentStream);
         myVideo.current.srcObject = currentStream;
