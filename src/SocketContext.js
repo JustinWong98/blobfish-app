@@ -4,7 +4,7 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext();
 // change to url of deployed server later
-const BACKEND_URL = 'http://localhost:3002';
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
 
 const socket = io(BACKEND_URL, {
   withCredentials: true,
@@ -35,7 +35,8 @@ const ContextProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
-
+        // TODO: Modify to facemesh
+        console.log('getting video from mediadevice');
         setStream(currentStream);
         //plays video in steam
         myVideo.current.srcObject = currentStream;
@@ -50,16 +51,22 @@ const ContextProvider = ({ children }) => {
 
   const answerCall = () => {
     setCallAccepted(true);
+    const userModStream = myVideoModified.current.captureStream();
+    console.log('userModStream :>> ', userModStream);
 
-    const peer = new Peer({ initiator: false, trickle: false, stream });
-
-    console.log(stream)
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: userModStream,
+    });
 
     peer.on('signal', (data) => {
       socket.emit('answerCall', { signal: data, to: call.from });
     });
 
     peer.on('stream', (currentStream) => {
+      console.log('getting stream from initiator');
+      console.log('currentStream :>> ', currentStream);
       userVideo.current.srcObject = currentStream;
     });
 
@@ -69,15 +76,14 @@ const ContextProvider = ({ children }) => {
   };
 
   const callUser = (id) => {
-    console.log('myVideo :>> ', myVideo);
-    console.log('myVideoModified :>> ', myVideoModified);
-    const userModStream = myVideoModified.current.captureStream(25);
-
+    const userModStream = myVideoModified.current.captureStream();
     console.log('userModStream :>> ', userModStream);
-    // const peer = new Peer({ initiator: true, trickle: false, userModStream });
-    const peer = new Peer({ initiator: true, trickle: false, stream });
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: userModStream,
+    });
     peer.on('signal', (data) => {
-      setCallAccepted(true);
       socket.emit('callUser', {
         userToCall: id,
         signalData: data,
@@ -88,11 +94,8 @@ const ContextProvider = ({ children }) => {
 
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
-      console.log(
-        'userVideo.current.srcObject :>> ',
-        userVideo.current.srcObject
-      );
-      setCallAccepted(true);
+      console.log('getting stream from initiator');
+      console.log('currentStream :>> ', currentStream);
     });
 
     socket.on('callAccepted', (signal) => {

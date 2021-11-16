@@ -64,13 +64,13 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
     const canvasCtx = canvasElement.getContext('2d');
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    // canvasCtx.drawImage(
-    //   results.image,
-    //   0,
-    //   0,
-    //   canvasElement.width,
-    //   canvasElement.height
-    // );
+    canvasCtx.drawImage(
+      results.image,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
     if (results.multiFaceLandmarks) {
       for (const landmarks of results.multiFaceLandmarks) {
         // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
@@ -153,6 +153,7 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           playsInline
           ref={videoRef}
           autoPlay
+          muted
           className={styles.video}
           style={{ display: 'none' }}
         />
