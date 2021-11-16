@@ -4,7 +4,7 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext();
 // change to url of deployed server later
-const BACKEND_URL = 'https://sleepy-plateau-69754.herokuapp.com';
+const BACKEND_URL = 'http://localhost:3002';
 
 const socket = io(BACKEND_URL, {
   withCredentials: true,
@@ -69,7 +69,7 @@ const ContextProvider = ({ children }) => {
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
     peer.on('signal', (data) => {
-      console.log(data)
+      setCallAccepted(true);
       socket.emit('callUser', {
         userToCall: id,
         signalData: data,
@@ -80,6 +80,7 @@ const ContextProvider = ({ children }) => {
 
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
+      setCallAccepted(true);
     });
 
     socket.on('callAccepted', (signal) => {
