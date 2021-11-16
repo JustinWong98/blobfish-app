@@ -28,15 +28,17 @@ const ContextProvider = ({ children }) => {
   const myVideo = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
-  const socketRef = useRef()
+  const socketRef = useRef();
 
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
+        // TODO: Modify to facemesh
+        console.log('getting video from mediadevice');
         setStream(currentStream);
         myVideo.current.srcObject = currentStream;
-    }, []);
+      }, []);
 
     socket.on('me', (id) => setMe(id));
 
@@ -95,35 +97,39 @@ const ContextProvider = ({ children }) => {
     window.location.reload();
   };
 
- const createPeer = (userToSignal, callerID, stream) => {
-        const peer = new Peer({
-            initiator: true,
-            trickle: false,
-            stream,
-        });
+  const createPeer = (userToSignal, callerID, stream) => {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
+    });
 
-        peer.on("signal", signal => {
-            socketRef.current.emit("sending signal", { userToSignal, callerID, signal })
-        })
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('sending signal', {
+        userToSignal,
+        callerID,
+        signal,
+      });
+    });
 
-        return peer;
-    }
+    return peer;
+  };
 
-    const addPeer = (incomingSignal, callerID, stream) => {
-        const peer = new Peer({
-            initiator: false,
-            trickle: false,
-            stream,
-        })
+  const addPeer = (incomingSignal, callerID, stream) => {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
 
-        peer.on("signal", signal => {
-            socketRef.current.emit("returning signal", { signal, callerID })
-        })
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('returning signal', { signal, callerID });
+    });
 
-        peer.signal(incomingSignal);
+    peer.signal(incomingSignal);
 
-        return peer;
-    }
+    return peer;
+  };
 
   return (
     <SocketContext.Provider

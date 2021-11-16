@@ -6,9 +6,6 @@ import { FaceMesh } from '@mediapipe/face_mesh';
 import * as Facemesh from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 import * as draw from '@mediapipe/drawing_utils';
-import { Visibility } from '@material-ui/icons';
-import Webcam from 'react-webcam';
-import { display } from '@material-ui/system';
 
 const drawConnectors = draw.drawConnectors;
 
@@ -46,17 +43,18 @@ const Canvas = ({ canvasRef, styles }) => {
   );
 };
 
-const getXYFromLandmark = (obj, videoRef) => {
-  const x = obj.x * videoRef.current.width;
-  const y = obj.y * videoRef.current.height;
-  return [x, y];
-};
+// const getXYFromLandmark = (obj, videoRef) => {
+//   const x = obj.x * videoRef.current.width;
+//   const y = obj.y * videoRef.current.height;
+//   return [x, y];
+// };
 
 const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
   console.log('running video frame');
+
   function onResults(results) {
-    const vidWidth = videoRef.current.video.videoWidth;
-    const vidHeight = videoRef.current.video.videoHeight;
+    const vidWidth = videoRef.current.videoWidth;
+    const vidHeight = videoRef.current.videoHeight;
 
     canvasRef.current.width = vidWidth;
     canvasRef.current.height = vidHeight;
@@ -128,10 +126,17 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
       minTrackingConfidence: 0.5,
     });
     faceMesh.onResults(onResults);
-    if (typeof videoRef.current !== 'undefined' && videoRef.current !== null) {
-      const camera = new cam.Camera(videoRef.current.video, {
+
+    console.log('videoRef.current.srcObject :>> ', videoRef.current.srcObject);
+    console.log('videoRef :>> ', videoRef);
+    console.log('videoRef.video :>> ', videoRef.video);
+    if (
+      typeof videoRef.current.srcObject !== 'undefined' &&
+      videoRef.current.srcObject !== null
+    ) {
+      const camera = new cam.Camera(videoRef.current, {
         onFrame: async () => {
-          await faceMesh.send({ image: videoRef.current.video });
+          await faceMesh.send({ image: videoRef.current });
         },
         width: 550,
         height: 412,
@@ -147,14 +152,14 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
       </Typography>
 
       <Grid item xs={12} md={12}>
-        <Webcam
+        <video
           playsInline
-          muted
           ref={videoRef}
           autoPlay
           className={styles.video}
           style={{ display: 'none' }}
         />
+        {/* REMOVE CANVAS, ^ Webcam may not be necessary  */}
         <Canvas canvasRef={canvasRef} styles={styles} />
       </Grid>
     </Paper>
@@ -171,10 +176,12 @@ function VideoPlayer() {
   return (
     <div>
       <Grid container className={classes.gridContainer}>
+        {/* Make normal */}
         {stream && (
           <VideoFrame
             name={name}
             videoRef={myVideo}
+            // TODO: remove canvasRef
             canvasRef={myCanvas}
             styles={classes}
           />
@@ -183,6 +190,7 @@ function VideoPlayer() {
           <VideoFrame
             name={call.name}
             videoRef={userVideo}
+            // TODO: remove canvasRef
             canvasRef={userCanvas}
             styles={classes}
           />
