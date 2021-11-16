@@ -127,9 +127,6 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
     });
     faceMesh.onResults(onResults);
 
-    console.log('videoRef.current.srcObject :>> ', videoRef.current.srcObject);
-    console.log('videoRef :>> ', videoRef);
-    console.log('videoRef.video :>> ', videoRef.video);
     if (
       typeof videoRef.current.srcObject !== 'undefined' &&
       videoRef.current.srcObject !== null
@@ -166,12 +163,31 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
   );
 };
 
+const OtherVideoFrame = ({ styles, videoRef, name }) => {
+  return (
+    <Paper className={styles.paper}>
+      <Typography variant="h5" gutterBottom>
+        {name || ''}
+      </Typography>
+      <Grid item xs={12} md={12}>
+        <video playsInline ref={videoRef} autoPlay className={styles.video} />
+      </Grid>
+    </Paper>
+  );
+};
+
 function VideoPlayer() {
-  const { name, callAccepted, myVideo, userVideo, callEnded, stream, call } =
-    useContext(SocketContext);
+  const {
+    name,
+    callAccepted,
+    myVideo,
+    myVideoModified,
+    userVideo,
+    callEnded,
+    stream,
+    call,
+  } = useContext(SocketContext);
   const classes = useStyles();
-  const myCanvas = useRef();
-  const userCanvas = useRef();
 
   return (
     <div>
@@ -182,16 +198,14 @@ function VideoPlayer() {
             name={name}
             videoRef={myVideo}
             // TODO: remove canvasRef
-            canvasRef={myCanvas}
+            canvasRef={myVideoModified}
             styles={classes}
           />
         )}
         {callAccepted && !callEnded && (
-          <VideoFrame
+          <OtherVideoFrame
             name={call.name}
             videoRef={userVideo}
-            // TODO: remove canvasRef
-            canvasRef={userCanvas}
             styles={classes}
           />
         )}
