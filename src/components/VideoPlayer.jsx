@@ -153,6 +153,7 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           playsInline
           ref={videoRef}
           autoPlay
+          muted
           className={styles.video}
           style={{ display: 'none' }}
         />
