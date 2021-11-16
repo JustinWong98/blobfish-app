@@ -26,17 +26,21 @@ const ContextProvider = ({ children }) => {
 
   // use a ref to populate video iframe with the src of stream
   const myVideo = useRef();
+  const myVideoModified = useRef();
   const userVideo = useRef();
   const connectionRef = useRef();
-  const socketRef = useRef()
+  const socketRef = useRef();
 
   useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
+        // TODO: Modify to facemesh
+        console.log('getting video from mediadevice');
         setStream(currentStream);
+        //plays video in steam
         myVideo.current.srcObject = currentStream;
-    }, []);
+      }, []);
 
     socket.on('me', (id) => setMe(id));
 
@@ -64,6 +68,12 @@ const ContextProvider = ({ children }) => {
   };
 
   const callUser = (id) => {
+    console.log('myVideo :>> ', myVideo);
+    console.log('myVideoModified :>> ', myVideoModified);
+    const userModStream = myVideoModified.current.captureStream(25);
+
+    console.log('userModStream :>> ', userModStream);
+    // const peer = new Peer({ initiator: true, trickle: false, userModStream });
     const peer = new Peer({ initiator: true, trickle: false, stream });
     peer.on('signal', (data) => {
       socket.emit('callUser', {
@@ -76,6 +86,11 @@ const ContextProvider = ({ children }) => {
 
     peer.on('stream', (currentStream) => {
       userVideo.current.srcObject = currentStream;
+      console.log(
+        'userVideo.current.srcObject :>> ',
+        userVideo.current.srcObject
+      );
+      setCallAccepted(true);
     });
 
     socket.on('callAccepted', (signal) => {
@@ -95,35 +110,39 @@ const ContextProvider = ({ children }) => {
     window.location.reload();
   };
 
- const createPeer = (userToSignal, callerID, stream) => {
-        const peer = new Peer({
-            initiator: true,
-            trickle: false,
-            stream,
-        });
+  const createPeer = (userToSignal, callerID, stream) => {
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream,
+    });
 
-        peer.on("signal", signal => {
-            socketRef.current.emit("sending signal", { userToSignal, callerID, signal })
-        })
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('sending signal', {
+        userToSignal,
+        callerID,
+        signal,
+      });
+    });
 
-        return peer;
-    }
+    return peer;
+  };
 
-    const addPeer = (incomingSignal, callerID, stream) => {
-        const peer = new Peer({
-            initiator: false,
-            trickle: false,
-            stream,
-        })
+  const addPeer = (incomingSignal, callerID, stream) => {
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream,
+    });
 
-        peer.on("signal", signal => {
-            socketRef.current.emit("returning signal", { signal, callerID })
-        })
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('returning signal', { signal, callerID });
+    });
 
-        peer.signal(incomingSignal);
+    peer.signal(incomingSignal);
 
-        return peer;
-    }
+    return peer;
+  };
 
   return (
     <SocketContext.Provider
@@ -131,6 +150,7 @@ const ContextProvider = ({ children }) => {
         call,
         callAccepted,
         myVideo,
+        myVideoModified,
         userVideo,
         stream,
         name,
