@@ -4,7 +4,7 @@ import Peer from 'simple-peer';
 
 const SocketContext = createContext();
 // change to url of deployed server later
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
+const BACKEND_URL = 'https://sleepy-plateau-69754.herokuapp.com';
 
 const socket = io(BACKEND_URL, {
   withCredentials: true,
@@ -34,9 +34,10 @@ const ContextProvider = ({ children }) => {
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
+        // to do - put canvas face mesh here and setStream to canvas
         setStream(currentStream);
         myVideo.current.srcObject = currentStream;
-    }, []);
+    });
 
     socket.on('me', (id) => setMe(id));
 
@@ -49,6 +50,8 @@ const ContextProvider = ({ children }) => {
     setCallAccepted(true);
 
     const peer = new Peer({ initiator: false, trickle: false, stream });
+
+    console.log(stream)
 
     peer.on('signal', (data) => {
       socket.emit('answerCall', { signal: data, to: call.from });
@@ -66,6 +69,7 @@ const ContextProvider = ({ children }) => {
   const callUser = (id) => {
     const peer = new Peer({ initiator: true, trickle: false, stream });
     peer.on('signal', (data) => {
+      console.log(data)
       socket.emit('callUser', {
         userToCall: id,
         signalData: data,
