@@ -1,3 +1,5 @@
+import { getFaceWidth, getFaceHeight } from '../utils_3d.mjs';
+
 //FROM VLADMIR's human
 // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 const rad2deg = (theta) => Math.round((theta * 180) / Math.PI);
@@ -95,9 +97,13 @@ export const calculateFaceAngle = (face, imageSize) => {
   // );
 
   const size = Math.max(
-    (mesh[152].y - mesh[10].y) * imageSize[1],
-    (mesh[454].x - mesh[234].x) * imageSize[0]
+    getFaceWidth(face, imageSize[0], imageSize[1]) * 1.5,
+    getFaceHeight(face, imageSize[0], imageSize[1])
   );
+  // const size = Math.max(
+  //   (mesh[152].y - mesh[10].y) * imageSize[1],
+  //   (mesh[454].x - mesh[234].x) * imageSize[0]
+  // );
   //   Math.max(face.boxRaw[2] * imageSize[0], face.boxRaw[3] * imageSize[1]) /
   //   1.5;
   // top, bottom, left, right

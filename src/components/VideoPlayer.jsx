@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useEffect } from 'react';
+import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { SocketContext } from '../SocketContext.js';
@@ -7,6 +7,8 @@ import * as Facemesh from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 import * as draw from '@mediapipe/drawing_utils';
 import { calculateFaceAngle } from './face/angles.mjs';
+import { getFaceWidth, getFaceHeight } from './utils_3d.mjs';
+import { ThreeCanvas } from './cube.jsx';
 const drawConnectors = draw.drawConnectors;
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +54,13 @@ const VideoCanvas = ({ canvasRef, styles }) => {
 
 const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
   console.log('running video frame');
+  const faceWidth = useRef();
+  const faceHeight = useRef();
+  const faceAngles = useRef({
+    pitch: 0,
+    roll: 0,
+    yaw: 0,
+  });
 
   function onResults(results) {
     const vidWidth = videoRef.current.videoWidth;
@@ -79,6 +88,16 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           vidWidth,
           vidHeight,
         ]);
+        faceWidth.current = getFaceWidth(landmarks, vidWidth, vidHeight);
+        faceHeight.current = getFaceHeight(landmarks, vidWidth, vidHeight);
+        faceAngles.current = angle;
+
+        // setFaceAttributes({ faceWidth, faceHeight, faceAngles });
+        // console.log(
+        //   'faceWidth.current, faceHeight.current :>> ',
+        //   faceWidth.current,
+        //   faceHeight.current
+        // );
         // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
 
         // drawPolylineFromLandMark(landmarks);
@@ -131,7 +150,7 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
     });
     console.log('faceMesh :>> ', faceMesh);
     faceMesh.onResults(onResults);
-
+    console.log('videoRef.current :>> ', videoRef.current);
     if (
       typeof videoRef.current.srcObject !== 'undefined' &&
       videoRef.current.srcObject !== null
@@ -162,6 +181,13 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           style={{ display: 'none' }}
         />
         <VideoCanvas canvasRef={canvasRef} styles={styles} />
+        <ThreeCanvas
+          styles={styles}
+          // faceAttributes={faceAttributes}
+          faceWidth={faceWidth}
+          faceHeight={faceHeight}
+          faceAngles={faceAngles}
+        />
       </Grid>
     </Paper>
   );
