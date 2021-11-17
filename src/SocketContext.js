@@ -36,7 +36,7 @@ const ContextProvider = ({ children }) => {
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         // TODO: Modify to facemesh
-        console.log('getting video from mediadevice');
+        console.log('getting video from mediadevice', currentStream);
         setStream(currentStream);
         //plays video in steam
         myVideo.current.srcObject = currentStream;
