@@ -6,7 +6,7 @@ import { FaceMesh } from '@mediapipe/face_mesh';
 import * as Facemesh from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 import * as draw from '@mediapipe/drawing_utils';
-
+import { calculateFaceAngle } from './face/angles.mjs';
 const drawConnectors = draw.drawConnectors;
 
 const useStyles = makeStyles((theme) => ({
@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Canvas = ({ canvasRef, styles }) => {
+const VideoCanvas = ({ canvasRef, styles }) => {
   return (
     <canvas
       ref={canvasRef}
@@ -46,6 +46,7 @@ const Canvas = ({ canvasRef, styles }) => {
 // const getXYFromLandmark = (obj, videoRef) => {
 //   const x = obj.x * videoRef.current.width;
 //   const y = obj.y * videoRef.current.height;
+//   const z = obj.z* videoRef.current.width;
 //   return [x, y];
 // };
 
@@ -71,8 +72,13 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
       canvasElement.width,
       canvasElement.height
     );
+    // calculateFaceAngle;
     if (results.multiFaceLandmarks) {
       for (const landmarks of results.multiFaceLandmarks) {
+        const { angle, matrix } = calculateFaceAngle(landmarks, [
+          vidWidth,
+          vidHeight,
+        ]);
         // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
 
         // drawPolylineFromLandMark(landmarks);
@@ -119,12 +125,11 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
     });
     faceMesh.setOptions({
       // enableFaceGeometry: true,
-
-      maxNumFaces: 1,
       refineLandmarks: true,
       minDetectionConfidence: 0.5,
       minTrackingConfidence: 0.5,
     });
+    console.log('faceMesh :>> ', faceMesh);
     faceMesh.onResults(onResults);
 
     if (
@@ -153,12 +158,10 @@ const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           playsInline
           ref={videoRef}
           autoPlay
-          muted
           className={styles.video}
           style={{ display: 'none' }}
         />
-        {/* REMOVE CANVAS, ^ Webcam may not be necessary  */}
-        <Canvas canvasRef={canvasRef} styles={styles} />
+        <VideoCanvas canvasRef={canvasRef} styles={styles} />
       </Grid>
     </Paper>
   );
