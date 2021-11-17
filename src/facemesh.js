@@ -3,13 +3,13 @@ import * as Facemesh from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 import * as draw from '@mediapipe/drawing_utils';
 
-const getXYFromLandmark = (obj, videoRef) => {
+export function getXYFromLandmark = (obj, videoRef) => {
   const x = obj.x * videoRef.current.width;
   const y = obj.y * videoRef.current.height;
   return [x, y];
 };
 
-function onResults(results) {
+export function onResults(results) {
   const vidWidth = videoRef.current.video.videoWidth;
   const vidHeight = videoRef.current.video.videoHeight;
 
@@ -66,7 +66,7 @@ function onResults(results) {
   }
   canvasCtx.restore();
 }
-
+//USE IN SOCKET IO
 useEffect(() => {
   console.log('running useeffect in video frame');
   const faceMesh = new FaceMesh({
@@ -76,7 +76,6 @@ useEffect(() => {
   });
   faceMesh.setOptions({
     // enableFaceGeometry: true,
-
     maxNumFaces: 1,
     refineLandmarks: true,
     minDetectionConfidence: 0.5,
