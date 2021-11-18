@@ -1,6 +1,6 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
-import { ThreeCanvas } from './cube';
+import { ThreeCanvas } from './Avatar';
 import { calculateFaceAngle } from './face/angles.mjs';
 import { getFaceWidth, getFaceHeight } from './utils_3d.mjs';
 
