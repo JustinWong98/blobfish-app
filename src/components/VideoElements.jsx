@@ -18,7 +18,13 @@ export const Canvas = ({ canvasRef, styles }) => {
     ></canvas>
   );
 };
-export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
+export const VideoFrame = ({
+  name,
+  userStream,
+  videoRef,
+  canvasRef,
+  styles,
+}) => {
   function onResults(results) {
     const vidWidth = videoRef.current.videoWidth;
     const vidHeight = videoRef.current.videoHeight;
@@ -29,18 +35,17 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
     const canvasElement = canvasRef.current;
 
     const canvasCtx = canvasElement.getContext('2d');
+
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    // canvasCtx.drawImage(
-    //   results.image,
-    //   0,
-    //   0,
-    //   canvasElement.width,
-    //   canvasElement.height
-    // );
+    canvasCtx.drawImage(
+      results.image,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
 
-    canvasCtx.fillStyle = 'yellow';
-    canvasCtx.fillRect(10, 10, 20, 10);
     if (results.multiFaceLandmarks) {
       for (const landmarks of results.multiFaceLandmarks) {
         // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
@@ -81,14 +86,13 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
   }
 
   useEffect(() => {
+    console.log('useEffect running in vid frame');
     const faceMesh = new FaceMesh({
       locateFile: (file) => {
         return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
       },
     });
     faceMesh.setOptions({
-      // enableFaceGeometry: true,
-
       maxNumFaces: 1,
       refineLandmarks: true,
       minDetectionConfidence: 0.5,
@@ -109,10 +113,10 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
       });
       camera.start();
     }
-  }, []);
+  });
 
   return (
-    <Paper className={styles.paper}>
+    <Paper className={styles.paper} key="self">
       <Typography variant="h5" gutterBottom>
         {name || ''}
       </Typography>
@@ -127,7 +131,11 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           style={{ display: 'none' }}
         />
         {/* REMOVE CANVAS, ^ Webcam may not be necessary  */}
-        <Canvas canvasRef={canvasRef} styles={styles} />
+        <Canvas
+          canvasRef={canvasRef}
+          styles={styles}
+          // style={{ display: 'none' }}
+        />
       </Grid>
     </Paper>
   );
@@ -135,7 +143,7 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
 
 export const OtherVideoFrame = ({ styles, videoRef, name }) => {
   return (
-    <Paper className={styles.paper}>
+    <Paper className={styles.paper} key="other">
       <Typography variant="h5" gutterBottom>
         {name || ''}
       </Typography>

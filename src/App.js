@@ -6,14 +6,9 @@ import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import VideoPlayer from './components/VideoPlayer.jsx';
 import Notifications from './components/Notifications.jsx';
-import Sidebar from './components/Sidebar.jsx'
-import Home from './routes/Home.jsx';  
-import {
-  Route,
-  NavLink,
-  BrowserRouter,
-  Routes
-} from "react-router-dom";
+import Sidebar from './components/Sidebar.jsx';
+import Home from './routes/Home.jsx';
+import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
 const useStyles = makeStyles((theme) => ({
   appBar: {
     borderRadius: 15,
@@ -46,8 +41,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path = '/' element={<Home />} />
-        <Route path ="/room/:roomID" element={<VideoPlayer />} />
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/room/:roomID"
+          element={<VideoPlayer key="videoPlayer" />}
+        />
       </Routes>
     </BrowserRouter>
   );

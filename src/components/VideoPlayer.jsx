@@ -61,13 +61,12 @@ function VideoPlayer() {
   const socketRef = useRef();
   socketRef.current = socket;
   useEffect(() => {
-    // socketRef.current = io.connect('http://localhost:3002');
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
         stream.current = currentStream;
-        // setStream(currentStream);
         //plays video in steam
+        console.log('myVideo :>> ', myVideo);
         myVideo.current.srcObject = currentStream;
         socketRef.current.emit('joined room', roomID);
         // person who joins connects to other peers
@@ -110,6 +109,9 @@ function VideoPlayer() {
           const item = peersRef.current.find((p) => p.peerID === data.id);
           item.peer.signal(data.signal);
         });
+      })
+      .catch((err) => {
+        console.log('error in getting stream', err);
       });
 
     socket.on('me', (id) => setMe(id));
@@ -183,19 +185,22 @@ function VideoPlayer() {
   //   })
   // }, [])
   // console.log(peers)
+  console.log('videoPlayer running');
   return (
     <div>
       <Grid container className={classes.gridContainer}>
         {/* Make normal */}
-        {stream && (
+        {
           <VideoFrame
+            key="videoFrame"
             name={name}
+            userStream={stream}
             videoRef={myVideo}
             // TODO: remove canvasRef
             canvasRef={myVideoModified}
             styles={classes}
           />
-        )}
+        }
         {peers.map((peer, index) => (
           <OtherVideoFrame
             name="other person"
