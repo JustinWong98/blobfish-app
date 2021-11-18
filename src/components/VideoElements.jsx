@@ -99,7 +99,7 @@ export const VideoFrame = ({
       minTrackingConfidence: 0.5,
     });
     faceMesh.onResults(onResults);
-
+    console.log('videoRef.current :>> ', videoRef.current);
     if (
       typeof videoRef.current.srcObject !== 'undefined' &&
       videoRef.current.srcObject !== null
@@ -130,12 +130,7 @@ export const VideoFrame = ({
           className={styles.video}
           style={{ display: 'none' }}
         />
-        {/* REMOVE CANVAS, ^ Webcam may not be necessary  */}
-        <Canvas
-          canvasRef={canvasRef}
-          styles={styles}
-          // style={{ display: 'none' }}
-        />
+        <Canvas canvasRef={canvasRef} styles={styles} />
       </Grid>
     </Paper>
   );

@@ -61,6 +61,7 @@ function VideoPlayer() {
   const socketRef = useRef();
   socketRef.current = socket;
   useEffect(() => {
+    console.log('use effect in videoPlayer');
     navigator.mediaDevices
       .getUserMedia({ video: true, audio: true })
       .then((currentStream) => {
@@ -177,14 +178,7 @@ function VideoPlayer() {
     return peer;
   };
   const classes = useStyles();
-  // useEffect(() => {
-  //   socketRef.current = io.connect('http://localhost:3002');
-  //   socketRef.current.emit('joined room', roomID)
-  //   socketRef.current.on('get users', users => {
-  //     console.log('it ran!')
-  //   })
-  // }, [])
-  // console.log(peers)
+
   console.log('videoPlayer running');
   return (
     <div>
