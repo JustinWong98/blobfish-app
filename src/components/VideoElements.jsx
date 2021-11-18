@@ -1,5 +1,8 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
+import { ThreeCanvas } from './cube';
+import { calculateFaceAngle } from './face/angles.mjs';
+import { getFaceWidth, getFaceHeight } from './utils_3d.mjs';
 
 import { FaceMesh } from '@mediapipe/face_mesh';
 import * as Facemesh from '@mediapipe/face_mesh';
@@ -7,7 +10,7 @@ import * as cam from '@mediapipe/camera_utils';
 import * as draw from '@mediapipe/drawing_utils';
 
 const drawConnectors = draw.drawConnectors;
-export const Canvas = ({ canvasRef, styles }) => {
+export const VidCanvas = ({ canvasRef, styles }) => {
   return (
     <canvas
       ref={canvasRef}
@@ -18,7 +21,21 @@ export const Canvas = ({ canvasRef, styles }) => {
     ></canvas>
   );
 };
-export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
+export const VideoFrame = ({
+  name,
+  videoRef,
+  canvasRef,
+  styles,
+  threeCanvasRef,
+}) => {
+  const faceWidth = useRef();
+  const faceHeight = useRef();
+  const faceAngles = useRef({
+    pitch: 0,
+    roll: 0,
+    yaw: 0,
+  });
+
   function onResults(results) {
     const vidWidth = videoRef.current.videoWidth;
     const vidHeight = videoRef.current.videoHeight;
@@ -42,9 +59,13 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
 
     if (results.multiFaceLandmarks) {
       for (const landmarks of results.multiFaceLandmarks) {
-        // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
-
-        // drawPolylineFromLandMark(landmarks);
+        const { angle, matrix } = calculateFaceAngle(landmarks, [
+          vidWidth,
+          vidHeight,
+        ]);
+        faceWidth.current = getFaceWidth(landmarks, vidWidth, vidHeight);
+        faceHeight.current = getFaceHeight(landmarks, vidWidth, vidHeight);
+        faceAngles.current = angle;
 
         drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_TESSELATION, {
           color: '#C0C0C070',
@@ -93,7 +114,6 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
       minTrackingConfidence: 0.5,
     });
     faceMesh.onResults(onResults);
-    console.log('videoRef.current :>> ', videoRef.current);
     if (
       typeof videoRef.current.srcObject !== 'undefined' &&
       videoRef.current.srcObject !== null
@@ -124,7 +144,14 @@ export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
           className={styles.video}
           style={{ display: 'none' }}
         />
-        <Canvas canvasRef={canvasRef} styles={styles} />
+        <VidCanvas canvasRef={canvasRef} styles={styles} />
+        <ThreeCanvas
+          threeCanvasRef={threeCanvasRef}
+          styles={styles}
+          faceWidth={faceWidth}
+          faceHeight={faceHeight}
+          faceAngles={faceAngles}
+        />
       </Grid>
     </Paper>
   );

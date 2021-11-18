@@ -10,15 +10,9 @@ const CubeHead = ({ faceWidth, faceHeight, faceAngles }) => {
   const myMesh = useRef();
 
   useFrame(({}) => {
-    console.log('faceAngles :>> ', faceAngles);
-    // const a = clock.getElapsedTime();
-    // myMesh.current.rotation.x = a;
     myMesh.current.rotation.x = faceAngles.current.pitch * 1.5; //up down tilt
     myMesh.current.rotation.y = -faceAngles.current.yaw * 1.5;
     myMesh.current.rotation.z = -faceAngles.current.roll * 0.5; //left right tilt
-    // myMesh.current.rotation.x = faceAngles.current.pitch * 1.2;
-    // myMesh.current.rotation.y = -faceAngles.current.yaw * 1;
-    // myMesh.current.rotation.z = faceAngles.current.roll * 1.7;
   });
 
   return (
@@ -69,12 +63,19 @@ const CubeHead = ({ faceWidth, faceHeight, faceAngles }) => {
   );
 };
 
-export const ThreeCanvas = ({ styles, faceWidth, faceHeight, faceAngles }) => {
+export const ThreeCanvas = ({
+  threeCanvasRef,
+  styles,
+  faceWidth,
+  faceHeight,
+  faceAngles,
+}) => {
   console.log('running three');
   console.log('faceAngles in Three canvas :>> ', faceAngles);
+  console.log('threeCavasRef :>> ', threeCanvasRef);
   return (
     <div id="canvas-container" className={styles.video}>
-      <Canvas>
+      <Canvas ref={threeCanvasRef}>
         <ambientLight intensity={0.1} />
         <directionalLight color="white" position={[0, 0, 5]} />
         <orthographicCamera makeDefault position={[0, 0, 0]} zoom={0} />

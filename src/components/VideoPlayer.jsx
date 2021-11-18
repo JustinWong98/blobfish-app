@@ -41,7 +41,6 @@ const useStyles = makeStyles((theme) => ({
 
 function VideoPlayer() {
   const { roomID } = useParams();
-  // const [stream, setStream] = useState();
   const [me, setMe] = useState('');
   const [call, setCall] = useState({});
   const [callAccepted, setCallAccepted] = useState(false);
@@ -56,9 +55,12 @@ function VideoPlayer() {
   const myVideo = useRef();
   const myVideoModified = useRef();
   const userVideo = useRef();
+  const threeCanvasRef = useRef();
   const connectionRef = useRef();
   const socketRef = useRef();
   socketRef.current = socket;
+
+  console.log('threeCanvasRef :>> ', threeCanvasRef);
   useEffect(() => {
     console.log('use effect in videoPlayer');
     navigator.mediaDevices
@@ -124,14 +126,17 @@ function VideoPlayer() {
   // when we create a new peer, the signal event fires, we capture the signal and send it down to each individual
   const createPeer = (userToSignal, callerID, userStream) => {
     const audioTrack = userStream.getAudioTracks();
-    const userModStream = myVideoModified.current.captureStream();
-    console.log('send user stream create peer', userModStream);
+    const user3DStream = threeCanvasRef.current.captureStream();
 
-    userModStream.addTrack(audioTrack[0]);
+    // const userModStream = myVideoModified.current.captureStream();
+    // console.log('send user stream create peer', userModStream);
+
+    user3DStream.addTrack(audioTrack[0]);
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: userModStream,
+      stream: user3DStream,
+      // stream: userModStream,
     });
 
     peer.on('signal', (signal) => {
@@ -152,13 +157,15 @@ function VideoPlayer() {
   const addPeer = (incomingSignal, callerID, userStream) => {
     // when a peer's initiator is false, they only signal when they receive a signal
     const audioTrack = userStream.getAudioTracks();
-    const userModStream = myVideoModified.current.captureStream();
-    console.log('send user stream from addPeer', userModStream);
-    userModStream.addTrack(audioTrack[0]);
+    const user3DStream = threeCanvasRef.current.captureStream();
+    // const userModStream = myVideoModified.current.captureStream();
+    console.log('send user stream from addPeer', user3DStream);
+    user3DStream.addTrack(audioTrack[0]);
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      stream: userModStream,
+      stream: user3DStream,
+      // stream: userModStream,
     });
     console.log('callerId from add peer :>> ', callerID);
 
@@ -182,13 +189,13 @@ function VideoPlayer() {
   return (
     <div>
       <Grid container className={classes.gridContainer}>
-        {/* Make normal */}
         {
           <VideoFrame
             key="videoFrame"
             name={name}
             videoRef={myVideo}
             canvasRef={myVideoModified}
+            threeCanvasRef={threeCanvasRef}
             styles={classes}
           />
         }
