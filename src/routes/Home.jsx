@@ -1,19 +1,11 @@
-import logo from './logo.svg';
-import './App.css';
 import React from 'react';
 import { render } from 'react-dom';
 import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import VideoPlayer from './components/VideoPlayer.jsx';
-import Notifications from './components/Notifications.jsx';
-import Sidebar from './components/Sidebar.jsx'
-import Home from './routes/Home.jsx';  
-import {
-  Route,
-  NavLink,
-  BrowserRouter,
-  Routes
-} from "react-router-dom";
+import VideoPlayer from '../components/VideoPlayer.jsx';
+import Notifications from '../components/Notifications.jsx';
+import Sidebar from '../components/Sidebar.jsx'
+
 const useStyles = makeStyles((theme) => ({
   appBar: {
     borderRadius: 15,
@@ -39,18 +31,21 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
 }));
-
-function App() {
+function Home() {
   const classes = useStyles();
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path = '/' element={<Home />} />
-        <Route path ="/room/:roomID" element={<VideoPlayer />} />
-      </Routes>
-    </BrowserRouter>
+    <div className={classes.wrapper}>
+      <AppBar position="static" color="inherit" className={classes.appBar}>
+        <Typography variant="h2" align="center">
+          {' '}
+          Blobfish Chat
+        </Typography>
+      </AppBar>
+      {/* <VideoPlayer /> */}
+      <Sidebar />
+    </div>
   );
 }
 
-export default App;
+export default Home;
