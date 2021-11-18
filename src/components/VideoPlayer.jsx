@@ -187,9 +187,7 @@ function VideoPlayer() {
           <VideoFrame
             key="videoFrame"
             name={name}
-            userStream={stream}
             videoRef={myVideo}
-            // TODO: remove canvasRef
             canvasRef={myVideoModified}
             styles={classes}
           />

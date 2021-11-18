@@ -18,13 +18,7 @@ export const Canvas = ({ canvasRef, styles }) => {
     ></canvas>
   );
 };
-export const VideoFrame = ({
-  name,
-  userStream,
-  videoRef,
-  canvasRef,
-  styles,
-}) => {
+export const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
   function onResults(results) {
     const vidWidth = videoRef.current.videoWidth;
     const vidHeight = videoRef.current.videoHeight;
