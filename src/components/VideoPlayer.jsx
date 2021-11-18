@@ -1,15 +1,21 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { SocketContext } from '../SocketContext.js';
-import { FaceMesh } from '@mediapipe/face_mesh';
-import * as Facemesh from '@mediapipe/face_mesh';
-import * as cam from '@mediapipe/camera_utils';
-import * as draw from '@mediapipe/drawing_utils';
-import { calculateFaceAngle } from './face/angles.mjs';
-import { getFaceWidth, getFaceHeight } from './utils_3d.mjs';
-import { ThreeCanvas } from './cube.jsx';
-const drawConnectors = draw.drawConnectors;
+
+import { io } from 'socket.io-client';
+import Peer from 'simple-peer';
+import { useParams } from 'react-router-dom';
+
+import { VideoFrame, OtherVideoFrame } from './VideoElements';
+const BACKEND_URL = 'http://localhost:3002';
+
+const socket = io(BACKEND_URL, {
+  withCredentials: true,
+  // rejectUnauthorized: false,
+});
+socket.on('connect_error', (err) => {
+  console.log(`connect_error due to ${err.message}`);
+});
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -33,212 +39,168 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const VideoCanvas = ({ canvasRef, styles }) => {
-  return (
-    <canvas
-      ref={canvasRef}
-      className={styles.video}
-      style={{
-        zindex: 10,
-      }}
-    ></canvas>
-  );
-};
+function VideoPlayer() {
+  const { roomID } = useParams();
+  // const [stream, setStream] = useState();
+  const [me, setMe] = useState('');
+  const [call, setCall] = useState({});
+  const [callAccepted, setCallAccepted] = useState(false);
+  const [callEnded, setCallEnded] = useState(false);
+  const [name, setName] = useState('');
+  const [peers, setPeers] = useState([]);
+  // array of peers for people in room
+  const peersRef = useRef([]);
+  const stream = useRef();
 
-// const getXYFromLandmark = (obj, videoRef) => {
-//   const x = obj.x * videoRef.current.width;
-//   const y = obj.y * videoRef.current.height;
-//   const z = obj.z* videoRef.current.width;
-//   return [x, y];
-// };
-
-const VideoFrame = ({ name, videoRef, canvasRef, styles }) => {
-  console.log('running video frame');
-  const faceWidth = useRef();
-  const faceHeight = useRef();
-  const faceAngles = useRef({
-    pitch: 0,
-    roll: 0,
-    yaw: 0,
-  });
-
-  function onResults(results) {
-    const vidWidth = videoRef.current.videoWidth;
-    const vidHeight = videoRef.current.videoHeight;
-
-    canvasRef.current.width = vidWidth;
-    canvasRef.current.height = vidHeight;
-
-    const canvasElement = canvasRef.current;
-
-    const canvasCtx = canvasElement.getContext('2d');
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    canvasCtx.drawImage(
-      results.image,
-      0,
-      0,
-      canvasElement.width,
-      canvasElement.height
-    );
-    // calculateFaceAngle;
-    if (results.multiFaceLandmarks) {
-      for (const landmarks of results.multiFaceLandmarks) {
-        const { angle, matrix } = calculateFaceAngle(landmarks, [
-          vidWidth,
-          vidHeight,
-        ]);
-        faceWidth.current = getFaceWidth(landmarks, vidWidth, vidHeight);
-        faceHeight.current = getFaceHeight(landmarks, vidWidth, vidHeight);
-        faceAngles.current = angle;
-
-        // setFaceAttributes({ faceWidth, faceHeight, faceAngles });
-        // console.log(
-        //   'faceWidth.current, faceHeight.current :>> ',
-        //   faceWidth.current,
-        //   faceHeight.current
-        // );
-        // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
-
-        // drawPolylineFromLandMark(landmarks);
-
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_TESSELATION, {
-          color: '#C0C0C070',
-          lineWidth: 1,
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_EYE, {
-          color: '#FF3030',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_EYEBROW, {
-          color: '#FF3030',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_IRIS, {
-          color: '#FF3030',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_LEFT_EYE, {
-          color: '#30FF30',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_LEFT_EYEBROW, {
-          color: '#30FF30',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_LEFT_IRIS, {
-          color: '#30FF30',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_FACE_OVAL, {
-          color: '#E0E0E0',
-        });
-        drawConnectors(canvasCtx, landmarks, Facemesh.FACEMESH_LIPS, {
-          color: '#E0E0E0',
-        });
-      }
-    }
-    canvasCtx.restore();
-  }
-
+  // use a ref to populate video iframe with the src of stream
+  const myVideo = useRef();
+  const myVideoModified = useRef();
+  const userVideo = useRef();
+  const connectionRef = useRef();
+  const socketRef = useRef();
+  socketRef.current = socket;
   useEffect(() => {
-    console.log('running useeffect in video frame');
-    const faceMesh = new FaceMesh({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      },
-    });
-    faceMesh.setOptions({
-      // enableFaceGeometry: true,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
-    console.log('faceMesh :>> ', faceMesh);
-    faceMesh.onResults(onResults);
-    console.log('videoRef.current :>> ', videoRef.current);
-    if (
-      typeof videoRef.current.srcObject !== 'undefined' &&
-      videoRef.current.srcObject !== null
-    ) {
-      const camera = new cam.Camera(videoRef.current, {
-        onFrame: async () => {
-          await faceMesh.send({ image: videoRef.current });
-        },
-        width: 550,
-        height: 412,
+    console.log('use effect in videoPlayer');
+    navigator.mediaDevices
+      .getUserMedia({ video: true, audio: true })
+      .then((currentStream) => {
+        stream.current = currentStream;
+        //plays video in steam
+        console.log('myVideo :>> ', myVideo);
+        myVideo.current.srcObject = currentStream;
+        socketRef.current.emit('joined room', roomID);
+        // person who joins connects to other peers
+      })
+      .then(() => {
+        socketRef.current.on('get users', (users) => {
+          const peers = [];
+          users.forEach((userID) => {
+            // for each user, create a peer and send in our id and stream
+            const peer = createPeer(
+              userID,
+              socketRef.current.id,
+              stream.current
+            );
+            // peersRef will handle collection of peers (all simple peer logic)
+            peersRef.current.push({
+              peerID: userID,
+              peer,
+            });
+            // setting state of array of peers for rendering purposes
+            peers.push(peer);
+          });
+          setPeers(peers);
+        });
+        // on the receiver end, this fires when a new user joins
+        socketRef.current.on('user joined', ({ signal, callerID }) => {
+          console.log('callId in user joined:>> ', callerID);
+          const peer = addPeer(signal, callerID, stream.current);
+          peersRef.current.push({
+            peerID: callerID,
+            peer,
+          });
+
+          setPeers((users) => [...users, peer]);
+        });
+        // when handshake is complete - receiver gives back a signal
+        socketRef.current.on('receiving returned signal', (data) => {
+          // find peer that we are receiving from since we are going to receive multiple peers.
+          // we loop through the list of peers and match the id of the one trying to signal us
+          const item = peersRef.current.find((p) => p.peerID === data.id);
+          item.peer.signal(data.signal);
+        });
+      })
+      .catch((err) => {
+        console.log('error in getting stream', err);
       });
-      camera.start();
-    }
+
+    socket.on('me', (id) => setMe(id));
+
+    socket.on('callUser', ({ from, name: callerName, signal }) => {
+      setCall({ isReceivingCall: true, from, name: callerName, signal });
+    });
   }, []);
 
-  return (
-    <Paper className={styles.paper}>
-      <Typography variant="h5" gutterBottom>
-        {name || ''}
-      </Typography>
+  // when we create a new peer, the signal event fires, we capture the signal and send it down to each individual
+  const createPeer = (userToSignal, callerID, userStream) => {
+    const audioTrack = userStream.getAudioTracks();
+    const userModStream = myVideoModified.current.captureStream();
+    console.log('send user stream create peer', userModStream);
 
-      <Grid item xs={12} md={12}>
-        <video
-          playsInline
-          ref={videoRef}
-          autoPlay
-          className={styles.video}
-          style={{ display: 'none' }}
-        />
-        <VideoCanvas canvasRef={canvasRef} styles={styles} />
-        <ThreeCanvas
-          styles={styles}
-          // faceAttributes={faceAttributes}
-          faceWidth={faceWidth}
-          faceHeight={faceHeight}
-          faceAngles={faceAngles}
-        />
-      </Grid>
-    </Paper>
-  );
-};
+    userModStream.addTrack(audioTrack[0]);
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: userModStream,
+    });
 
-const OtherVideoFrame = ({ styles, videoRef, name }) => {
-  return (
-    <Paper className={styles.paper}>
-      <Typography variant="h5" gutterBottom>
-        {name || ''}
-      </Typography>
-      <Grid item xs={12} md={12}>
-        <video playsInline ref={videoRef} autoPlay className={styles.video} />
-      </Grid>
-    </Paper>
-  );
-};
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('sending signal', {
+        userToSignal,
+        callerID,
+        signal,
+      });
+    });
+    peer.on('stream', (currentStream) => {
+      console.log('getting stream from receiver :>> ', currentStream);
+      userVideo.current.srcObject = currentStream;
+    });
+    return peer;
+  };
 
-function VideoPlayer() {
-  const {
-    name,
-    callAccepted,
-    myVideo,
-    myVideoModified,
-    userVideo,
-    callEnded,
-    stream,
-    call,
-  } = useContext(SocketContext);
+  // incomingSignal is sent when new person comes into room, users wait for that signal before firing off their own signal back to the initiator(the one who joined the room)
+  const addPeer = (incomingSignal, callerID, userStream) => {
+    // when a peer's initiator is false, they only signal when they receive a signal
+    const audioTrack = userStream.getAudioTracks();
+    const userModStream = myVideoModified.current.captureStream();
+    console.log('send user stream from addPeer', userModStream);
+    userModStream.addTrack(audioTrack[0]);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: userModStream,
+    });
+    console.log('callerId from add peer :>> ', callerID);
+
+    peer.on('signal', (signal) => {
+      // sends back to the server and then back to the callerID to complete handshake
+      socketRef.current.emit('returning signal', { signal, callerID });
+    });
+
+    peer.on('stream', (currentStream) => {
+      console.log('getting stream from new peer :>> ', currentStream);
+      userVideo.current.srcObject = currentStream;
+    });
+    // fires the above event to fire
+    peer.signal(incomingSignal);
+
+    return peer;
+  };
   const classes = useStyles();
 
+  console.log('videoPlayer running');
   return (
     <div>
       <Grid container className={classes.gridContainer}>
         {/* Make normal */}
-        {stream && (
+        {
           <VideoFrame
+            key="videoFrame"
             name={name}
+            userStream={stream}
             videoRef={myVideo}
             // TODO: remove canvasRef
             canvasRef={myVideoModified}
             styles={classes}
           />
-        )}
-        {callAccepted && !callEnded && (
+        }
+        {peers.map((peer, index) => (
           <OtherVideoFrame
-            name={call.name}
+            name="other person"
             videoRef={userVideo}
             styles={classes}
           />
-        )}
+        ))}
       </Grid>
     </div>
   );
