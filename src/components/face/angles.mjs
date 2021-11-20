@@ -69,11 +69,6 @@ export const calculateFaceAngle = (face, imageSize) => {
       yaw: radians(mesh[33].x, mesh[33].z, mesh[263].x, mesh[263].z), // looking at x,z of outside corners of leftEye and rightEye
       // roll is face lean left/right
       roll: radians(mesh[33].x, mesh[33].y, mesh[263].x, mesh[263].y), // looking at x,y of outside corners of leftEye and rightEye
-      // pitch: radians(mesh[10][1], mesh[10][2], mesh[152][1], mesh[152][2]), // looking at y,z of top and bottom points of the face
-      // // yaw is face turn left/right
-      // yaw: radians(mesh[33][0], mesh[33][2], mesh[263][0], mesh[263][2]), // looking at x,z of outside corners of leftEye and rightEye
-      // // roll is face lean left/right
-      // roll: radians(mesh[33][0], mesh[33][1], mesh[263][0], mesh[263][1]), // looking at x,y of outside corners of leftEye and rightEye
     };
     return angle;
   };
@@ -87,36 +82,17 @@ export const calculateFaceAngle = (face, imageSize) => {
       angle: { pitch: 0, yaw: 0, roll: 0 },
       matrix: [1, 0, 0, 0, 1, 0, 0, 0, 1],
     };
-  // console.log(
-  //   'mesh[152].y - mesh[10].y) * imageSize[1] :>> ',
-  //   (mesh[152].y - mesh[10].y) * imageSize[1]
-  // );
-  // console.log(
-  //   '(mesh[454] - mesh[234]) * imageSize[0] :>> ',
-  //   (mesh[454].x - mesh[234].x) * imageSize[0]
-  // );
 
   const size = Math.max(
     getFaceWidth(face, imageSize[0], imageSize[1]) * 1.5,
     getFaceHeight(face, imageSize[0], imageSize[1])
   );
-  // const size = Math.max(
-  //   (mesh[152].y - mesh[10].y) * imageSize[1],
-  //   (mesh[454].x - mesh[234].x) * imageSize[0]
-  // );
-  //   Math.max(face.boxRaw[2] * imageSize[0], face.boxRaw[3] * imageSize[1]) /
-  //   1.5;
   // top, bottom, left, right
   const pts = [mesh[10], mesh[152], mesh[234], mesh[454]].map((pt) => [
     // make the xyz coordinates proportional, independent of the image/box size
-    // pt[0] * imageSize[0],
-    // pt[1] * imageSize[1],
     (pt.x * imageSize[0]) / size,
     (pt.y * imageSize[1]) / size,
     pt.z,
-    // (pt[0] * imageSize[0]) / size,
-    // (pt[1] * imageSize[1]) / size,
-    // pt[2],
   ]);
 
   const y_axis = normalize(subVectors(pts[1], pts[0]));
@@ -139,7 +115,6 @@ export const calculateFaceAngle = (face, imageSize) => {
     z_axis[2],
   ];
   const angle = rotationMatrixToEulerAngle(matrix);
-  // const angle = meshToEulerAngle(mesh);
 
   return { angle, matrix };
 };
