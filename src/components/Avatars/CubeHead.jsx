@@ -63,15 +63,14 @@ export const CubeHead = ({
   rightEyeOpening,
   mouthDim,
 }) => {
-  console.log('leftEyeOpening.current :>> ', leftEyeOpening.current);
-  console.log('rightEyeOpening.current :>> ', rightEyeOpening.current);
-
   const leftEye = useRef();
   const rightEye = useRef();
   const mouthRef = useRef();
 
   useFrame((state, delta) => {
-    console.log('delta :>> ', delta * 1000);
+    // console.log('delta :>> ', delta * 1000);
+
+    //UPDATE EYES
     leftEye.current.scale.z = 0.3;
     rightEye.current.scale.z = 0.3;
 
@@ -82,23 +81,25 @@ export const CubeHead = ({
       rightEye.current.scale.z = 1 + rightEyeOpening.current;
     }
 
-    //MOUTH
-    const normMouthLength = mouthDim.current.length / (faceWidth.current / 3);
-    const normMouthTopBot =
-      mouthDim.current.topBotHeight / (faceHeight.current / 5);
-    const normMouthMidBot =
-      mouthDim.current.midBotHeight / (faceHeight.current / 6);
+    //UPDATE MOUTH
+    if (mouthRef.current !== undefined) {
+      const normMouthLength = mouthDim.current.length / (faceWidth.current / 3);
+      const normMouthTopBot =
+        mouthDim.current.topBotHeight / (faceHeight.current / 6);
+      const normMouthMidBot =
+        mouthDim.current.midBotHeight / (faceHeight.current / 6);
 
-    const mouthVertices = [
-      // top left bottom right
-      new THREE.Vector2(0, -0.75 * (normMouthMidBot - normMouthTopBot)), // top lip
-      new THREE.Vector2(0.5 * normMouthLength, 0), // left
-      new THREE.Vector2(0, -0.75 * normMouthMidBot - 0.2), // bottom
-      new THREE.Vector2(-0.5 * normMouthLength, 0), // right
-    ];
-    const mouth = new THREE.Shape(mouthVertices);
-    const mouthGeo = new THREE.ShapeGeometry(mouth);
-    mouthRef.current.geometry = mouthGeo;
+      const mouthVertices = [
+        // top left bottom right
+        new THREE.Vector2(0, -1 * (normMouthMidBot - normMouthTopBot)), // top lip
+        new THREE.Vector2(0.5 * normMouthLength, 0), // left
+        new THREE.Vector2(0, -1 * normMouthMidBot - 0.1), // bottom
+        new THREE.Vector2(-0.5 * normMouthLength, 0), // right
+      ];
+      const mouth = new THREE.Shape(mouthVertices);
+      const mouthGeo = new THREE.ShapeGeometry(mouth);
+      mouthRef.current.geometry = mouthGeo;
+    }
   });
 
   return (
