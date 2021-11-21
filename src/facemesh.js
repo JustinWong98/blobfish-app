@@ -30,6 +30,7 @@ export function onResults(results) {
   );
   if (results.multiFaceLandmarks) {
     for (const landmarks of results.multiFaceLandmarks) {
+      // console.log('landmarks :>> ', landmarks);
       // draw.drawLandmarks(canvasCtx, landmarks, { color: '#FF3030' });
 
       // drawPolylineFromLandMark(landmarks);
