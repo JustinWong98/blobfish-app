@@ -128,7 +128,6 @@ function VideoPlayer() {
     const audioTrack = userStream.getAudioTracks();
     const user3DStream = threeCanvasRef.current.captureStream();
 
-    // const userModStream = myVideoModified.current.captureStream();
     // console.log('send user stream create peer', userModStream);
 
     user3DStream.addTrack(audioTrack[0]);
@@ -136,7 +135,6 @@ function VideoPlayer() {
       initiator: true,
       trickle: false,
       stream: user3DStream,
-      // stream: userModStream,
     });
 
     peer.on('signal', (signal) => {
