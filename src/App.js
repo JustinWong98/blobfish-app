@@ -17,6 +17,7 @@ import NavBar from './components/NavBar.jsx';
 import Home from './routes/Home.jsx';
 import { Front } from './routes/Front.jsx';
 import SignUp from './routes/Signup';
+import Login from './routes/Login';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
 
 export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
@@ -72,7 +73,7 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
   const [username, setUsername] = useState(getCookie('username').trim());
   const [userId, setUserId] = useState(Number(getCookie('userId').trim()));
-
+  console.log('setIsLoggedIn :>> ', setIsLoggedIn);
   return (
     <CookiesProvider>
       <ThemeProvider theme={theme}>
@@ -80,9 +81,15 @@ function App() {
           <NavBar />
           <Routes>
             <Route path="/front" element={<Front />} />
-            <Route path="/signup" element={<SignUp />} />
-            {/* <Route path="/login" element={<Login />} />
-        <Route path='/avatar' element ={<Avatar/>}/> */}
+            <Route
+              path="/signup"
+              element={<SignUp setIsLoggedIn={setIsLoggedIn} />}
+            />
+            <Route
+              path="/login"
+              element={<Login setIsLoggedIn={setIsLoggedIn} />}
+            />
+            {/* <Route path='/avatar' element ={<Avatar/>}/> */}
 
             <Route path="/" element={<Home />} />
             <Route

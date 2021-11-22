@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { useCookies } from 'react-cookie';
+import { useNavigate } from 'react-router-dom';
+
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -10,6 +12,7 @@ import { BACKEND_URL } from '../App.js';
 import * as successes from '../modules/successes.mjs';
 import * as errors from '../modules/errors.mjs';
 import * as cookie from '../modules/cookie.mjs';
+import { Typography } from '@mui/material';
 
 const Username = ({ username, setUserName }) => {
   return (
@@ -59,9 +62,7 @@ function SignUp({ isLoggedIn, setIsLoggedIn }) {
   const [username, setUserName] = useState();
   // const [email, setEmail] = useState();
   const [password, setPassword] = useState();
-  console.log('username :>> ', username);
-  // console.log('email :>> ', email);
-  console.log('password :>> ', password);
+  const navigate = useNavigate();
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -91,10 +92,12 @@ function SignUp({ isLoggedIn, setIsLoggedIn }) {
           setPasswordInvalidMessage(passwordInvalid);
           setGlobalErrorMessage(errors.LOGIN_GLOBAL_ERROR_MESSAGE);
         } else {
+          console.log('setIsLoggedIn :>> ', setIsLoggedIn);
           setIsLoggedIn(true);
           setCookie('username', response.data.username, { path: '/' });
           setCookie('userId', response.data.id, { path: '/' });
           setCookie('isLoggedIn', response.data.hashedId, { path: '/' });
+          navigate('/front');
         }
       })
       .catch((e) => {
@@ -114,13 +117,16 @@ function SignUp({ isLoggedIn, setIsLoggedIn }) {
         <Box
           component="form"
           sx={{
-            '& .MuiTextField-root': { mb: 2 },
+            '& .MuiTextField-root': { mt: 2, mb: 2 },
             display: 'flex',
             flexDirection: 'column',
           }}
           noValidate
           autoComplete="off"
         >
+          <Typography variant="body1" color="initial">
+            Sign up
+          </Typography>
           <Username username={username} setUserName={setUserName} />
           {/* <Email email={email} setEmail={setEmail} /> */}
           <Password password={password} setPassword={setPassword} />

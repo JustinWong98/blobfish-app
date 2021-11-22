@@ -1,10 +1,11 @@
 import { useRef, useEffect, useState } from 'react';
 import Container from '@mui/material/Container';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Grid, Typography, Paper } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 import { useNavigate } from 'react-router-dom';
 import { VideoFrame } from '../components/VideoElements.jsx';
 import Button from '@mui/material/Button';
+import { Typography } from '@mui/material';
 
 const useStyles = makeStyles((theme) => ({
   video: {
@@ -87,10 +88,13 @@ export const Front = () => {
   return (
     // <Container =
     <div>
-      <Container maxWidth="md" className>
+      <Container maxWidth="md" className="mt-2">
+        <Typography variant="h5" color="initial">
+          BlobFish chat
+        </Typography>
         <VideoFrame
           key="videoFrame"
-          name={'Welcome to blobfish chat'}
+          name={''}
           videoRef={myVideo}
           canvasRef={myVideoModified}
           threeCanvasRef={threeCanvasRef}
