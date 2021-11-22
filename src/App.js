@@ -1,10 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-import React from 'react';
-import { render } from 'react-dom';
+import React, { useState } from 'react';
+import { CookiesProvider } from 'react-cookie';
 import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { hasLoginCookie, getCookie } from './modules/cookie.mjs';
 
 // import { theme } from './modules/theme.mjs';
 
@@ -17,6 +18,9 @@ import Home from './routes/Home.jsx';
 import { Front } from './routes/Front.jsx';
 import SignUp from './routes/Signup';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
+
+export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
+
 const useStyles = makeStyles((theme) => ({
   // appBar: {
   //   borderRadius: 15,
@@ -65,25 +69,30 @@ const theme = createTheme({
 
 function App() {
   const classes = useStyles();
+  const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
+  const [username, setUsername] = useState(getCookie('username').trim());
+  const [userId, setUserId] = useState(Number(getCookie('userId').trim()));
 
   return (
-    <ThemeProvider theme={theme}>
-      <BrowserRouter>
-        <NavBar />
-        <Routes>
-          <Route path="/front" element={<Front />} />
-          <Route path="/signup" element={<SignUp />} />
-          {/* <Route path="/login" element={<Login />} />
+    <CookiesProvider>
+      <ThemeProvider theme={theme}>
+        <BrowserRouter>
+          <NavBar />
+          <Routes>
+            <Route path="/front" element={<Front />} />
+            <Route path="/signup" element={<SignUp />} />
+            {/* <Route path="/login" element={<Login />} />
         <Route path='/avatar' element ={<Avatar/>}/> */}
 
-          <Route path="/" element={<Home />} />
-          <Route
-            path="/room/:roomID"
-            element={<VideoPlayer key="videoPlayer" />}
-          />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+            <Route path="/" element={<Home />} />
+            <Route
+              path="/room/:roomID"
+              element={<VideoPlayer key="videoPlayer" />}
+            />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </CookiesProvider>
   );
 }
 

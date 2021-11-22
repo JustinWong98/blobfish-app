@@ -13,16 +13,15 @@ export const getCookie = (cname) => {
   }
   return '';
 };
-
 export const hasLoginCookie = () => {
   if (
-    getCookie('loggedIn').trim() === ''
-    && getCookie('session').trim() === ''
-    && getCookie('userSession').trim() === ''
-    && getCookie('userId').trim() === ''
-    && getCookie('realName').trim() === ''
-    && getCookie('username').trim() === ''
-    && getCookie('description').trim() === ''
+    getCookie('loggedIn').trim() === '' &&
+    getCookie('session').trim() === '' &&
+    getCookie('userSession').trim() === '' &&
+    getCookie('userId').trim() === '' &&
+    getCookie('realName').trim() === '' &&
+    getCookie('username').trim() === '' &&
+    getCookie('description').trim() === ''
   ) {
     return false;
   }
