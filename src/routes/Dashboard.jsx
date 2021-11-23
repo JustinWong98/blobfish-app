@@ -1,8 +1,8 @@
 import { useRef, useEffect, useState } from 'react';
 import { VideoFrame } from '../components/VideoElements';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Typography, Container, Box, Grid } from '@mui/material';
 import CreateRoom from './CreateRoom';
+import RoomList from '../components/RoomsList';
 
 function Dashboard({ isLoggedIn, username }) {
   const myVideo = useRef();
@@ -34,11 +34,11 @@ function Dashboard({ isLoggedIn, username }) {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <Typography variant="h3" color="initial">
-              {username}
+              {username}'s video chat
             </Typography>
           </Grid>
           <Grid item xs={12} md={8} lg={6}>
-            {/* <VideoFrame
+            <VideoFrame
               key="videoFrame"
               name={''}
               videoRef={myVideo}
@@ -46,11 +46,17 @@ function Dashboard({ isLoggedIn, username }) {
               threeCanvasRef={threeCanvasRef}
               // styles={classes}
               videoIsSet={videoIsSet}
-            /> */}
+            />
           </Grid>
           <Grid item xs={12} md={8} lg={6}>
+            <Typography variant="h5" color="initial">
+              New room
+            </Typography>
             <CreateRoom username={username} />
-            <div style={{ 'background-color': 'yellow' }}>fafs</div>
+            <Typography variant="h5" color="initial">
+              Rooms
+            </Typography>
+            <RoomList />
           </Grid>
         </Grid>
       </Container>

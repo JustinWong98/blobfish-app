@@ -167,9 +167,6 @@ export const VideoFrame = ({
 
   return (
     <Grid item xs={12} md={12}>
-      <Typography variant="h5" gutterBottom>
-        {name || ''}
-      </Typography>
       <Paper className={styles.paper} key="self">
         <video
           playsInline
@@ -194,6 +191,9 @@ export const VideoFrame = ({
             className={'align-middle'}
           />
         )}
+        <Typography variant="h5" gutterBottom className="text-center">
+          {name || ''}
+        </Typography>
       </Paper>
     </Grid>
   );
@@ -203,12 +203,12 @@ export const OtherVideoFrame = ({ videoRef, name }) => {
   const styles = videoStyles();
   return (
     <Paper className={styles.paper} key="other">
+      <Grid item xs={12} md={12} className={'m-2'}>
+        <video playsInline ref={videoRef} autoPlay className={styles.video} />
+      </Grid>
       <Typography variant="h5" gutterBottom>
         {name || ''}
       </Typography>
-      <Grid item xs={12} md={12}>
-        <video playsInline ref={videoRef} autoPlay className={styles.video} />
-      </Grid>
     </Paper>
   );
 };

@@ -39,19 +39,7 @@ function CreateRoom({ username }) {
   }
   console.log('cookies.userId :>> ', cookies.userId);
   return (
-    <Box
-      component="form"
-      sx={{
-        '& .MuiTextField-root': { mt: 2, mb: 2 },
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-      noValidate
-      autoComplete="off"
-    >
-      <Typography variant="body1" color="initial">
-        Video chat room
-      </Typography>
+    <div>
       <TextField
         id="Room name"
         label="Room name"
@@ -71,7 +59,7 @@ function CreateRoom({ username }) {
       >
         Create a Room
       </Button>
-    </Box>
+    </div>
   );
 }
 

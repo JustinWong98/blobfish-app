@@ -9,7 +9,7 @@ import { hasLoginCookie, getCookie } from './modules/cookie.mjs';
 
 // import { theme } from './modules/theme.mjs';
 
-import VideoPlayer from './components/VideoPlayer.jsx';
+import Room from './components/Room.jsx';
 import Notifications from './components/Notifications.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import NavBar from './components/NavBar.jsx';
@@ -111,7 +111,7 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route
               path="/room/:roomID"
-              element={<VideoPlayer key="videoPlayer" />}
+              element={<Room key="videoPlayer" username={username} />}
             />
           </Routes>
         </BrowserRouter>

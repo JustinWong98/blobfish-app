@@ -1,7 +1,9 @@
 import { makeStyles } from '@material-ui/core/styles';
+import { borderBottom } from '@mui/system';
 
 export const videoStyles = makeStyles((theme) => ({
   video: {
+    // borderBottom: '1px solid black',
     width: '100%',
     height: 'auto',
     // width: '550px',
@@ -12,6 +14,7 @@ export const videoStyles = makeStyles((theme) => ({
     // },
   },
   avatar: {
+    // borderBottom: '1px solid black',
     height: '412px',
     [theme.breakpoints.down('xs')]: {
       height: '225px',
@@ -24,8 +27,8 @@ export const videoStyles = makeStyles((theme) => ({
     },
   },
   paper: {
-    padding: '10px',
     border: '2px solid black',
+    padding: '10px',
     margin: '10px',
   },
 }));

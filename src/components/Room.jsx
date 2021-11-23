@@ -26,13 +26,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function VideoPlayer() {
+function Room({ username }) {
   const { roomID } = useParams();
   const [me, setMe] = useState('');
   const [call, setCall] = useState({});
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
-  const [name, setName] = useState('');
   const [peers, setPeers] = useState([]);
   // array of peers for people in room
   const peersRef = useRef([]);
@@ -180,7 +179,7 @@ function VideoPlayer() {
         <Grid item xs={4}>
           <VideoFrame
             key="videoFrame"
-            name={name}
+            name={username}
             videoRef={myVideo}
             canvasRef={myVideoModified}
             threeCanvasRef={threeCanvasRef}
@@ -188,13 +187,14 @@ function VideoPlayer() {
             videoIsSet={videoIsSet}
           />
         </Grid>
-
-        {peers.map((peer, index) => (
-          <OtherVideoFrame name="other person" videoRef={userVideo} />
-        ))}
+        <Grid item xs={4}>
+          {peers.map((peer, index) => (
+            <OtherVideoFrame name="other person" videoRef={userVideo} />
+          ))}
+        </Grid>
       </Grid>
     </div>
   );
 }
 
-export default VideoPlayer;
+export default Room;
