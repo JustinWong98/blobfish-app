@@ -53,7 +53,7 @@ const Password = ({ password, setPassword }) => {
     />
   );
 };
-function SignUp({ isLoggedIn, setIsLoggedIn }) {
+function SignUp({ isLoggedIn, setIsLoggedIn, setUsername }) {
   const [cookies, setCookie] = useCookies(['userId', 'isLoggedIn', 'username']);
   const [globalErrorMessage, setGlobalErrorMessage] = useState('');
   const [usernameInvalidMessage, setUsernameInvalidMessage] = useState('');
@@ -93,11 +93,12 @@ function SignUp({ isLoggedIn, setIsLoggedIn }) {
           setGlobalErrorMessage(errors.LOGIN_GLOBAL_ERROR_MESSAGE);
         } else {
           console.log('setIsLoggedIn :>> ', setIsLoggedIn);
+          setUsername(response.data.username);
           setIsLoggedIn(true);
           setCookie('username', response.data.username, { path: '/' });
           setCookie('userId', response.data.id, { path: '/' });
           setCookie('isLoggedIn', response.data.hashedId, { path: '/' });
-          navigate('/front');
+          navigate('/dashboard');
         }
       })
       .catch((e) => {

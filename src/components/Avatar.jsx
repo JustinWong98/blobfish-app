@@ -1,5 +1,7 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
+import { videoStyles } from '../modules/useStyles.jsx';
+
 import * as THREE from 'three';
 import { CubeHead } from './Avatars/CubeHead';
 // import { OrthographicCamera } from 'three';
@@ -41,8 +43,8 @@ const Avatar = ({
 };
 
 export const ThreeCanvas = ({
+  canvasRef,
   threeCanvasRef,
-  styles,
   faceWidth,
   faceHeight,
   faceAngles,
@@ -50,11 +52,11 @@ export const ThreeCanvas = ({
   rightEyeOpening,
   mouthDim,
 }) => {
+  const styles = videoStyles();
+
   console.log('running three');
-  console.log('faceAngles in Three canvas :>> ', faceAngles);
-  console.log('threeCavasRef :>> ', threeCanvasRef);
   return (
-    <div id="canvas-container" className={styles.video}>
+    <div id="canvas-container" className={styles.avatar}>
       <Canvas ref={threeCanvasRef}>
         <ambientLight intensity={0.1} />
         <directionalLight color="white" position={[0, 0, 5]} />

@@ -9,7 +9,7 @@ import { hasLoginCookie, getCookie } from './modules/cookie.mjs';
 
 // import { theme } from './modules/theme.mjs';
 
-import VideoPlayer from './components/VideoPlayer.jsx';
+import Room from './components/Room.jsx';
 import Notifications from './components/Notifications.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import NavBar from './components/NavBar.jsx';
@@ -18,6 +18,7 @@ import Home from './routes/Home.jsx';
 import { Front } from './routes/Front.jsx';
 import SignUp from './routes/Signup';
 import Login from './routes/Login';
+import Dashboard from './routes/Dashboard';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
 
 export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
@@ -83,18 +84,34 @@ function App() {
             <Route path="/front" element={<Front />} />
             <Route
               path="/signup"
-              element={<SignUp setIsLoggedIn={setIsLoggedIn} />}
+              element={
+                <SignUp
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUsername={setUsername}
+                />
+              }
             />
             <Route
               path="/login"
-              element={<Login setIsLoggedIn={setIsLoggedIn} />}
+              element={
+                <Login
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUsername={setUsername}
+                />
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={
+                <Dashboard isLoggedIn={isLoggedIn} username={username} />
+              }
             />
             {/* <Route path='/avatar' element ={<Avatar/>}/> */}
 
             <Route path="/" element={<Home />} />
             <Route
               path="/room/:roomID"
-              element={<VideoPlayer key="videoPlayer" />}
+              element={<Room key="videoPlayer" username={username} />}
             />
           </Routes>
         </BrowserRouter>

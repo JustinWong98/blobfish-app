@@ -1,5 +1,6 @@
 import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
+import { videoStyles } from '../modules/useStyles.jsx';
 import { ThreeCanvas } from './Avatar';
 import { calculateFaceAngle } from './face/angles.mjs';
 import {
@@ -64,9 +65,10 @@ export const VideoFrame = ({
   name,
   videoRef,
   canvasRef,
-  styles,
+  videoIsSet,
   threeCanvasRef,
 }) => {
+  const styles = videoStyles();
   const faceWidth = useRef();
   const faceHeight = useRef();
   const faceAngles = useRef({
@@ -127,12 +129,6 @@ export const VideoFrame = ({
           vidHeight
         );
         mouthDim.current = mouthDimensions(landmarks, vidWidth, vidHeight);
-        // console.log('mouthDim.current :>> ', mouthDim.current);
-        // console.log(
-        //   'leftEyeOpening.current :>> ',
-        //   leftEyeOpenRatio(landmarks, vidWidth, vidHeight)
-        // );
-        // console.log('rightEyeOpening.current :>> ', rightEyeOpening.current);
 
         drawMeshConnectors(canvasCtx, landmarks);
       }
@@ -170,12 +166,8 @@ export const VideoFrame = ({
   });
 
   return (
-    <Paper className={styles.paper} key="self">
-      <Typography variant="h5" gutterBottom>
-        {name || ''}
-      </Typography>
-
-      <Grid item xs={12} md={12}>
+    <Grid item xs={12} md={12}>
+      <Paper className={styles.paper} key="self">
         <video
           playsInline
           ref={videoRef}
@@ -184,31 +176,39 @@ export const VideoFrame = ({
           className={styles.video}
           style={{ display: 'none' }}
         />
-        <VidCanvas canvasRef={canvasRef} styles={styles} />
-        <ThreeCanvas
-          threeCanvasRef={threeCanvasRef}
-          styles={styles}
-          faceWidth={faceWidth}
-          faceHeight={faceHeight}
-          faceAngles={faceAngles}
-          leftEyeOpening={leftEyeOpening}
-          rightEyeOpening={rightEyeOpening}
-          mouthDim={mouthDim}
-        />
-      </Grid>
-    </Paper>
+        {videoIsSet && <VidCanvas canvasRef={canvasRef} styles={styles} />}
+        {videoIsSet && (
+          <ThreeCanvas
+            canvasRef={canvasRef}
+            threeCanvasRef={threeCanvasRef}
+            styles={styles}
+            faceWidth={faceWidth}
+            faceHeight={faceHeight}
+            faceAngles={faceAngles}
+            leftEyeOpening={leftEyeOpening}
+            rightEyeOpening={rightEyeOpening}
+            mouthDim={mouthDim}
+            className={'align-middle'}
+          />
+        )}
+        <Typography variant="h5" gutterBottom className="text-center">
+          {name || ''}
+        </Typography>
+      </Paper>
+    </Grid>
   );
 };
 
-export const OtherVideoFrame = ({ styles, videoRef, name }) => {
+export const OtherVideoFrame = ({ videoRef, name }) => {
+  const styles = videoStyles();
   return (
     <Paper className={styles.paper} key="other">
+      <Grid item xs={12} md={12} className={'m-2'}>
+        <video playsInline ref={videoRef} autoPlay className={styles.video} />
+      </Grid>
       <Typography variant="h5" gutterBottom>
         {name || ''}
       </Typography>
-      <Grid item xs={12} md={12}>
-        <video playsInline ref={videoRef} autoPlay className={styles.video} />
-      </Grid>
     </Paper>
   );
 };
