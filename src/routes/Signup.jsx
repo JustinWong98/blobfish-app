@@ -98,7 +98,7 @@ function SignUp({ isLoggedIn, setIsLoggedIn, setUsername }) {
           setCookie('username', response.data.username, { path: '/' });
           setCookie('userId', response.data.id, { path: '/' });
           setCookie('isLoggedIn', response.data.hashedId, { path: '/' });
-          navigate('/front');
+          navigate('/dashboard');
         }
       })
       .catch((e) => {

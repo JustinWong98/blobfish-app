@@ -177,7 +177,7 @@ function VideoPlayer() {
   return (
     <div>
       <Grid container className={classes.gridContainer}>
-        {
+        <Grid item xs={4}>
           <VideoFrame
             key="videoFrame"
             name={name}
@@ -187,7 +187,8 @@ function VideoPlayer() {
             styles={classes}
             videoIsSet={videoIsSet}
           />
-        }
+        </Grid>
+
         {peers.map((peer, index) => (
           <OtherVideoFrame name="other person" videoRef={userVideo} />
         ))}

@@ -102,7 +102,9 @@ function App() {
             />
             <Route
               path="/dashboard"
-              element={<Dashboard isLoggedIn={isLoggedIn} />}
+              element={
+                <Dashboard isLoggedIn={isLoggedIn} username={username} />
+              }
             />
             {/* <Route path='/avatar' element ={<Avatar/>}/> */}
 

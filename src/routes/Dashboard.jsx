@@ -2,8 +2,9 @@ import { useRef, useEffect, useState } from 'react';
 import { VideoFrame } from '../components/VideoElements';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Typography, Container, Box, Grid } from '@mui/material';
+import CreateRoom from './CreateRoom';
 
-function Dashboard() {
+function Dashboard({ isLoggedIn, username }) {
   const myVideo = useRef();
   const myVideoModified = useRef();
   const threeCanvasRef = useRef();
@@ -29,38 +30,30 @@ function Dashboard() {
 
   return (
     <>
-      {/* <Container maxWidth="lg" className="border-2 p-8 m-4 rounded-md"> */}
-      <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12}>
-          <Typography variant="body1" color="initial">
-            Dashboard
-          </Typography>
+      <Container maxWidth="lg" className="border-2 p-8 m-4 rounded-md">
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h3" color="initial">
+              {username}
+            </Typography>
+          </Grid>
+          <Grid item xs={12} md={8} lg={6}>
+            {/* <VideoFrame
+              key="videoFrame"
+              name={''}
+              videoRef={myVideo}
+              canvasRef={myVideoModified}
+              threeCanvasRef={threeCanvasRef}
+              // styles={classes}
+              videoIsSet={videoIsSet}
+            /> */}
+          </Grid>
+          <Grid item xs={12} md={8} lg={6}>
+            <CreateRoom username={username} />
+            <div style={{ 'background-color': 'yellow' }}>fafs</div>
+          </Grid>
         </Grid>
-        <Grid item xs={12} md={8} lg={6}>
-          <VideoFrame
-            key="videoFrame"
-            name={''}
-            videoRef={myVideo}
-            canvasRef={myVideoModified}
-            threeCanvasRef={threeCanvasRef}
-            // styles={classes}
-            videoIsSet={videoIsSet}
-          />
-        </Grid>
-      </Grid>
-
-      {/* <Box
-          component="form"
-          sx={{
-            '& .MuiTextField-root': { mt: 2, mb: 2 },
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-          noValidate
-          autoComplete="off"
-        > */}
-      {/* </Box> */}
-      {/* </Container> */}
+      </Container>
     </>
   );
 }

@@ -54,17 +54,6 @@ export const ThreeCanvas = ({
 }) => {
   const styles = videoStyles();
 
-  // useEffect(() => {
-  //   console.log('threeCanvasRef.current :>> ', threeCanvasRef.current);
-  //   console.log('canvasRef.current :>> ', canvasRef.current);
-  //   try {
-  //     canvasContainer.current.width = canvasRef.current.width;
-  //     canvasContainer.current.height = canvasRef.current.height;
-  //   } catch (e) {
-  //     console.log('error in loading canvas dimensions to three canvas');
-  //   }
-  // });
-
   console.log('running three');
   return (
     <div id="canvas-container" className={styles.avatar}>

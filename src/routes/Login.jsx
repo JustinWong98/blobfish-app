@@ -87,7 +87,7 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
           setCookie('username', response.data.username, { path: '/' });
           setCookie('userId', response.data.id, { path: '/' });
           setCookie('isLoggedIn', response.data.hashedId, { path: '/' });
-          navigate('/front');
+          navigate('/dashboard');
         }
       })
       .catch((e) => {
@@ -122,7 +122,6 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
             {'Sign up'}
           </Link>
           <Username username={username} setUserName={setUserName} />
-          {/* <Email email={email} setEmail={setEmail} /> */}
           <Password password={password} setPassword={setPassword} />
           <div className=" flex justify-end">
             <Button
