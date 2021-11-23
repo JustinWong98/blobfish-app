@@ -1,9 +1,12 @@
 import { useRef, useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 
 import axios from 'axios';
 import { BACKEND_URL } from '../App.js';
 
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,9 +14,63 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import { Typography, Container, Box, Grid } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
+import {
+  Typography,
+  Container,
+  Box,
+  Grid,
+  Button,
+  IconButton,
+} from '@mui/material';
+
+const RoomButton = ({ uuid }) => {
+  const navigate = useNavigate();
+  const handleClick = (e) => {
+    e.preventDefault();
+    navigate(`/dashboard`);
+    // navigate(`/room/${uuid}`);
+  };
+
+  return (
+    <Button
+      variant="contained"
+      color="secondary"
+      size="small"
+      onClick={handleClick}
+    >
+      Join
+    </Button>
+  );
+};
+
+const DeleteButton = ({ roomId }) => {
+  const navigate = useNavigate();
+  console.log('roomId :>> ', roomId);
+  const handleClick = (e) => {
+    e.preventDefault();
+    axios
+      .delete(`${BACKEND_URL}/rooms/${roomId}`)
+      .then((response) => {
+        console.log('response from deleting room :>> ', response);
+        navigate(`/dashboard`);
+        //TODO GET WHOLE LIST TO RERENDER AFTER DELEING
+      })
+      .catch((e) => {
+        console.log('e from deleting room :>> ', e);
+      });
+  };
+
+  return (
+    <IconButton aria-label="delete" onClick={handleClick}>
+      <DeleteIcon color="secondary" fontSize="medium" />
+    </IconButton>
+  );
+};
 const RoomRows = ({ rooms }) => {
+  const [cookies] = useCookies(['username']);
+  console.log('rooms :>> ', rooms);
   const rows = rooms.map((row) => (
     <TableRow
       key={row.name}
@@ -22,7 +79,11 @@ const RoomRows = ({ rooms }) => {
       <TableCell component="th" scope="row">
         {row.name}
       </TableCell>
-      <TableCell align="right">{row.userId}</TableCell>
+      <TableCell align="center">{row.username}</TableCell>
+      <TableCell align="center">{<RoomButton uuid={row.uuid} />}</TableCell>
+      <TableCell align="right">
+        {cookies.username === row.username && <DeleteButton roomId={row.id} />}
+      </TableCell>
     </TableRow>
   ));
 
@@ -43,7 +104,7 @@ function RoomList() {
       .then((response) => {
         console.log('rooms :>> ', rooms);
         console.log('response.data  :>> ', response.data);
-        setRooms(response.data.items);
+        setRooms(response.data.rooms);
       })
       .catch((e) => {
         console.log('error in getting rooms for room list', e);
@@ -52,12 +113,14 @@ function RoomList() {
 
   console.log('rooms :>> ', rooms);
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{ maxHeight: 200 }}>
       <Table aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
-            <TableCell align="right">Creator</TableCell>
+            <TableCell align="center">Creator</TableCell>
+            <TableCell align="center">Join</TableCell>
+            <TableCell align="right">Delete</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

@@ -56,7 +56,7 @@ function Dashboard({ isLoggedIn, username }) {
             <Typography variant="h5" color="initial">
               Rooms
             </Typography>
-            <RoomList />
+            <RoomList username={username} />
           </Grid>
         </Grid>
       </Container>

@@ -10,7 +10,8 @@ import {
   Paper,
 } from '@material-ui/core';
 import axios from 'axios';
-import { PhoneDisabled } from '@material-ui/icons';
+import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
+// import { PhoneDisabled } from '@material-ui/icons';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 
@@ -53,7 +54,7 @@ function CreateRoom({ username }) {
       <Button
         variant="contained"
         color="secondary"
-        startIcon={<PhoneDisabled fontSize="large" />}
+        startIcon={<VideoCameraFrontIcon fontSize="large" />}
         fullWidth
         onClick={create}
       >
