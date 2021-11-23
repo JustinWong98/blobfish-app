@@ -18,6 +18,7 @@ import Home from './routes/Home.jsx';
 import { Front } from './routes/Front.jsx';
 import SignUp from './routes/Signup';
 import Login from './routes/Login';
+import Dashboard from './routes/Dashboard';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
 
 export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
@@ -83,11 +84,25 @@ function App() {
             <Route path="/front" element={<Front />} />
             <Route
               path="/signup"
-              element={<SignUp setIsLoggedIn={setIsLoggedIn} />}
+              element={
+                <SignUp
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUsername={setUsername}
+                />
+              }
             />
             <Route
               path="/login"
-              element={<Login setIsLoggedIn={setIsLoggedIn} />}
+              element={
+                <Login
+                  setIsLoggedIn={setIsLoggedIn}
+                  setUsername={setUsername}
+                />
+              }
+            />
+            <Route
+              path="/dashboard"
+              element={<Dashboard isLoggedIn={isLoggedIn} />}
             />
             {/* <Route path='/avatar' element ={<Avatar/>}/> */}
 

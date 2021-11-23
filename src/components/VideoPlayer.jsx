@@ -18,24 +18,11 @@ socket.on('connect_error', (err) => {
 });
 
 const useStyles = makeStyles((theme) => ({
-  video: {
-    width: '550px',
-    height: '412px',
-    [theme.breakpoints.down('xs')]: {
-      width: '300px',
-      heigth: '225px',
-    },
-  },
   gridContainer: {
     justifyContent: 'center',
     [theme.breakpoints.down('xs')]: {
       flexDirection: 'column',
     },
-  },
-  paper: {
-    padding: '10px',
-    border: '2px solid black',
-    margin: '10px',
   },
 }));
 
@@ -58,6 +45,8 @@ function VideoPlayer() {
   const threeCanvasRef = useRef();
   const connectionRef = useRef();
   const socketRef = useRef();
+  const [videoIsSet, setVideo] = useState(false);
+
   socketRef.current = socket;
 
   console.log('threeCanvasRef :>> ', threeCanvasRef);
@@ -71,6 +60,7 @@ function VideoPlayer() {
         console.log('myVideo :>> ', myVideo);
         myVideo.current.srcObject = currentStream;
         socketRef.current.emit('joined room', roomID);
+        setVideo(true);
         // person who joins connects to other peers
       })
       .then(() => {
@@ -195,14 +185,11 @@ function VideoPlayer() {
             canvasRef={myVideoModified}
             threeCanvasRef={threeCanvasRef}
             styles={classes}
+            videoIsSet={videoIsSet}
           />
         }
         {peers.map((peer, index) => (
-          <OtherVideoFrame
-            name="other person"
-            videoRef={userVideo}
-            styles={classes}
-          />
+          <OtherVideoFrame name="other person" videoRef={userVideo} />
         ))}
       </Grid>
     </div>

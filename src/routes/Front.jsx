@@ -7,28 +7,6 @@ import { VideoFrame } from '../components/VideoElements.jsx';
 import Button from '@mui/material/Button';
 import { Typography } from '@mui/material';
 
-const useStyles = makeStyles((theme) => ({
-  video: {
-    width: '550px',
-    height: '412px',
-    [theme.breakpoints.down('xs')]: {
-      width: '300px',
-      heigth: '225px',
-    },
-  },
-  gridContainer: {
-    justifyContent: 'center',
-    [theme.breakpoints.down('xs')]: {
-      flexDirection: 'column',
-    },
-  },
-  paper: {
-    padding: '10px',
-    border: '2px solid black',
-    margin: '10px',
-  },
-}));
-
 const LoginButton = () => {
   const useStyles = makeStyles((theme) => ({
     button: { backgroundColor: theme.palette.secondary.dark },
@@ -65,7 +43,6 @@ export const Front = () => {
   const myVideo = useRef();
   const myVideoModified = useRef();
   const threeCanvasRef = useRef();
-  const classes = useStyles();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
 
@@ -98,7 +75,6 @@ export const Front = () => {
           videoRef={myVideo}
           canvasRef={myVideoModified}
           threeCanvasRef={threeCanvasRef}
-          styles={classes}
           videoIsSet={videoIsSet}
         />
 

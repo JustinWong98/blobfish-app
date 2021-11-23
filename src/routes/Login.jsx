@@ -41,7 +41,7 @@ const Password = ({ password, setPassword }) => {
     />
   );
 };
-function Login({ isLoggedIn, setIsLoggedIn }) {
+function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
   const [cookies, setCookie] = useCookies(['userId', 'isLoggedIn', 'username']);
   const [globalErrorMessage, setGlobalErrorMessage] = useState('');
   const [usernameInvalidMessage, setUsernameInvalidMessage] = useState('');
@@ -58,10 +58,11 @@ function Login({ isLoggedIn, setIsLoggedIn }) {
     let usernameInvalid = '';
     let passwordInvalid = '';
 
+    console.log('BACKEND_URL :>> ', BACKEND_URL);
     axios
       .post(`${BACKEND_URL}/login`, { username, password })
       .then((response) => {
-        console.log('response from signup :>> ', response);
+        console.log('response from login :>> ', response);
         if (response.data.error) {
           window.scrollTo(0, 0);
           if (
@@ -82,6 +83,7 @@ function Login({ isLoggedIn, setIsLoggedIn }) {
         } else {
           console.log('setIsLoggedIn :>> ', setIsLoggedIn);
           setIsLoggedIn(true);
+          setUsername(response.data.username);
           setCookie('username', response.data.username, { path: '/' });
           setCookie('userId', response.data.id, { path: '/' });
           setCookie('isLoggedIn', response.data.hashedId, { path: '/' });
