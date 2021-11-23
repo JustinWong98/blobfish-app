@@ -1,10 +1,12 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { render } from 'react-dom';
 import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import VideoPlayer from '../components/Room.jsx';
 import Notifications from '../components/Notifications.jsx';
-import Sidebar from '../components/Sidebar.jsx';
+import Sidebar from '../components/Sidebar.jsx'
+import AvatarMaker from '../components/AvatarMaker.jsx';
+import { Canvas, useFrame } from '@react-three/fiber';
 
 const useStyles = makeStyles((theme) => ({
   appBar: {
@@ -33,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 function Home() {
   const classes = useStyles();
-
   return (
     <div className={classes.wrapper}>
       <AppBar position="static" color="inherit" className={classes.appBar}>
@@ -42,8 +43,10 @@ function Home() {
           Blobfish Chat
         </Typography>
       </AppBar>
-      {/* <VideoPlayer /> */}
       <Sidebar />
+      <Canvas>
+        <AvatarMaker/>
+      </Canvas>
     </div>
   );
 }

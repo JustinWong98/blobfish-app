@@ -19,7 +19,7 @@ const Avatar = ({
   mouthDim,
 }) => {
   let chosenAvatar = (
-    <Blobfish 
+    <Blobfish   
       faceWidth={faceWidth}
       faceHeight={faceHeight}
       faceAngles={faceAngles}
@@ -43,8 +43,8 @@ const Avatar = ({
     <group position={[-1, 0, 0]} ref={myMesh}>
       {/* <Stars /> */}
       {chosenAvatar}
-      <GroundPlane />
-      <BackDrop />
+      {/* <GroundPlane />
+      <BackDrop /> */}
     </group>
   );
 };
@@ -81,10 +81,3 @@ export const ThreeCanvas = ({
     </div>
   );
 };
-
-// if (
-//   typeof videoRef.current.srcObject !== 'undefined' &&
-//   videoRef.current.srcObject !== null
-// ) {
-//   const videoTexture = new VideoTexture(videoRef.current.srcObject);
-// }
