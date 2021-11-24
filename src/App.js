@@ -7,7 +7,7 @@ import { hasLoginCookie, getCookie } from './modules/cookie.mjs';
 
 // import { theme } from './modules/theme.mjs';
 
-import Room from './components/Dashboard/Room.jsx';
+import Room from './routes/Room.jsx';
 import NavBar from './components/NavBar.jsx';
 
 import Home from './routes/Home.jsx';
