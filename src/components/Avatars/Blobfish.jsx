@@ -96,10 +96,10 @@
 
 // useGLTF.preload('/scene.gltf')
 
-import React, { useRef } from 'react'
-import { useGLTF } from '@react-three/drei'
+import React, { useRef } from 'react';
+import { useGLTF } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
-import * as THREE from 'three'; 
+import * as THREE from 'three';
 
 const Mouth = ({ mouthRef }) => {
   //Mouth length is half of face by default
@@ -119,49 +119,47 @@ const Mouth = ({ mouthRef }) => {
   );
 };
 
-export const Blobfish = ({ faceWidth,
-  faceHeight,
+export const Blobfish = ({
   faceAngles,
   leftEyeOpening,
   rightEyeOpening,
-  mouthDim,}) => {
-  
-  const group = useRef()
-  const leftEye = useRef()
-  const rightEye = useRef()
-  const mouth = useRef()
-  const { nodes, materials } = useGLTF('/scene3.gltf')
+  mouthDim,
+}) => {
+  const group = useRef();
+  const leftEye = useRef();
+  const rightEye = useRef();
+  const mouth = useRef();
+  const { nodes, materials } = useGLTF('/scene3.gltf');
 
-   useFrame((state, delta) => {
+  useFrame((state, delta) => {
     leftEye.current.position.x = 0.44;
     rightEye.current.position.x = 0.44;
     // console.log(leftEyeOpening.current)
     if (leftEyeOpening.current > 0.3) {
-      leftEye.current.position.x = 0.5 ;
+      leftEye.current.position.x = 0.5;
     }
     if (rightEyeOpening.current > 0.3) {
       rightEye.current.position.x = 0.5;
     }
-    // const normMouthLength = mouthDim.current.length / (faceWidth.current / 3);  
-    const normMouthLength = mouthDim.current.length / (faceWidth.current / 3);
-    const normMouthTopBot =
-      mouthDim.current.topBotHeight / (faceHeight.current / 5);
-    const normMouthMidBot =
-      mouthDim.current.midBotHeight / (faceHeight.current / 6);
-
+    const { length, topBotHeight } = mouthDim.current;
     const mouthVertices = [
       // top left bottom right
-      new THREE.Vector2(0, -0.15 + (normMouthTopBot * 0.3)), // top lip
-      new THREE.Vector2(0.5 * normMouthLength, 0), // left
+      new THREE.Vector2(0, -0.15 + topBotHeight * 0.3), // top lip
+      new THREE.Vector2(0.5 * length, 0), // left
       new THREE.Vector2(0, -0.25), // bottom
-      new THREE.Vector2(-0.5 * normMouthLength, 0), // right
+      new THREE.Vector2(-0.5 * length, 0), // right
     ];
     const mouthShape = new THREE.Shape(mouthVertices);
     const mouthGeo = new THREE.ShapeGeometry(mouthShape);
     mouth.current.geometry = mouthGeo;
-  })
+  });
   return (
-    <group ref={group} scale={[2.5,2.5,2.5]} position={[1,0,0]}dispose={null}>
+    <group
+      ref={group}
+      scale={[2.5, 2.5, 2.5]}
+      position={[1, 0, 0]}
+      dispose={null}
+    >
       <group rotation={[0.17, -Math.PI / 2, 0]}>
         <mesh
           castShadow
@@ -181,9 +179,12 @@ export const Blobfish = ({ faceWidth,
           scale={[0.06, 0.05, 0.06]}
           ref={leftEye}
         />
-        <mesh ref = {mouth} position={[0.97, -0.22, 0]}
-          rotation={[-Math.PI / 2, Math.PI / 6, -Math.PI / 2]}>
-          <Mouth/>
+        <mesh
+          ref={mouth}
+          position={[0.97, -0.22, 0]}
+          rotation={[-Math.PI / 2, Math.PI / 6, -Math.PI / 2]}
+        >
+          <Mouth />
         </mesh>
         {/* <mesh
           castShadow
@@ -241,7 +242,7 @@ export const Blobfish = ({ faceWidth,
         />
       </group>
     </group>
-  )
-}
+  );
+};
 
-useGLTF.preload('/scene3.gltf')
+useGLTF.preload('/scene3.gltf');

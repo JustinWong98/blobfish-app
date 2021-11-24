@@ -19,9 +19,7 @@ const Avatar = ({
   mouthDim,
 }) => {
   let chosenAvatar = (
-    <Blobfish   
-      faceWidth={faceWidth}
-      faceHeight={faceHeight}
+    <Blobfish
       faceAngles={faceAngles}
       leftEyeOpening={leftEyeOpening}
       rightEyeOpening={rightEyeOpening}
@@ -52,8 +50,8 @@ const Avatar = ({
 export const ThreeCanvas = ({
   canvasRef,
   threeCanvasRef,
-  faceWidth,
-  faceHeight,
+  // faceWidth,
+  // faceHeight,
   faceAngles,
   leftEyeOpening,
   rightEyeOpening,
@@ -70,8 +68,6 @@ export const ThreeCanvas = ({
         <directionalLight position={[0, 0, 5]} />
         <orthographicCamera makeDefault position={[0, 0, 0]} zoom={0} />
         <Avatar
-          faceWidth={faceWidth}
-          faceHeight={faceHeight}
           faceAngles={faceAngles}
           leftEyeOpening={leftEyeOpening}
           rightEyeOpening={rightEyeOpening}

@@ -11,13 +11,7 @@ const Head = () => {
     <>
       {' '}
       <boxGeometry args={[2, 2.5, 2]} />
-      {/* <sphereGeometry args={[2, 32, 16]} /> */}
-      {/* <octahedronGeometry args={[2, 0]} /> */}
       <meshStandardMaterial color="gray" />
-      {/* <meshPhongMaterial color="black" opacity={0.1} transparent={true} /> */}
-      {/* <meshStandardMaterial color="blue" /> */}
-      {/* <meshNormalMaterial color="blue" /> */}
-      {/* <meshBasicMaterial color="blue" /> */}
     </>
   );
 };
@@ -56,8 +50,6 @@ const Mouth = ({ mouthRef }) => {
   );
 };
 export const CubeHead = ({
-  faceWidth,
-  faceHeight,
   faceAngles,
   leftEyeOpening,
   rightEyeOpening,
@@ -83,18 +75,14 @@ export const CubeHead = ({
 
     //UPDATE MOUTH
     if (mouthRef.current !== undefined) {
-      const normMouthLength = mouthDim.current.length / (faceWidth.current / 3);
-      const normMouthTopBot =
-        mouthDim.current.topBotHeight / (faceHeight.current / 6);
-      const normMouthMidBot =
-        mouthDim.current.midBotHeight / (faceHeight.current / 6);
+      const { length, topBotHeight, midBotHeight } = mouthDim.current;
 
       const mouthVertices = [
         // top left bottom right
-        new THREE.Vector2(0, -1 * (normMouthMidBot - normMouthTopBot)), // top lip
-        new THREE.Vector2(0.5 * normMouthLength, 0), // left
-        new THREE.Vector2(0, -1 * normMouthMidBot - 0.1), // bottom
-        new THREE.Vector2(-0.5 * normMouthLength, 0), // right
+        new THREE.Vector2(0, -1 * (midBotHeight - topBotHeight)), // top lip
+        new THREE.Vector2(0.5 * length, 0), // left
+        new THREE.Vector2(0, -1 * midBotHeight - 0.1), // bottom
+        new THREE.Vector2(-0.5 * length, 0), // right
       ];
       const mouth = new THREE.Shape(mouthVertices);
       const mouthGeo = new THREE.ShapeGeometry(mouth);
