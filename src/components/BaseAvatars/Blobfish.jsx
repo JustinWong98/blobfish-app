@@ -4,10 +4,10 @@ import { useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three'; 
 
-const Mouth = ({ mouthRef }) => {
+const Mouth = () => {
   //Mouth length is half of face by default
   const vertices = [
-    new THREE.Vector2(0, -0), // top lip
+    new THREE.Vector2(0, -0.4), // top lip
     new THREE.Vector2(0.5, 0), // left
     new THREE.Vector2(0, -0.5), // bottom
     new THREE.Vector2(-0.5, 0), // right
@@ -22,17 +22,23 @@ const Mouth = ({ mouthRef }) => {
   );
 };
 
-export const Blobfish = () => {
+export const Blobfish = ({
+  xAxis,
+  yAxis,
+  zAxis,
+  size
+}) => {
   const { nodes, materials } = useGLTF('/scene3.gltf')
 
   return (
-    <group scale={[2.5,2.5,2.5]} position={[1,0,0]}dispose={null}>
-      <group rotation={[0.17, -Math.PI / 2, 0]}>
+    <group scale={[xAxis,yAxis,zAxis]} position={[0,0,0]}dispose={null}>
+      <group rotation={[0.17, -Math.PI / 2, 0]} scale={[size, size, size]}>
         <mesh
           castShadow
           receiveShadow
           geometry={nodes.Sphere.geometry}
           material={nodes.Sphere.material}
+          color='#0000ff'
           position={[0.55, 0, 0.3]}
           scale={[0.06, 0.05, 0.06]}
         />
