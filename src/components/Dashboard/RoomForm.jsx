@@ -3,16 +3,16 @@ import { v1 as uuid } from 'uuid';
 import { Button, TextField } from '@material-ui/core';
 import axios from 'axios';
 import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
-import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { RoomListContext } from './RoomRepo.jsx';
-import { BACKEND_URL } from '../App.js';
+import { BACKEND_URL } from '../../App.js';
 import { addRoom } from './roomsListReducer.js';
+
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 
 function RoomForm({ username }) {
   const [name, setName] = useState();
-  const [cookies, setCookie] = useCookies(['userId', 'username']);
-  let navigate = useNavigate();
+  const [cookies] = useCookies(['userId', 'username']);
 
   const dispatch = useContext(RoomListContext);
 
@@ -57,7 +57,7 @@ function RoomForm({ username }) {
         fullWidth
         onClick={create}
       >
-        Create a Room
+        Create
       </Button>
     </div>
   );

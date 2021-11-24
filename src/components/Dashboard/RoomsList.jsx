@@ -1,14 +1,8 @@
-import React, {
-  useRef,
-  useEffect,
-  useState,
-  useReducer,
-  useContext,
-} from 'react';
+import React, { useEffect, useContext } from 'react';
 import { useCookies } from 'react-cookie';
 
 import axios from 'axios';
-import { BACKEND_URL } from '../App.js';
+import { BACKEND_URL } from '../../App.js';
 
 import { useNavigate } from 'react-router-dom';
 
