@@ -4,6 +4,10 @@ import { videoStyles } from '../modules/useStyles.jsx';
 
 import * as THREE from 'three';
 import { CubeHead } from './Avatars/CubeHead';
+import { Blobfish } from './Avatars/Blobfish.jsx';
+import { Light } from './Avatars/Light';
+import { GroundPlane, BackDrop } from './Avatars/Background';
+import { Stars, Sky } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
 const Avatar = ({
@@ -15,7 +19,7 @@ const Avatar = ({
   mouthDim,
 }) => {
   let chosenAvatar = (
-    <CubeHead
+    <Blobfish   
       faceWidth={faceWidth}
       faceHeight={faceHeight}
       faceAngles={faceAngles}
@@ -36,8 +40,11 @@ const Avatar = ({
   });
 
   return (
-    <group position={[0, 0, 0]} ref={myMesh}>
+    <group position={[-1, 0, 0]} ref={myMesh}>
+      {/* <Stars /> */}
       {chosenAvatar}
+      {/* <GroundPlane />
+      <BackDrop /> */}
     </group>
   );
 };
@@ -59,7 +66,8 @@ export const ThreeCanvas = ({
     <div id="canvas-container" className={styles.avatar}>
       <Canvas ref={threeCanvasRef}>
         <ambientLight intensity={0.1} />
-        <directionalLight color="white" position={[0, 0, 5]} />
+        {/* Light destroys blobfish color */}
+        <directionalLight position={[0, 0, 5]} />
         <orthographicCamera makeDefault position={[0, 0, 0]} zoom={0} />
         <Avatar
           faceWidth={faceWidth}
@@ -73,10 +81,3 @@ export const ThreeCanvas = ({
     </div>
   );
 };
-
-// if (
-//   typeof videoRef.current.srcObject !== 'undefined' &&
-//   videoRef.current.srcObject !== null
-// ) {
-//   const videoTexture = new VideoTexture(videoRef.current.srcObject);
-// }
