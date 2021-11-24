@@ -1,9 +1,16 @@
 import React, { useState, useContext } from 'react';
-import { Button, TextField, Grid, Typography, Container, Paper } from '@material-ui/core';
+import {
+  Button,
+  TextField,
+  Grid,
+  Typography,
+  Container,
+  Paper,
+} from '@material-ui/core';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Assignment, Phone, PhoneDisabled } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
-import CreateRoom from '../routes/CreateRoom.jsx';
+import RoomForm from './RoomForm.jsx';
 // import { SocketContext } from '../SocketContext';
 
 const useStyles = makeStyles((theme) => ({
@@ -55,7 +62,7 @@ const Sidebar = () => {
               </CopyToClipboard> */}
             </Grid>
             <Grid item xs={12} md={6} className={classes.padding}>
-              <CreateRoom />
+              <RoomForm />
             </Grid>
           </Grid>
         </form>
