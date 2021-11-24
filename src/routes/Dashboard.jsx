@@ -1,15 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
 import { VideoFrame } from '../components/VideoElements';
 import { Typography, Container, Box, Grid } from '@mui/material';
-import RoomRepo from '../components/RoomRepo';
+import RoomRepo from '../components/Dashboard/RoomRepo';
+import AvatarPanel from '../components/Dashboard/AvatarPanel';
 
-function Dashboard({ isLoggedIn, username }) {
+function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
   const myVideo = useRef();
   const myVideoModified = useRef();
   const threeCanvasRef = useRef();
-  // const classes = useStyles();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
+
+  // to update with default config, etc
 
   useEffect(() => {
     console.log('use effect in videoPlayer');
@@ -44,10 +46,16 @@ function Dashboard({ isLoggedIn, username }) {
               canvasRef={myVideoModified}
               threeCanvasRef={threeCanvasRef}
               videoIsSet={videoIsSet}
+              avatarModel={avatarModel}
             />
           </Grid>
           <Grid item xs={12} md={8} lg={6}>
             <RoomRepo username={username} />
+            <AvatarPanel
+              userId={userId}
+              avatarModel={avatarModel}
+              setAvatar={setAvatar}
+            />
           </Grid>
         </Grid>
       </Container>

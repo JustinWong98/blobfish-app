@@ -10,7 +10,7 @@ import {
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { Assignment, Phone, PhoneDisabled } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
-import RoomForm from './RoomForm.jsx';
+import RoomForm from './Dashboard/RoomForm.jsx';
 // import { SocketContext } from '../SocketContext';
 
 const useStyles = makeStyles((theme) => ({

@@ -1,6 +1,6 @@
 import { Typography, Container, Box, Grid } from '@mui/material';
 import RoomForm from './RoomForm';
-import RoomList from '../components/RoomsList';
+import RoomList from './RoomsList';
 import React, { useReducer } from 'react';
 
 import { roomsReducer, initialState } from './roomsListReducer.js';
