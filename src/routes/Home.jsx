@@ -1,14 +1,13 @@
-import React, {useRef} from 'react';
+import React, { useRef } from 'react';
 import { render } from 'react-dom';
 import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import VideoPlayer from '../components/Room.jsx';
+import VideoPlayer from './Room.jsx';
 import Notifications from '../components/Notifications.jsx';
-import Sidebar from '../components/Sidebar.jsx'
+import Sidebar from '../components/Sidebar.jsx';
 import { Canvas, useFrame } from '@react-three/fiber';
 import AvatarContainer from '../components/BaseAvatars/AvatarContainer.jsx';
-
 
 const useStyles = makeStyles((theme) => ({
   appBar: {

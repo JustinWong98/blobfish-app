@@ -9,6 +9,7 @@ import {
   leftEyeOpenRatio,
   rightEyeOpenRatio,
   mouthDimensions,
+  normMouthDimensions,
 } from './utils_3d.mjs';
 
 import { FaceMesh } from '@mediapipe/face_mesh';
@@ -51,15 +52,7 @@ const drawMeshConnectors = (canvasCtx, landmarks) => {
   });
 };
 export const VidCanvas = ({ canvasRef, styles }) => {
-  return (
-    <canvas
-      ref={canvasRef}
-      className={styles.video}
-      style={{
-        zindex: 10,
-      }}
-    ></canvas>
-  );
+  return <canvas ref={canvasRef} className={styles.video}></canvas>;
 };
 export const VideoFrame = ({
   name,
@@ -69,8 +62,6 @@ export const VideoFrame = ({
   threeCanvasRef,
 }) => {
   const styles = videoStyles();
-  const faceWidth = useRef();
-  const faceHeight = useRef();
   const faceAngles = useRef({
     pitch: 0,
     roll: 0,
@@ -115,8 +106,6 @@ export const VideoFrame = ({
           vidWidth,
           vidHeight,
         ]);
-        faceWidth.current = getFaceWidth(landmarks, vidWidth, vidHeight);
-        faceHeight.current = getFaceHeight(landmarks, vidWidth, vidHeight);
         faceAngles.current = angle;
         leftEyeOpening.current = leftEyeOpenRatio(
           landmarks,
@@ -128,7 +117,7 @@ export const VideoFrame = ({
           vidWidth,
           vidHeight
         );
-        mouthDim.current = mouthDimensions(landmarks, vidWidth, vidHeight);
+        mouthDim.current = normMouthDimensions(landmarks, vidWidth, vidHeight);
 
         drawMeshConnectors(canvasCtx, landmarks);
       }
@@ -182,8 +171,6 @@ export const VideoFrame = ({
             canvasRef={canvasRef}
             threeCanvasRef={threeCanvasRef}
             styles={styles}
-            faceWidth={faceWidth}
-            faceHeight={faceHeight}
             faceAngles={faceAngles}
             leftEyeOpening={leftEyeOpening}
             rightEyeOpening={rightEyeOpening}

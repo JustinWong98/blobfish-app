@@ -3,9 +3,6 @@ const RIGHT_FACE = 454;
 const TOP_FACE = 10;
 const BOT_FACE = 152;
 
-const NOSE_BASE = 2;
-const NOSE_TIP = 1;
-
 const getDiagonalDist = (p1, p2, imageX, imageY) => {
   return Math.sqrt(
     Math.pow((p1.x - p2.x) * imageX, 2) + Math.pow((p1.y - p2.y) * imageY, 2)
@@ -31,8 +28,8 @@ const LEFT_EYE_BOT = 374;
 const RIGHT_EYE_TOP = 159;
 const RIGHT_EYE_BOT = 145;
 
-const RIGHT_IRIS = [469, 470, 471, 472];
-const LEFT_IRIS = [474, 475, 476, 477];
+// const RIGHT_IRIS = [469, 470, 471, 472];
+// const LEFT_IRIS = [474, 475, 476, 477];
 
 const RIGHT_IRIS_V = [470, 472];
 const LEFT_IRIS_V = [475, 477];
@@ -111,8 +108,20 @@ export const mouthDimensions = (landmarks, imageX, imageY) => {
   return { length, midBotHeight, topBotHeight };
 };
 
-const mouthTopPtWRTMiddle = (landmarks, imageX, imageY) => {
-  const p1 = landmarks[TOP_LIP_BOTTOM];
+export const normMouthDimensions = (landmarks, imageX, imageY) => {
+  const faceHeight = getFaceWidth(landmarks, imageX, imageY);
+  const faceWidth = getFaceHeight(landmarks, imageX, imageY);
+
+  const { length, midBotHeight, topBotHeight } = mouthDimensions(
+    landmarks,
+    imageX,
+    imageY
+  );
+  return {
+    length: (length / faceWidth) * 3,
+    midBotHeight: (midBotHeight / faceHeight) * 6,
+    topBotHeight: (topBotHeight / faceHeight) * 6,
+  };
 };
 
 export const mouthHeight = (landmarks, imageX, imageY) => {
