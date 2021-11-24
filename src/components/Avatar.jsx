@@ -10,9 +10,7 @@ import { GroundPlane, BackDrop } from './Avatars/Background';
 import { Stars, Sky } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
-const Avatar = ({
-  faceWidth,
-  faceHeight,
+export const Avatar = ({
   faceAngles,
   leftEyeOpening,
   rightEyeOpening,
@@ -50,8 +48,6 @@ const Avatar = ({
 export const ThreeCanvas = ({
   canvasRef,
   threeCanvasRef,
-  // faceWidth,
-  // faceHeight,
   faceAngles,
   leftEyeOpening,
   rightEyeOpening,
