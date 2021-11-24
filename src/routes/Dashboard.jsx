@@ -1,8 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { VideoFrame } from '../components/VideoElements';
 import { Typography, Container, Box, Grid } from '@mui/material';
-import CreateRoom from './CreateRoom';
-import RoomList from '../components/RoomsList';
+import RoomRepo from '../components/RoomRepo';
 
 function Dashboard({ isLoggedIn, username }) {
   const myVideo = useRef();
@@ -44,19 +43,11 @@ function Dashboard({ isLoggedIn, username }) {
               videoRef={myVideo}
               canvasRef={myVideoModified}
               threeCanvasRef={threeCanvasRef}
-              // styles={classes}
               videoIsSet={videoIsSet}
             />
           </Grid>
           <Grid item xs={12} md={8} lg={6}>
-            <Typography variant="h5" color="initial">
-              New room
-            </Typography>
-            <CreateRoom username={username} />
-            <Typography variant="h5" color="initial">
-              Rooms
-            </Typography>
-            <RoomList username={username} />
+            <RoomRepo username={username} />
           </Grid>
         </Grid>
       </Container>
