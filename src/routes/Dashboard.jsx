@@ -1,16 +1,17 @@
 import { useRef, useEffect, useState } from 'react';
 import { VideoFrame } from '../components/VideoElements';
 import { Typography, Container, Box, Grid } from '@mui/material';
-import CreateRoom from './CreateRoom';
-import RoomList from '../components/RoomsList';
+import RoomRepo from '../components/Dashboard/RoomRepo';
+import AvatarPanel from '../components/Dashboard/AvatarPanel';
 
-function Dashboard({ isLoggedIn, username }) {
+function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
   const myVideo = useRef();
   const myVideoModified = useRef();
   const threeCanvasRef = useRef();
-  // const classes = useStyles();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
+
+  // to update with default config, etc
 
   useEffect(() => {
     console.log('use effect in videoPlayer');
@@ -44,19 +45,17 @@ function Dashboard({ isLoggedIn, username }) {
               videoRef={myVideo}
               canvasRef={myVideoModified}
               threeCanvasRef={threeCanvasRef}
-              // styles={classes}
               videoIsSet={videoIsSet}
+              avatarModel={avatarModel}
             />
           </Grid>
           <Grid item xs={12} md={8} lg={6}>
-            <Typography variant="h5" color="initial">
-              New room
-            </Typography>
-            <CreateRoom username={username} />
-            <Typography variant="h5" color="initial">
-              Rooms
-            </Typography>
-            <RoomList />
+            <RoomRepo username={username} />
+            <AvatarPanel
+              userId={userId}
+              avatarModel={avatarModel}
+              setAvatar={setAvatar}
+            />
           </Grid>
         </Grid>
       </Container>

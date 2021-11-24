@@ -6,7 +6,7 @@ import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useParams } from 'react-router-dom';
 
-import { VideoFrame, OtherVideoFrame } from './VideoElements';
+import { VideoFrame, OtherVideoFrame } from '../components/VideoElements';
 const BACKEND_URL = 'http://localhost:3002';
 
 const socket = io(BACKEND_URL, {

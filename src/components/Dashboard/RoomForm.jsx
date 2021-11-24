@@ -1,25 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { v1 as uuid } from 'uuid';
-import {
-  Button,
-  TextField,
-  Box,
-  Grid,
-  Typography,
-  Container,
-  Paper,
-} from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import axios from 'axios';
-import { PhoneDisabled } from '@material-ui/icons';
-import { useNavigate } from 'react-router-dom';
+import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import { useCookies } from 'react-cookie';
+import { RoomListContext } from './RoomRepo.jsx';
+import { BACKEND_URL } from '../../App.js';
+import { addRoom } from './roomsListReducer.js';
 
-import { BACKEND_URL } from '../App.js';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 
-function CreateRoom({ username }) {
+function RoomForm({ username }) {
   const [name, setName] = useState();
-  const [cookies, setCookie] = useCookies(['userId']);
-  let navigate = useNavigate();
+  const [cookies] = useCookies(['userId', 'username']);
+
+  const dispatch = useContext(RoomListContext);
+
   function create(e) {
     e.preventDefault();
     if (name === '') {
@@ -31,7 +27,11 @@ function CreateRoom({ username }) {
       .post(`${BACKEND_URL}/rooms`, { userId: cookies.userId, uuid: id, name })
       .then((response) => {
         console.log('response.data from create a room :>> ', response.data);
-        navigate(`/room/${id}`);
+        // navigate(`/room/${id}`);
+        dispatch(
+          addRoom({ ...response.data.room, username: cookies.username })
+        );
+        setName('');
       })
       .catch((e) => {
         console.log('e in createRoom :>> ', e);
@@ -53,14 +53,14 @@ function CreateRoom({ username }) {
       <Button
         variant="contained"
         color="secondary"
-        startIcon={<PhoneDisabled fontSize="large" />}
+        startIcon={<VideoCameraFrontIcon fontSize="large" />}
         fullWidth
         onClick={create}
       >
-        Create a Room
+        Create
       </Button>
     </div>
   );
 }
 
-export default CreateRoom;
+export default RoomForm;
