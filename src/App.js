@@ -91,7 +91,7 @@ function App() {
             />
             <Route path="/avatar" element={<AvatarEditor />} />
 
-            <Route path="/" element={<World />} />
+            <Route path="/" element={<World avatarModel={avatarModel} />} />
             <Route
               path="/room/:roomID"
               element={<Room key="videoPlayer" username={username} />}

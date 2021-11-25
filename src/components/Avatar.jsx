@@ -10,29 +10,19 @@ import { GroundPlane, BackDrop } from './Avatars/Background';
 import { Stars, Sky } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
-export const Avatar = ({
-  faceAngles,
-  leftEyeOpening,
-  rightEyeOpening,
-  mouthDim,
-}) => {
-  let chosenAvatar = (
-    <Blobfish
-      faceAngles={faceAngles}
-      leftEyeOpening={leftEyeOpening}
-      rightEyeOpening={rightEyeOpening}
-      mouthDim={mouthDim}
-    />
-  );
+export const Avatar = ({ faceCalculations }) => {
+  console.log('faceCalculations.current :>> ', faceCalculations.current);
+  let chosenAvatar = <Blobfish faceCalculations={faceCalculations} />;
 
   const myMesh = useRef();
 
   useFrame((state, delta) => {
+    const { angle } = faceCalculations.current;
     // console.log('state in useFrame :>> ', state);
     // console.log('delta in useFrame :>> ', delta * 1000);
-    myMesh.current.rotation.x = faceAngles.current.pitch * 1.5; //up down tilt
-    myMesh.current.rotation.y = -faceAngles.current.yaw * 1.5;
-    myMesh.current.rotation.z = -faceAngles.current.roll * 0.5; //left right tilt
+    myMesh.current.rotation.x = angle.pitch * 1.5; //up down tilt
+    myMesh.current.rotation.y = -angle.yaw * 1.5;
+    myMesh.current.rotation.z = -angle.roll * 0.5; //left right tilt
   });
 
   return (
@@ -45,14 +35,7 @@ export const Avatar = ({
   );
 };
 
-export const ThreeCanvas = ({
-  canvasRef,
-  threeCanvasRef,
-  faceAngles,
-  leftEyeOpening,
-  rightEyeOpening,
-  mouthDim,
-}) => {
+export const ThreeCanvas = ({ threeCanvasRef, faceCalculations }) => {
   const styles = videoStyles();
 
   console.log('running three');
@@ -63,12 +46,7 @@ export const ThreeCanvas = ({
         {/* Light destroys blobfish color */}
         <directionalLight position={[0, 0, 5]} />
         <orthographicCamera makeDefault position={[0, 0, 0]} zoom={0} />
-        <Avatar
-          faceAngles={faceAngles}
-          leftEyeOpening={leftEyeOpening}
-          rightEyeOpening={rightEyeOpening}
-          mouthDim={mouthDim}
-        />
+        <Avatar faceCalculations={faceCalculations} />
       </Canvas>
     </div>
   );

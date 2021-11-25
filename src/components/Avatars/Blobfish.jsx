@@ -119,29 +119,25 @@ const Mouth = ({ mouthRef }) => {
   );
 };
 
-export const Blobfish = ({
-  faceAngles,
-  leftEyeOpening,
-  rightEyeOpening,
-  mouthDim,
-}) => {
+export const Blobfish = ({ faceCalculations }) => {
   const group = useRef();
   const leftEye = useRef();
   const rightEye = useRef();
   const mouth = useRef();
   const { nodes, materials } = useGLTF('/scene3.gltf');
-
   useFrame((state, delta) => {
+    const { leftEyeOpening, rightEyeOpening, mouthDim } =
+      faceCalculations.current;
     leftEye.current.position.x = 0.44;
     rightEye.current.position.x = 0.44;
     // console.log(leftEyeOpening.current)
-    if (leftEyeOpening.current > 0.3) {
+    if (leftEyeOpening > 0.3) {
       leftEye.current.position.x = 0.5;
     }
-    if (rightEyeOpening.current > 0.3) {
+    if (rightEyeOpening > 0.3) {
       rightEye.current.position.x = 0.5;
     }
-    const { length, topBotHeight } = mouthDim.current;
+    const { length, topBotHeight } = mouthDim;
     const mouthVertices = [
       // top left bottom right
       new THREE.Vector2(0, -0.15 + topBotHeight * 0.3), // top lip
