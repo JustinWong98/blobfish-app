@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     width: '100%',
   },
 }));
-function Home() {
+function AvatarEditor() {
   const classes = useStyles();
   return (
     <div className={classes.wrapper}>
@@ -50,4 +50,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default AvatarEditor;

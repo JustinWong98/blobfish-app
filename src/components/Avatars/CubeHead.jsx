@@ -49,12 +49,7 @@ const Mouth = ({ mouthRef }) => {
     </>
   );
 };
-export const CubeHead = ({
-  faceAngles,
-  leftEyeOpening,
-  rightEyeOpening,
-  mouthDim,
-}) => {
+export const CubeHead = ({ leftEyeOpening, rightEyeOpening, mouthDim }) => {
   const leftEye = useRef();
   const rightEye = useRef();
   const mouthRef = useRef();

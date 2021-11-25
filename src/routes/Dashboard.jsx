@@ -3,6 +3,7 @@ import { VideoFrame } from '../components/VideoElements';
 import { Typography, Container, Box, Grid } from '@mui/material';
 import RoomRepo from '../components/Dashboard/RoomRepo';
 import AvatarPanel from '../components/Dashboard/AvatarPanel';
+import { getWebCamStream } from '../modules/webcam.jsx';
 
 function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
   const myVideo = useRef();
@@ -15,18 +16,7 @@ function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
 
   useEffect(() => {
     console.log('use effect in videoPlayer');
-    navigator.mediaDevices
-      .getUserMedia({ video: true, audio: true })
-      .then((currentStream) => {
-        stream.current = currentStream;
-
-        myVideo.current.srcObject = currentStream;
-        setVideo(true);
-        console.log('suceeded in getting video stream');
-      })
-      .catch((err) => {
-        console.log('error in getting stream', err);
-      });
+    getWebCamStream(stream, myVideo, setVideo);
   }, [myVideo]);
 
   return (

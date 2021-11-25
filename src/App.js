@@ -10,12 +10,13 @@ import { hasLoginCookie, getCookie } from './modules/cookie.mjs';
 import Room from './routes/Room.jsx';
 import NavBar from './components/NavBar.jsx';
 
-import Home from './routes/Home.jsx';
+import AvatarEditor from './routes/AvatarEditor.jsx';
 import { Front } from './routes/Front.jsx';
 import SignUp from './routes/Signup';
 import Login from './routes/Login';
 import Dashboard from './routes/Dashboard';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
+import World from './routes/World';
 
 export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
 
@@ -88,9 +89,9 @@ function App() {
                 />
               }
             />
-            {/* <Route path='/avatar' element ={<Avatar/>}/> */}
+            <Route path="/avatar" element={<AvatarEditor />} />
 
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<World avatarModel={avatarModel} />} />
             <Route
               path="/room/:roomID"
               element={<Room key="videoPlayer" username={username} />}
