@@ -3,12 +3,12 @@ import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { SocketContext } from '../components/context/sockets.js';
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useParams } from 'react-router-dom';
 
 import { VideoFrame, OtherVideoFrame } from '../components/VideoElements';
-import { BACKEND_URL } from '../BACKEND_URL';
+// import { BACKEND_URL } from '../BACKEND_URL';
 
 // const socket = io(BACKEND_URL, {
 //   withCredentials: true,
@@ -46,12 +46,29 @@ function Room({ username }) {
   const connectionRef = useRef();
   const socketRef = useRef();
   const [videoIsSet, setVideo] = useState(false);
+  const [threeCanvasStarted, setThreeCStart] = useState(false);
 
   const socket = useContext(SocketContext);
-
+  console.log('socket :>> ', socket);
   socketRef.current = socket;
-
+  console.log('socketRef.current :>> ', socketRef.current);
   console.log('threeCanvasRef :>> ', threeCanvasRef);
+
+  const receiverSendSignal = (data) => {
+    // find peer that we are receiving from since we are going to receive multiple peers.
+    // we loop through the list of peers and match the id of the one trying to signal us
+    const item = peersRef.current.find((p) => p.peerID === data.id);
+    item.peer.signal(data.signal);
+  };
+
+  const callUserSetCall = ({ from, name: callerName, signal }) => {
+    setCall({ isReceivingCall: true, from, name: callerName, signal });
+  };
+  const listener = (eventName, ...args) => {
+    console.log('socket eventName :>> ', eventName);
+    console.log('args :>> ', args);
+  };
+
   useEffect(() => {
     console.log('use effect in videoPlayer');
     navigator.mediaDevices
@@ -66,57 +83,72 @@ function Room({ username }) {
         // person who joins connects to other peers
       })
       .then(() => {
-        socketRef.current.on('get users', (users) => {
-          const peers = [];
-          users.forEach((userID) => {
-            // for each user, create a peer and send in our id and stream
-            const peer = createPeer(
-              userID,
-              socketRef.current.id,
-              stream.current
-            );
-            // peersRef will handle collection of peers (all simple peer logic)
-            peersRef.current.push({
-              peerID: userID,
-              peer,
-            });
-            // setting state of array of peers for rendering purposes
-            peers.push(peer);
-          });
-          setPeers(peers);
-        });
-        // on the receiver end, this fires when a new user joins
-        socketRef.current.on('user joined', ({ signal, callerID }) => {
-          console.log('callId in user joined:>> ', callerID);
-          const peer = addPeer(signal, callerID, stream.current);
-          peersRef.current.push({
-            peerID: callerID,
-            peer,
-          });
-
-          setPeers((users) => [...users, peer]);
-        });
         // when handshake is complete - receiver gives back a signal
-        socketRef.current.on('receiving returned signal', (data) => {
-          // find peer that we are receiving from since we are going to receive multiple peers.
-          // we loop through the list of peers and match the id of the one trying to signal us
-          const item = peersRef.current.find((p) => p.peerID === data.id);
-          item.peer.signal(data.signal);
-        });
+        socketRef.current.on('receiving returned signal', receiverSendSignal);
       })
       .catch((err) => {
         console.log('error in getting stream', err);
       });
 
-    socket.on('me', (id) => setMe(id));
+    socket.on('me', setMe);
+    // socket.on('me', (id) => setMe(id));
 
-    socket.on('callUser', ({ from, name: callerName, signal }) => {
-      setCall({ isReceivingCall: true, from, name: callerName, signal });
-    });
+    socket.on('callUser', callUserSetCall);
+
+    //CHECKER
+    socket.onAny(listener);
+
+    return () => {
+      socketRef.current.off('receiving returned signal', receiverSendSignal);
+      socket.off('me', setMe);
+      socket.off('callUser', callUserSetCall);
+      socket.offAny(listener);
+    };
   }, []);
+
+  const getUsers = (users) => {
+    const peers = [];
+    users.forEach((userID) => {
+      // for each user, create a peer and send in our id and stream
+      const peer = createPeer(userID, socketRef.current.id, stream.current);
+      // peersRef will handle collection of peers (all simple peer logic)
+      peersRef.current.push({
+        peerID: userID,
+        peer,
+      });
+      // setting state of array of peers for rendering purposes
+      peers.push(peer);
+    });
+    setPeers(peers);
+  };
+
+  const newUserJoins = ({ signal, callerID }) => {
+    console.log('callId in user joined:>> ', callerID);
+    const peer = addPeer(signal, callerID, stream.current);
+    peersRef.current.push({
+      peerID: callerID,
+      peer,
+    });
+
+    setPeers((users) => [...users, peer]);
+  };
+
+  useEffect(() => {
+    console.log('threeCanvasStarted :>> ', threeCanvasStarted);
+    console.log('threeCanvasRef.current :>> ', threeCanvasRef.current);
+    socketRef.current.on('get users', getUsers);
+    // on the receiver end, this fires when a new user joins
+    socketRef.current.on('user joined', newUserJoins);
+
+    return () => {
+      socketRef.current.off('get users', getUsers);
+      socketRef.current.off('user joined', newUserJoins);
+    };
+  }, [threeCanvasStarted]);
 
   // when we create a new peer, the signal event fires, we capture the signal and send it down to each individual
   const createPeer = (userToSignal, callerID, userStream) => {
+    console.log('threeCanvasRef.current :>> ', threeCanvasRef.current);
     const audioTrack = userStream.getAudioTracks();
     const user3DStream = threeCanvasRef.current.captureStream();
 
@@ -186,8 +218,8 @@ function Room({ username }) {
             videoRef={myVideo}
             canvasRef={myVideoModified}
             threeCanvasRef={threeCanvasRef}
-            styles={classes}
             videoIsSet={videoIsSet}
+            setThreeCStart={setThreeCStart}
           />
         </Grid>
         <Grid item xs={4}>
