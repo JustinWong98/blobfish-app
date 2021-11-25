@@ -100,6 +100,7 @@ export const VideoFrame = ({
 };
 
 export const OtherVideoFrame = ({ videoRef, name }) => {
+  console.log('videoRef.current :>> ', videoRef.current);
   const styles = videoStyles();
   return (
     <Paper className={styles.paper} key="other">
