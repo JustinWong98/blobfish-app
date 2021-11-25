@@ -69,7 +69,7 @@ function SignUp({ isLoggedIn, setIsLoggedIn, setUsername }) {
 
     let usernameInvalid = '';
     let passwordInvalid = '';
-    console.log('hi')
+
     axios
       .post(`${BACKEND_URL}/signup`, { username, password })
       .then((response) => {

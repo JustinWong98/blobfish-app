@@ -3,10 +3,8 @@ import AvatarMaker from './AvatarMaker'
 import BlobfishControls from './BlobfishControls';
 import CubeHeadControls from './CubeHeadControls';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Slider, Typography, MenuItem, InputLabel, FormControl, Select, Button, TextField } from '@mui/material'
+import { Slider, Typography, MenuItem, InputLabel, FormControl, Select, Button } from '@mui/material'
 import { CubeHead } from '../Avatars/CubeHead';
-import axios from 'axios'
-import {BACKEND_URL} from '../../App.js'
 
 function AvatarContainer() {
   // when they select an avatar, change all these to default values for that avatar
@@ -23,49 +21,13 @@ function AvatarContainer() {
   const [headColor, setHeadColor] = useState('#808080')
   const [earColor, setEarColor] = useState('#ffff00')
   const [eyeColor, setEyeColor] = useState('#0000ff')
-  const [name, setName] = useState('')
-  
 
 
-  // to put in a store
   const handleSubmit = () => {
     switch(avatar) {
       case "Blobfish":
-        const blobData = {
-          model: 'Blobfish',
-          userId: 1,
-          name,
-          xAxis,
-          yAxis,
-          zAxis,
-          size
-        }
-        axios.post(`${BACKEND_URL}/avatars`, blobData).then((res) => {
-          if (res.data === 'success') {
-            // redirect to dashboard
-          }
-        }
-        )
         break;
       case "CubeHead":
-        const cubeData = {
-          model: 'CubeHead',
-          userId: 1,
-          name,
-          headHeight,
-          headWidth,
-          headLength,
-          earLength,
-          headColor,
-          earColor,
-          eyeColor
-        }
-        axios.post(`${BACKEND_URL}/avatars`, cubeData).then((res) => {
-          if (res.data === 'success') {
-            // redirect to dashboard
-          }
-        }
-        )
         break;
       default:
         return
@@ -102,7 +64,6 @@ function AvatarContainer() {
     {/* Make diff components for each*/}
     {avatar === 'Blobfish' && <BlobfishControls setXAxis={setXAxis} setYAxis={setYAxis} setZAxis={setZAxis} setSize={setSize}/>}
     {avatar === 'CubeHead' && <CubeHeadControls setHeadHeight={setHeadHeight} setHeadWidth={setHeadWidth} setHeadLength={setHeadLength} setEarLength={setEarLength} setHeadColor={setHeadColor} setEarColor={setEarColor} setEyeColor={setEyeColor}/>}
-    <TextField label="Avatar Name" variant="outlined" required onChange={(e) => {setName(e.target.value)}}/>
     <Button variant="contained" color="success" onClick={handleSubmit}>
         Submit
     </Button>
