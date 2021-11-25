@@ -4,6 +4,7 @@ import {
   rightEyeOpenRatio,
   normMouthDimensions,
 } from '../utils_3d.mjs';
+import { FaceMesh } from '@mediapipe/face_mesh';
 
 import * as Facemesh from '@mediapipe/face_mesh';
 import * as draw from '@mediapipe/drawing_utils';
@@ -56,8 +57,21 @@ const faceCalculator = (landmarks, vidWidth, vidHeight) => {
   const mouthDim = normMouthDimensions(landmarks, vidWidth, vidHeight);
   return { angle, leftEyeOpening, rightEyeOpening, mouthDim };
 };
-
-function onResults(results, videoRef, canvasRef, faceCalculations) {
+export const faceMeshSetup = () => {
+  const faceMesh = new FaceMesh({
+    locateFile: (file) => {
+      return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+    },
+  });
+  faceMesh.setOptions({
+    maxNumFaces: 1,
+    refineLandmarks: true,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5,
+  });
+  return faceMesh;
+};
+function onResultsCanvas(results, videoRef, canvasRef, faceCalculations) {
   const vidWidth = videoRef.current.videoWidth;
   const vidHeight = videoRef.current.videoHeight;
   matchCanvasDimToVid(videoRef, canvasRef);
@@ -81,7 +95,27 @@ function onResults(results, videoRef, canvasRef, faceCalculations) {
   canvasCtx.restore();
 }
 
-export const onFaceMeshResult = (
+export const onResults = (results, videoRef, faceCalculations) => {
+  const vidWidth = videoRef.current.videoWidth;
+  const vidHeight = videoRef.current.videoHeight;
+  if (results.multiFaceLandmarks) {
+    for (const landmarks of results.multiFaceLandmarks) {
+      faceCalculations.current = faceCalculator(landmarks, vidWidth, vidHeight);
+    }
+  }
+};
+
+export const onResultsCalFace = (
+  results,
+  videoRef,
+  setFaceMeshStart,
+  faceCalculations
+) => {
+  setFaceMeshStart(true);
+  onResults(results, videoRef, faceCalculations);
+};
+
+export const onResultCalFaceCanvas = (
   results,
   videoRef,
   canvasRef,
@@ -89,5 +123,5 @@ export const onFaceMeshResult = (
   faceCalculations
 ) => {
   setFaceMeshStart(true);
-  onResults(results, videoRef, canvasRef, faceCalculations);
+  onResultsCanvas(results, videoRef, canvasRef, faceCalculations);
 };

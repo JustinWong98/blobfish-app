@@ -10,6 +10,7 @@ import { GroundPlane, BackDrop } from './Avatars/Background';
 import { Stars, Sky } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
+// ability to fetch different types of avatars here
 export const Avatar = ({ faceCalculations }) => {
   console.log('faceCalculations.current :>> ', faceCalculations.current);
   let chosenAvatar = <Blobfish faceCalculations={faceCalculations} />;

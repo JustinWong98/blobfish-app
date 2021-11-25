@@ -120,6 +120,8 @@ const Mouth = ({ mouthRef }) => {
 };
 
 export const Blobfish = ({ faceCalculations }) => {
+  console.log('running in blobfish');
+
   const group = useRef();
   const leftEye = useRef();
   const rightEye = useRef();
@@ -153,7 +155,7 @@ export const Blobfish = ({ faceCalculations }) => {
     <group
       ref={group}
       scale={[2.5, 2.5, 2.5]}
-      position={[1, 0, 0]}
+      position={[0, 0, 0]}
       dispose={null}
     >
       <group rotation={[0.17, -Math.PI / 2, 0]}>

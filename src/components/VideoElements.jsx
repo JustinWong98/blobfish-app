@@ -6,7 +6,7 @@ import { ThreeCanvas } from './Avatar';
 import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 
-import { onFaceMeshResult } from './face/facemesh.jsx';
+import { onResultCalFaceCanvas, faceMeshSetup } from './face/facemesh.jsx';
 
 export const VidCanvas = ({ canvasRef, styles }) => {
   return <canvas ref={canvasRef} className={styles.video}></canvas>;
@@ -38,19 +38,9 @@ export const VideoFrame = ({
 
   useEffect(() => {
     console.log('useEffect running in vid frame');
-    const faceMesh = new FaceMesh({
-      locateFile: (file) => {
-        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
-      },
-    });
-    faceMesh.setOptions({
-      maxNumFaces: 1,
-      refineLandmarks: true,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
-    });
+    const faceMesh = faceMeshSetup();
     faceMesh.onResults((results) => {
-      onFaceMeshResult(
+      onResultCalFaceCanvas(
         results,
         videoRef,
         canvasRef,
@@ -66,8 +56,6 @@ export const VideoFrame = ({
         onFrame: async () => {
           await faceMesh.send({ image: videoRef.current });
         },
-        width: 550,
-        height: 412,
       });
       camera.start();
     }
