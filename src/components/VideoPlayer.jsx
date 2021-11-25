@@ -60,7 +60,7 @@ function VideoPlayer() {
   const socketRef = useRef();
   socketRef.current = socket;
 
-  const getUsers = (users) => {
+  const pushPeers = (users) => {
     const peers = [];
     users.forEach((userID) => {
       // for each user, create a peer and send in our id and stream
@@ -76,7 +76,7 @@ function VideoPlayer() {
     setPeers(peers);
   };
 
-  const userJoined = ({ signal, callerID }) => {
+  const addPeer = ({ signal, callerID }) => {
     console.log('callId in user joined:>> ', callerID);
     const peer = addPeer(signal, callerID, stream.current);
     peersRef.current.push({
@@ -107,9 +107,9 @@ function VideoPlayer() {
         // person who joins connects to other peers
       })
       .then(() => {
-        socketRef.current.on('get users', getUsers);
+        socketRef.current.on('get users', pushPeers);
         // on the receiver end, this fires when a new user joins
-        socketRef.current.on('user joined', userJoined);
+        socketRef.current.on('user joined', addPeer);
         // when handshake is complete - receiver gives back a signal
         socketRef.current.on(
           'receiving returned signal',
@@ -123,9 +123,9 @@ function VideoPlayer() {
     // socket.on('me', setMe);
     // socket.on('me', (id) => setMe(id));
     return () => {
-      socketRef.current.off('get users', getUsers);
+      socketRef.current.off('get users', pushPeers);
       // on the receiver end, this fires when a new user joins
-      socketRef.current.off('user joined', userJoined);
+      socketRef.current.off('user joined', addPeer);
       // when handshake is complete - receiver gives back a signal
       socketRef.current.off(
         'receiving returned signal',
@@ -143,15 +143,11 @@ function VideoPlayer() {
     const audioTrack = userStream.getAudioTracks();
     const user3DStream = threeCanvasRef.current.captureStream();
 
-    // const userModStream = myVideoModified.current.captureStream();
-    // console.log('send user stream create peer', userModStream);
-
     user3DStream.addTrack(audioTrack[0]);
     const peer = new Peer({
       initiator: true,
       trickle: false,
       stream: user3DStream,
-      // stream: userModStream,
     });
     console.log(`peer`, peer);
 
@@ -161,6 +157,7 @@ function VideoPlayer() {
         callerID,
         signal,
       });
+      console.log('peer signalled');
     });
     peer.on('stream', (currentStream) => {
       console.log('getting stream from receiver :>> ', currentStream);
@@ -174,14 +171,13 @@ function VideoPlayer() {
     // when a peer's initiator is false, they only signal when they receive a signal
     const audioTrack = userStream.getAudioTracks();
     const user3DStream = threeCanvasRef.current.captureStream();
-    // const userModStream = myVideoModified.current.captureStream();
     console.log('send user stream from addPeer', user3DStream);
+
     user3DStream.addTrack(audioTrack[0]);
     const peer = new Peer({
       initiator: false,
       trickle: false,
       stream: user3DStream,
-      // stream: userModStream,
     });
     console.log('callerId from add peer :>> ', callerID);
 
