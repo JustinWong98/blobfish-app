@@ -27,9 +27,9 @@ export function Box(props) {
 
 export const Terrain = () => {
   return (
-    <mesh visible position={[0, -1, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+    <mesh visible position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeBufferGeometry attach="geometry" args={[5000, 5000, 128, 128]} />
-      <meshBasicMaterial color="white" />
+      <meshBasicMaterial color="gray" />
       {/* <meshStandardMaterial
         attach="material"
         color="white"
