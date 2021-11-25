@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import { Typography, AppBar } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import VideoPlayer from '../components/Room.jsx';
+import VideoPlayer from './Room.jsx';
 import Notifications from '../components/Notifications.jsx';
 import Sidebar from '../components/Sidebar.jsx'
 import { Canvas, useFrame } from '@react-three/fiber';
