@@ -1,4 +1,10 @@
-import React, { useContext, useRef, useEffect, useState } from 'react';
+import React, {
+  useContext,
+  useRef,
+  useEffect,
+  useState,
+  Suspense,
+} from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { videoStyles } from '../modules/useStyles.jsx';
 import { ThreeCanvas } from './Avatar';
@@ -18,14 +24,15 @@ export const VideoFrame = ({
   canvasRef,
   videoIsSet,
   threeCanvasRef,
+  setThreeCStart,
 }) => {
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   const styles = videoStyles();
   const faceCalculations = useRef({
     faceAngle: {
       pitch: 0,
-      roll: 0,
       yaw: 0,
+      roll: 0,
     },
     leftEyeOpening: 1,
     rightEyeOpening: 1,
@@ -72,15 +79,18 @@ export const VideoFrame = ({
           className={styles.video}
           style={{ display: 'none' }}
         />
-        {videoIsSet && <VidCanvas canvasRef={canvasRef} styles={styles} />}
         {faceMeshStarted && (
           <ThreeCanvas
             threeCanvasRef={threeCanvasRef}
             styles={styles}
             faceCalculations={faceCalculations}
+            setThreeCStart={setThreeCStart}
             className={'align-middle'}
           />
         )}
+        {videoIsSet && <VidCanvas canvasRef={canvasRef} styles={styles} />}
+        {/* <Suspense fallback={null}> */}
+        {/* </Suspense> */}
         <Typography variant="h5" gutterBottom className="text-center">
           {name || ''}
         </Typography>

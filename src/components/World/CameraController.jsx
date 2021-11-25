@@ -8,7 +8,7 @@ export const CameraController = () => {
   const { camera, gl } = useThree();
 
   useFrame((_, delta) => {
-    // console.log('camera :>> ', camera);
+    console.log('camera :>> ', camera);
     // console.log('camera.position :>> ', camera.position);
     // camera.position.set(camera.position.x, 0, camera.position.z);
     // move camera according to key pressed
@@ -24,25 +24,25 @@ export const CameraController = () => {
 
       // increase momentum if camera higher
       momentum = momentum + camera.position.z * 0.02;
-      //set condition that camera position cannot be below the floor
       //get these to move the character too
+      // console.log('camera.position :>> ', camera.position);
       switch (key) {
         case 'w':
           camera.translateZ(-momentum);
-          // camera.position.set(camera.position.x, 0, camera.position.z);
+          camera.position.set(camera.position.x, 0, camera.position.z);
 
           break;
         case 's':
           camera.translateZ(momentum);
-          // camera.position.set(camera.position.x, 0, camera.position.z);
+          camera.position.set(camera.position.x, 0, camera.position.z);
           break;
         case 'd':
           camera.translateX(momentum);
-          // camera.position.set(camera.position.x, 0, camera.position.z);
+          camera.position.set(camera.position.x, 0, camera.position.z);
           break;
         case 'a':
           camera.translateX(-momentum);
-          // camera.position.set(camera.position.x, 0, camera.position.z);
+          camera.position.set(camera.position.x, 0, camera.position.z);
           break;
         default:
       }
@@ -53,11 +53,12 @@ export const CameraController = () => {
     const controls = new OrbitControls(camera, gl.domElement);
     controls.minDistance = 3;
     controls.maxDistance = 20;
-    // controls.enableRotate = false;
-    // controls.minAzimuthAngle = 0;
-    // controls.maxAzimuthAngle = 0;
-    // controls.minAzimuthAngle = 0;
-    // controls.maxAzimuthAngle = 0;
+    controls.maxPolarAngle = Math.PI / 2;
+    camera.position.set(0, 0, 5);
+    // for when avartar is facing others
+    // camera.position.set(0, 0, -5);
+    // camera.rotation.y = Math.PI;
+    controls.minPolarAngle = Math.PI / 3;
     return () => {
       controls.dispose();
     };

@@ -8,7 +8,7 @@ import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import axios from 'axios';
 
-import { BACKEND_URL } from '../App.js';
+import { BACKEND_URL } from '../BACKEND_URL';
 import * as successes from '../modules/successes.mjs';
 import * as errors from '../modules/errors.mjs';
 import * as cookie from '../modules/cookie.mjs';

@@ -72,27 +72,33 @@ export const faceMeshSetup = () => {
   return faceMesh;
 };
 function onResultsCanvas(results, videoRef, canvasRef, faceCalculations) {
-  const vidWidth = videoRef.current.videoWidth;
-  const vidHeight = videoRef.current.videoHeight;
-  matchCanvasDimToVid(videoRef, canvasRef);
-  const canvasElement = canvasRef.current;
-  const canvasCtx = canvasElement.getContext('2d');
-  canvasCtx.save();
-  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-  canvasCtx.drawImage(
-    results.image,
-    0,
-    0,
-    canvasElement.width,
-    canvasElement.height
-  );
-  if (results.multiFaceLandmarks) {
-    for (const landmarks of results.multiFaceLandmarks) {
-      faceCalculations.current = faceCalculator(landmarks, vidWidth, vidHeight);
-      drawMeshConnectors(canvasCtx, landmarks);
+  if (videoRef.current !== null) {
+    const vidWidth = videoRef.current.videoWidth;
+    const vidHeight = videoRef.current.videoHeight;
+    matchCanvasDimToVid(videoRef, canvasRef);
+    const canvasElement = canvasRef.current;
+    const canvasCtx = canvasElement.getContext('2d');
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(
+      results.image,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
+    if (results.multiFaceLandmarks) {
+      for (const landmarks of results.multiFaceLandmarks) {
+        faceCalculations.current = faceCalculator(
+          landmarks,
+          vidWidth,
+          vidHeight
+        );
+        drawMeshConnectors(canvasCtx, landmarks);
+      }
     }
+    canvasCtx.restore();
   }
-  canvasCtx.restore();
 }
 
 export const onResults = (results, videoRef, faceCalculations) => {
@@ -112,6 +118,7 @@ export const onResultsCalFace = (
   faceCalculations
 ) => {
   setFaceMeshStart(true);
+  // console.log('videoRef.current :>> ', videoRef.current);
   onResults(results, videoRef, faceCalculations);
 };
 

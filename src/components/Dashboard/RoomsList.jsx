@@ -2,7 +2,7 @@ import React, { useEffect, useContext } from 'react';
 import { useCookies } from 'react-cookie';
 
 import axios from 'axios';
-import { BACKEND_URL } from '../../App.js';
+import { BACKEND_URL } from '../../BACKEND_URL';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -16,7 +16,7 @@ import Paper from '@mui/material/Paper';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 import { RoomListContext } from './RoomRepo.jsx';
-import { deleteRoom, setRoom } from './roomsListReducer.js';
+import { deleteRoom, setRoom } from '../context/roomsListReducer.js';
 
 import { Button, IconButton } from '@mui/material';
 

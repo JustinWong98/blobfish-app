@@ -1,10 +1,11 @@
-import { Suspense, useRef, useState, useEffect } from 'react';
+import { Suspense, useRef, useState, useEffect, useContext } from 'react';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { VideoFrame } from '../components/VideoElements';
-
+// import { Physics, userBox } from 'use-cannon';
 import { Terrain, Box } from '../components/World/baseElements.jsx';
 
+import { SocketContext } from '../components/context/sockets.js';
 import {
   handleKeyDown,
   handleKeyUp,
@@ -30,19 +31,19 @@ import { Avatar } from '../components/Avatar.jsx';
 function World({ avatarModel }) {
   console.log('loading world');
   const videoRef = useRef();
-  const myVideoModified = useRef();
-  const threeCanvasRef = useRef();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
 
   const styles = videoStyles();
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
 
+  const socket = useContext(SocketContext);
+
   const faceCalculations = useRef({
     angle: {
       pitch: 0,
-      roll: 0,
       yaw: 0,
+      roll: 0,
     },
     leftEyeOpening: 1,
     rightEyeOpening: 1,
@@ -93,7 +94,11 @@ function World({ avatarModel }) {
       camera.start();
     }
   });
-  ////
+  // HEAD ROTATION IS CAMERA ROTATION. BAD IDEA
+  // NAME TAG FOR EACH AVATAR
+
+  //STREAM FACE CALCULATIONS AND AUDIO
+
   return (
     <>
       <video
@@ -102,29 +107,21 @@ function World({ avatarModel }) {
         autoPlay
         muted
         className={styles.video}
-        // style={{ display: 'none' }}
+        style={{ display: 'none' }}
       />
-      {/* {videoRef && (
-        <VideoFrame
-          key="videoFrame"
-          name={''}
-          videoRef={videoRef}
-          canvasRef={myVideoModified}
-          threeCanvasRef={threeCanvasRef}
-          videoIsSet={videoIsSet}
-          avatarModel={avatarModel}
-        />
-      )} */}
-      <Canvas style={{ background: 'skyblue' }}>
+      <Canvas
+        style={{ background: 'skyblue' }}
+        camera={{ position: [0, 0, 0] }}
+      >
         <CameraController />
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
-          {faceCalculations.current && (
-            <Avatar faceCalculations={faceCalculations} />
-          )}
-          <Box position={[-1.2, 0, 0]} />
-          <Box position={[1.2, 0, 0]} />
+          <group>
+            {faceCalculations.current && (
+              <Avatar faceCalculations={faceCalculations} />
+            )}
+          </group>
           <Terrain />
         </Suspense>
         {/* The X axis is red. The Y axis is green. The Z axis is blue */}
