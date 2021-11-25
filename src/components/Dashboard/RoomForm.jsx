@@ -5,8 +5,8 @@ import axios from 'axios';
 import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import { useCookies } from 'react-cookie';
 import { RoomListContext } from './RoomRepo.jsx';
-import { BACKEND_URL } from '../../App.js';
-import { addRoom } from './roomsListReducer.js';
+import { BACKEND_URL } from '../../BACKEND_URL';
+import { addRoom } from '../context/roomsListReducer.js';
 
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 

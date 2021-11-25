@@ -24,8 +24,8 @@ export const VideoFrame = ({
   const faceCalculations = useRef({
     faceAngle: {
       pitch: 0,
-      roll: 0,
       yaw: 0,
+      roll: 0,
     },
     leftEyeOpening: 1,
     rightEyeOpening: 1,

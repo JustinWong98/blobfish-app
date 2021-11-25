@@ -3,7 +3,7 @@ import RoomForm from './RoomForm';
 import RoomList from './RoomsList';
 import React, { useReducer } from 'react';
 
-import { roomsReducer, initialState } from './roomsListReducer.js';
+import { roomsReducer, initialState } from '../context/roomsListReducer.js';
 
 export const RoomListContext = React.createContext(null);
 

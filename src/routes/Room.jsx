@@ -2,20 +2,21 @@ import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { SocketContext } from '../components/context/sockets.js';
 import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useParams } from 'react-router-dom';
 
 import { VideoFrame, OtherVideoFrame } from '../components/VideoElements';
-const BACKEND_URL = 'http://localhost:3002';
+import { BACKEND_URL } from '../BACKEND_URL';
 
-const socket = io(BACKEND_URL, {
-  withCredentials: true,
-  // rejectUnauthorized: false,
-});
-socket.on('connect_error', (err) => {
-  console.log(`connect_error due to ${err.message}`);
-});
+// const socket = io(BACKEND_URL, {
+//   withCredentials: true,
+//   // rejectUnauthorized: false,
+// });
+// socket.on('connect_error', (err) => {
+//   console.log(`connect_error due to ${err.message}`);
+// });
 
 const useStyles = makeStyles((theme) => ({
   gridContainer: {
@@ -45,6 +46,8 @@ function Room({ username }) {
   const connectionRef = useRef();
   const socketRef = useRef();
   const [videoIsSet, setVideo] = useState(false);
+
+  const socket = useContext(SocketContext);
 
   socketRef.current = socket;
 
