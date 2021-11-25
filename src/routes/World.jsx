@@ -1,10 +1,6 @@
 import { Suspense, useRef, useState, useEffect } from 'react';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Blobfish } from '../components/Avatars/Blobfish.jsx';
-import Container from '@mui/material/Container';
-import * as THREE from 'three';
-import { VideoFrame } from '../components/VideoElements';
 
 import { Terrain, Box } from '../components/World/baseElements.jsx';
 
@@ -15,7 +11,6 @@ import {
 } from '../components/World/CameraController';
 import { getWebCamStream } from '../modules/webcam';
 
-import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 //  import
 import { videoStyles } from '../modules/useStyles.jsx';
