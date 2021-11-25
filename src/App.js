@@ -4,7 +4,7 @@ import { CookiesProvider } from 'react-cookie';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { hasLoginCookie, getCookie } from './modules/cookie.mjs';
-
+import { SocketContext, socket } from './components/context/sockets.js';
 // import { theme } from './modules/theme.mjs';
 
 import Room from './routes/Room.jsx';
@@ -17,8 +17,6 @@ import Login from './routes/Login';
 import Dashboard from './routes/Dashboard';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
 import World from './routes/World';
-
-export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:3002';
 
 const theme = createTheme({
   typography: {
@@ -55,54 +53,56 @@ function App() {
 
   console.log('setIsLoggedIn :>> ', setIsLoggedIn);
   return (
-    <CookiesProvider>
-      <ThemeProvider theme={theme}>
-        <AvatarJSONContext.Provider value={{avatarJSON, setAvatarJSON}}>
-        <BrowserRouter>
-          <NavBar />
-          <Routes>
-            <Route path="/front" element={<Front />} />
-            <Route
-              path="/signup"
-              element={
-                <SignUp
-                  setIsLoggedIn={setIsLoggedIn}
-                  setUsername={setUsername}
-                />
-              }
-            />
-            <Route
-              path="/login"
-              element={
-                <Login
-                  setIsLoggedIn={setIsLoggedIn}
-                  setUsername={setUsername}
-                />
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <Dashboard
-                  isLoggedIn={isLoggedIn}
-                  username={username}
-                  userId={userId}
-                  avatarModel={avatarModel}
-                  setAvatar={setAvatar}
-                />
-              }
-            />
-            <Route path="/avatar" element={<AvatarEditor />} />
-            <Route path="/" element={<World avatarModel={avatarModel} />} />
-            <Route
-              path="/room/:roomID"
-              element={<Room key="videoPlayer" username={username} />}
-            />
-          </Routes>
-        </BrowserRouter>
-        </AvatarJSONContext.Provider>
-      </ThemeProvider>
-    </CookiesProvider>
+    <SocketContext.Provider value={socket}>
+      <CookiesProvider>
+        <ThemeProvider theme={theme}>
+          <AvatarJSONContext.Provider value={{avatarJSON, setAvatarJSON}}>
+          <BrowserRouter>
+            <NavBar />
+            <Routes>
+              <Route path="/front" element={<Front />} />
+              <Route
+                path="/signup"
+                element={
+                  <SignUp
+                    setIsLoggedIn={setIsLoggedIn}
+                    setUsername={setUsername}
+                  />
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <Login
+                    setIsLoggedIn={setIsLoggedIn}
+                    setUsername={setUsername}
+                  />
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <Dashboard
+                    isLoggedIn={isLoggedIn}
+                    username={username}
+                    userId={userId}
+                    avatarModel={avatarModel}
+                    setAvatar={setAvatar}
+                  />
+                }
+              />
+              <Route path="/avatar" element={<AvatarEditor />} />
+              <Route path="/" element={<World avatarModel={avatarModel} />} />
+              <Route
+                path="/room/:roomID"
+                element={<Room key="videoPlayer" username={username} />}
+              />
+            </Routes>
+          </BrowserRouter>
+          </AvatarJSONContext.Provider>
+        </ThemeProvider>
+      </CookiesProvider>
+    </SocketContext.Provider>
   );
 }
 

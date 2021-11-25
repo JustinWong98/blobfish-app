@@ -2,20 +2,21 @@ import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { io } from 'socket.io-client';
+import { SocketContext } from '../components/context/sockets.js';
+// import { io } from 'socket.io-client';
 import Peer from 'simple-peer';
 import { useParams } from 'react-router-dom';
 
 import { VideoFrame, OtherVideoFrame } from '../components/VideoElements';
-const BACKEND_URL = 'http://localhost:3002';
+// import { BACKEND_URL } from '../BACKEND_URL';
 
-const socket = io(BACKEND_URL, {
-  withCredentials: true,
-  // rejectUnauthorized: false,
-});
-socket.on('connect_error', (err) => {
-  console.log(`connect_error due to ${err.message}`);
-});
+// const socket = io(BACKEND_URL, {
+//   withCredentials: true,
+//   // rejectUnauthorized: false,
+// });
+// socket.on('connect_error', (err) => {
+//   console.log(`connect_error due to ${err.message}`);
+// });
 
 const useStyles = makeStyles((theme) => ({
   gridContainer: {
@@ -45,10 +46,56 @@ function Room({ username }) {
   const connectionRef = useRef();
   const socketRef = useRef();
   const [videoIsSet, setVideo] = useState(false);
+  const [threeCanvasStarted, setThreeCStart] = useState(false);
 
+  const socket = useContext(SocketContext);
+  console.log('socket :>> ', socket);
   socketRef.current = socket;
-
+  console.log('socketRef.current :>> ', socketRef.current);
   console.log('threeCanvasRef :>> ', threeCanvasRef);
+
+  const receiverSendSignal = (data) => {
+    // find peer that we are receiving from since we are going to receive multiple peers.
+    // we loop through the list of peers and match the id of the one trying to signal us
+    const item = peersRef.current.find((p) => p.peerID === data.id);
+    item.peer.signal(data.signal);
+  };
+
+  const callUserSetCall = ({ from, name: callerName, signal }) => {
+    setCall({ isReceivingCall: true, from, name: callerName, signal });
+  };
+  const listener = (eventName, ...args) => {
+    console.log('socket eventName :>> ', eventName);
+    console.log('args :>> ', args);
+  };
+
+  const getUsers = (users) => {
+    const peers = [];
+    users.forEach((userID) => {
+      // for each user, create a peer and send in our id and stream
+      const peer = createPeer(userID, socketRef.current.id, stream.current);
+      // peersRef will handle collection of peers (all simple peer logic)
+      peersRef.current.push({
+        peerID: userID,
+        peer,
+      });
+      // setting state of array of peers for rendering purposes
+      peers.push(peer);
+    });
+    setPeers(peers);
+  };
+
+  const newUserJoins = ({ signal, callerID }) => {
+    console.log('callId in user joined:>> ', callerID);
+    const peer = addPeer(signal, callerID, stream.current);
+    peersRef.current.push({
+      peerID: callerID,
+      peer,
+    });
+
+    setPeers((users) => [...users, peer]);
+  };
+
   useEffect(() => {
     console.log('use effect in videoPlayer');
     navigator.mediaDevices
@@ -63,67 +110,56 @@ function Room({ username }) {
         // person who joins connects to other peers
       })
       .then(() => {
-        socketRef.current.on('get users', (users) => {
-          const peers = [];
-          users.forEach((userID) => {
-            // for each user, create a peer and send in our id and stream
-            const peer = createPeer(
-              userID,
-              socketRef.current.id,
-              stream.current
-            );
-            // peersRef will handle collection of peers (all simple peer logic)
-            peersRef.current.push({
-              peerID: userID,
-              peer,
-            });
-            // setting state of array of peers for rendering purposes
-            peers.push(peer);
-          });
-          setPeers(peers);
-        });
-        // on the receiver end, this fires when a new user joins
-        socketRef.current.on('user joined', ({ signal, callerID }) => {
-          console.log('callId in user joined:>> ', callerID);
-          const peer = addPeer(signal, callerID, stream.current);
-          peersRef.current.push({
-            peerID: callerID,
-            peer,
-          });
-
-          setPeers((users) => [...users, peer]);
-        });
         // when handshake is complete - receiver gives back a signal
-        socketRef.current.on('receiving returned signal', (data) => {
-          // find peer that we are receiving from since we are going to receive multiple peers.
-          // we loop through the list of peers and match the id of the one trying to signal us
-          const item = peersRef.current.find((p) => p.peerID === data.id);
-          item.peer.signal(data.signal);
-        });
+        socketRef.current.on('get users', getUsers);
+        socketRef.current.on('user joined', newUserJoins);
+        socketRef.current.on('receiving returned signal', receiverSendSignal);
       })
       .catch((err) => {
         console.log('error in getting stream', err);
       });
 
-    socket.on('me', (id) => setMe(id));
+    socket.on('me', setMe);
+    socket.on('callUser', callUserSetCall);
+    // socket.on('me', (id) => setMe(id));
 
-    socket.on('callUser', ({ from, name: callerName, signal }) => {
-      setCall({ isReceivingCall: true, from, name: callerName, signal });
-    });
+    // on the receiver end, this fires when a new user joins
+    //CHECKER
+    socket.onAny(listener);
+
+    return () => {
+      socketRef.current.off('receiving returned signal', receiverSendSignal);
+      socket.off('me', setMe);
+      socket.off('callUser', callUserSetCall);
+      socket.offAny(listener);
+
+      socketRef.current.off('get users', getUsers);
+      socketRef.current.off('user joined', newUserJoins);
+    };
   }, []);
+
+  useEffect(() => {
+    console.log('threeCanvasStarted :>> ', threeCanvasStarted);
+    console.log('threeCanvasRef.current :>> ', threeCanvasRef.current);
+
+    return () => {};
+  }, [threeCanvasStarted]);
 
   // when we create a new peer, the signal event fires, we capture the signal and send it down to each individual
   const createPeer = (userToSignal, callerID, userStream) => {
-    const audioTrack = userStream.getAudioTracks();
-    const user3DStream = threeCanvasRef.current.captureStream();
+    console.log('threeCanvasRef.current :>> ', threeCanvasRef.current);
+    // const audioTrack = userStream.getAudioTracks();
+    // const user3DStream = threeCanvasRef.current.captureStream();
 
     // console.log('send user stream create peer', userModStream);
 
-    user3DStream.addTrack(audioTrack[0]);
+    // user3DStream.addTrack(audioTrack[0]);
+    console.log('streaming from create peer :>> ', userStream);
     const peer = new Peer({
       initiator: true,
       trickle: false,
-      stream: user3DStream,
+      // stream: user3DStream,
+      stream: userStream,
     });
 
     peer.on('signal', (signal) => {
@@ -132,6 +168,7 @@ function Room({ username }) {
         callerID,
         signal,
       });
+      console.log('peer signal in create:>> ', signal);
     });
     peer.on('stream', (currentStream) => {
       console.log('getting stream from receiver :>> ', currentStream);
@@ -143,22 +180,25 @@ function Room({ username }) {
   // incomingSignal is sent when new person comes into room, users wait for that signal before firing off their own signal back to the initiator(the one who joined the room)
   const addPeer = (incomingSignal, callerID, userStream) => {
     // when a peer's initiator is false, they only signal when they receive a signal
-    const audioTrack = userStream.getAudioTracks();
-    const user3DStream = threeCanvasRef.current.captureStream();
+    // const audioTrack = userStream.getAudioTracks();
+    // const user3DStream = threeCanvasRef.current.captureStream();
     // const userModStream = myVideoModified.current.captureStream();
-    console.log('send user stream from addPeer', user3DStream);
-    user3DStream.addTrack(audioTrack[0]);
+    // console.log('send user stream from addPeer', user3DStream);
+    // user3DStream.addTrack(audioTrack[0]);
+
+    console.log('streaming from add peer :>> ', userStream);
     const peer = new Peer({
       initiator: false,
       trickle: false,
-      stream: user3DStream,
-      // stream: userModStream,
+      // stream: user3DStream,
+      stream: userStream,
     });
     console.log('callerId from add peer :>> ', callerID);
 
     peer.on('signal', (signal) => {
       // sends back to the server and then back to the callerID to complete handshake
       socketRef.current.emit('returning signal', { signal, callerID });
+      console.log('peer signal in add:>> ', signal);
     });
 
     peer.on('stream', (currentStream) => {
@@ -183,8 +223,8 @@ function Room({ username }) {
             videoRef={myVideo}
             canvasRef={myVideoModified}
             threeCanvasRef={threeCanvasRef}
-            styles={classes}
             videoIsSet={videoIsSet}
+            setThreeCStart={setThreeCStart}
           />
         </Grid>
         <Grid item xs={4}>

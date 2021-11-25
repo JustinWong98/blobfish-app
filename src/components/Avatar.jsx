@@ -46,7 +46,7 @@ export const Avatar = ({ faceCalculations, avatarJSON, setAvatarJSON }) => {
   });
 
   return (
-    <group position={[-1, 0, 0]} ref={myMesh}>
+    <group position={[0, 0, 0]} ref={myMesh}>
       {/* <Stars /> */}
       {chosenAvatar}
       {/* <GroundPlane />
