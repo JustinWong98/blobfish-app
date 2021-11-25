@@ -119,7 +119,11 @@ const Mouth = ({ mouthRef }) => {
   );
 };
 
-export const Blobfish = ({ faceCalculations }) => {
+export const Blobfish = ({ faceCalculations,
+  xAxis,
+  yAxis,
+  zAxis,
+  size }) => {
   console.log('running in blobfish');
 
   const group = useRef();
@@ -154,11 +158,11 @@ export const Blobfish = ({ faceCalculations }) => {
   return (
     <group
       ref={group}
-      scale={[2.5, 2.5, 2.5]}
+      scale={[xAxis,yAxis,zAxis]}
       position={[0, 0, 0]}
       dispose={null}
     >
-      <group rotation={[0.17, -Math.PI / 2, 0]}>
+      <group rotation={[0.17, -Math.PI / 2, 0]} scale={[size, size, size]}>
         <mesh
           castShadow
           receiveShadow

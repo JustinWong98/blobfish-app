@@ -1,17 +1,21 @@
 import Button from '@mui/material/Button';
 import { Typography, Container, Box, Grid, MenuItem } from '@mui/material';
+import axios from 'axios'
+import { useNavigate } from 'react-router-dom';
+import { AvatarJSONContext } from '../../App';
 
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 
-import * as React from 'react';
+import React, {useState, useEffect, useContext} from 'react';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import { BACKEND_URL } from '../../App';
 
 const AvatarButton = () => {
+  const navigate = useNavigate();
   const handleClick = (e) => {
-    e.preventDefault();
-    //Route to avatar creator
+    navigate('/avatar')
   };
 
   return (
@@ -28,14 +32,33 @@ const AvatarButton = () => {
 };
 
 const AvatarDropDown = ({ userId, avatarModel, setAvatar }) => {
-  // const [avatarName, setAvatarName]
-  // get avatars by this person using axios get
-  // get default avatars get from??
+  const {avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext)
+  const [userAvatar, setUserAvatar] = useState([])
+  const [chosenAvatar, setChosenAvatar] = useState(0)
+  useEffect(() => {
+    axios.get(`${BACKEND_URL}/avatars/${userId}`, userId).then((results) => {
+      setUserAvatar(results.data)
+    })
+  }, [])
+  // setAvatarNames(results.data)
   // consider use context, use reducers for uploading and accessing avatar models
 
   const handleChange = (event) => {
-    // find avatar in database according to value -> avatar id
-    // setAvatar(event.target.value);
+    if (event.target.value > 0  ) {
+      console.log(userId)
+      const data = {
+        userId: userId,
+        avatarId: event.target.value
+      }
+      axios.post(`${BACKEND_URL}/displayAvatar`, data).then((result) => {
+        console.log(result.data.specs)
+        setAvatarJSON(result.data.specs)
+      })
+    }
+    else {
+      setAvatarJSON(event.target.value)
+    }
+    setChosenAvatar(event.target.value)
   };
 
   return (
@@ -46,14 +69,15 @@ const AvatarDropDown = ({ userId, avatarModel, setAvatar }) => {
           labelId="demo-simple-select-label"
           variant="filled"
           id="demo-simple-select"
-          value={avatarModel.name}
+          value={chosenAvatar}
           label="Model"
           onChange={handleChange}
         >
-          {/* To replace with user's models */}
-          <MenuItem value={10}>{avatarModel.name}</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {userAvatar.map((avatar) => (
+            <MenuItem value={avatar.id}>{avatar.name}</MenuItem>
+          ))}
+          <MenuItem value='Blobfish'>Blobfish</MenuItem>
+          <MenuItem value='CubeHead'>CubeHead</MenuItem>
         </Select>
       </FormControl>
     </Box>
@@ -61,6 +85,7 @@ const AvatarDropDown = ({ userId, avatarModel, setAvatar }) => {
 };
 
 function AvatarPanel({ userId, avatarModel, setAvatar }) {
+  console.log(`userId`, userId)
   return (
     <>
       <Typography variant="h5" color="initial">

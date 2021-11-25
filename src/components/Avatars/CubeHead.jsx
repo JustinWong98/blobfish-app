@@ -49,14 +49,22 @@ const Mouth = ({ mouthRef }) => {
     </>
   );
 };
-export const CubeHead = ({ leftEyeOpening, rightEyeOpening, mouthDim }) => {
+export const CubeHead = ({ faceCalculations,
+headHeight,
+headWidth,
+headLength,
+earLength,
+headColor,
+earColor,
+eyeColor }) => {
   const leftEye = useRef();
   const rightEye = useRef();
   const mouthRef = useRef();
 
   useFrame((state, delta) => {
     // console.log('delta :>> ', delta * 1000);
-
+const { leftEyeOpening, rightEyeOpening, mouthDim } =
+      faceCalculations.current;
     //UPDATE EYES
     leftEye.current.scale.z = 0.3;
     rightEye.current.scale.z = 0.3;
@@ -88,33 +96,35 @@ export const CubeHead = ({ leftEyeOpening, rightEyeOpening, mouthDim }) => {
   return (
     <>
       <mesh>
-        <Head />
+        <Head headHeight={headHeight} headWidth={headWidth} headLength={headLength} headColor={headColor}/>
       </mesh>
       <mesh position={[1.25, 1.5, 0.0]}>
-        <Ear />
+        <Ear earLength={earLength} earColor={earColor}/>
       </mesh>
       <mesh position={[-1.25, 1.5, 0.0]}>
-        <Ear />
+        <Ear earLength={earLength} earColor={earColor}/>
       </mesh>
-      <mesh
-        ref={rightEye}
-        position={[-0.5, 0.5, 1]}
-        rotation={[Math.PI * 0.5, 0, 0]}
-        scale={[1, 1, 2]}
-      >
-        <Eye />
-      </mesh>
-      <mesh
-        ref={leftEye}
-        position={[0.5, 0.5, 1]}
-        rotation={[Math.PI * 0.5, 0, 0]}
-        scale={[1, 1, 2]}
-      >
-        <Eye />
-      </mesh>
-      <mesh position={[0, -0.25, 1.1]} ref={mouthRef}>
-        <Mouth />
-      </mesh>
+      <group position={[0,0,headLength/2]}>
+        <mesh
+          ref={rightEye}
+          position={[-0.5, 0.5, 0]}
+          rotation={[Math.PI * 0.5, 0, 0]}
+          scale={[1, 1, 2]}
+        >
+          <Eye eyeColor={eyeColor}/>
+        </mesh>
+        <mesh
+          ref={leftEye}
+          position={[0.5, 0.5, 1]}
+          rotation={[Math.PI * 0.5, 0, 0]}
+          scale={[1, 1, 2]}
+        >
+          <Eye eyeColor={eyeColor}/>
+        </mesh>
+        <mesh position={[0, -0.25, 1.1]} ref={mouthRef}>
+          <Mouth />
+        </mesh>
+      </group>
     </>
   );
 };

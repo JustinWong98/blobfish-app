@@ -1,5 +1,5 @@
 import './App.css';
-import React, { useState } from 'react';
+import React, { useState, createContext } from 'react';
 import { CookiesProvider } from 'react-cookie';
 import { makeStyles } from '@material-ui/core/styles';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
@@ -41,9 +41,11 @@ const theme = createTheme({
   },
 });
 
+export const AvatarJSONContext = createContext()
 function App() {
   const useStyles = makeStyles();
   const classes = useStyles(theme);
+  const [avatarJSON, setAvatarJSON] = useState({})
   const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
   const [username, setUsername] = useState(getCookie('username').trim());
   const [userId, setUserId] = useState(Number(getCookie('userId').trim()));
@@ -55,6 +57,7 @@ function App() {
   return (
     <CookiesProvider>
       <ThemeProvider theme={theme}>
+        <AvatarJSONContext.Provider value={{avatarJSON, setAvatarJSON}}>
         <BrowserRouter>
           <NavBar />
           <Routes>
@@ -90,7 +93,6 @@ function App() {
               }
             />
             <Route path="/avatar" element={<AvatarEditor />} />
-
             <Route path="/" element={<World avatarModel={avatarModel} />} />
             <Route
               path="/room/:roomID"
@@ -98,6 +100,7 @@ function App() {
             />
           </Routes>
         </BrowserRouter>
+        </AvatarJSONContext.Provider>
       </ThemeProvider>
     </CookiesProvider>
   );

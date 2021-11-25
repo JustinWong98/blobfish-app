@@ -2,6 +2,7 @@ import React, { useContext, useRef, useEffect, useState } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { videoStyles } from '../modules/useStyles.jsx';
 import { ThreeCanvas } from './Avatar';
+import { AvatarJSONContext } from '../App.js';
 
 import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
@@ -19,6 +20,7 @@ export const VideoFrame = ({
   videoIsSet,
   threeCanvasRef,
 }) => {
+  const {avatarJSON, setAvatarJSON} = useContext(AvatarJSONContext)
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   const styles = videoStyles();
   const faceCalculations = useRef({
@@ -79,6 +81,8 @@ export const VideoFrame = ({
             styles={styles}
             faceCalculations={faceCalculations}
             className={'align-middle'}
+            avatarJSON={avatarJSON}
+            setAvatarJSON={setAvatarJSON}
           />
         )}
         <Typography variant="h5" gutterBottom className="text-center">
