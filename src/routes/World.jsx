@@ -1,6 +1,7 @@
 import { Suspense, useRef, useState, useEffect } from 'react';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
+import { VideoFrame } from '../components/VideoElements';
 
 import { Terrain, Box } from '../components/World/baseElements.jsx';
 
@@ -11,6 +12,7 @@ import {
 } from '../components/World/CameraController';
 import { getWebCamStream } from '../modules/webcam';
 
+import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 //  import
 import { videoStyles } from '../modules/useStyles.jsx';
@@ -37,7 +39,7 @@ function World({ avatarModel }) {
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
 
   const faceCalculations = useRef({
-    faceAngle: {
+    angle: {
       pitch: 0,
       roll: 0,
       yaw: 0,
@@ -77,7 +79,7 @@ function World({ avatarModel }) {
     const faceMesh = faceMeshSetup();
     faceMesh.onResults((results) => {
       onResultsCalFace(results, videoRef, setFaceMeshStart, faceCalculations);
-      console.log('faceCalculations.current :>> ', faceCalculations.current);
+      // console.log('faceCalculations.current :>> ', faceCalculations.current);
     });
     if (
       typeof videoRef.current.srcObject !== 'undefined' &&
@@ -91,9 +93,7 @@ function World({ avatarModel }) {
       camera.start();
     }
   });
-  // FACE ROTATION IS ALSO CAMERA ROTATION
-  // CAMERA MOTION IS ALSO AVATAR MOVEMENT
-
+  ////
   return (
     <>
       <video
@@ -120,7 +120,9 @@ function World({ avatarModel }) {
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
-          <Avatar faceCalculations={faceCalculations} />
+          {faceCalculations.current && (
+            <Avatar faceCalculations={faceCalculations} />
+          )}
           <Box position={[-1.2, 0, 0]} />
           <Box position={[1.2, 0, 0]} />
           <Terrain />
