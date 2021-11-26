@@ -10,7 +10,7 @@ import React, {useState, useEffect, useContext} from 'react';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
-import { BACKEND_URL } from '../../App';
+import { BACKEND_URL } from '../../BACKEND_URL';
 
 const AvatarButton = () => {
   const navigate = useNavigate();

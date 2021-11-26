@@ -5,7 +5,7 @@ import CubeHeadControls from './CubeHeadControls';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Slider, Typography, MenuItem, InputLabel, FormControl, Select, Button, TextField } from '@mui/material'
 import { CubeHead } from '../Avatars/CubeHead';
-import { BACKEND_URL } from '../../App';
+import { BACKEND_URL } from '../../BACKEND_URL';
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 

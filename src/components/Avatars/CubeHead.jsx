@@ -6,29 +6,29 @@ const shape = new THREE.Shape();
 shape.lineTo(0, 1);
 shape.lineTo(1, 0);
 
-const Head = () => {
+const Head = ({headHeight, headWidth, headLength, headColor}) => {
   return (
     <>
       {' '}
-      <boxGeometry args={[2, 2.5, 2]} />
-      <meshStandardMaterial color="gray" />
+      <boxGeometry args={[headWidth, headHeight, headLength]} />
+      <meshStandardMaterial color={headColor} />
     </>
   );
 };
-const Ear = () => {
+const Ear = ({earLength, earColor}) => {
   return (
     <>
-      <boxGeometry args={[0.5, 2, 1]} />
-      <meshStandardMaterial color="yellow" />
+      <boxGeometry args={[0.5, earLength, 1]} />
+      <meshStandardMaterial color={earColor} />
     </>
   );
 };
 
-const Eye = () => {
+const Eye = ({eyeColor}) => {
   return (
     <>
       <cylinderGeometry args={[0.25, 0.25, 0.25]} />
-      <meshStandardMaterial color="blue" />
+      <meshStandardMaterial color={eyeColor} />
     </>
   );
 };
@@ -78,7 +78,7 @@ const { leftEyeOpening, rightEyeOpening, mouthDim } =
 
     //UPDATE MOUTH
     if (mouthRef.current !== undefined) {
-      const { length, topBotHeight, midBotHeight } = mouthDim.current;
+      const { length, topBotHeight, midBotHeight } = mouthDim;
 
       const mouthVertices = [
         // top left bottom right
@@ -115,13 +115,13 @@ const { leftEyeOpening, rightEyeOpening, mouthDim } =
         </mesh>
         <mesh
           ref={leftEye}
-          position={[0.5, 0.5, 1]}
+          position={[0.5, 0.5, 0]}
           rotation={[Math.PI * 0.5, 0, 0]}
           scale={[1, 1, 2]}
         >
           <Eye eyeColor={eyeColor}/>
         </mesh>
-        <mesh position={[0, -0.25, 1.1]} ref={mouthRef}>
+        <mesh position={[0, -0.25, 0.1]} ref={mouthRef}>
           <Mouth />
         </mesh>
       </group>
