@@ -104,7 +104,15 @@ export const VideoFrame = ({
 };
 
 export const OtherVideoFrame = ({ videoRef, name }) => {
-  console.log('videoRef.current :>> ', videoRef.current);
+  try {
+    console.log(
+      'videoRef.current in otherVideoFrame:>> ',
+      videoRef.current.srcObject
+    );
+  } catch (e) {
+    console.log('no src object in other video frame');
+  }
+
   const styles = videoStyles();
   return (
     <Paper className={styles.paper} key="other">
