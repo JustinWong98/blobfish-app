@@ -69,11 +69,11 @@ const { leftEyeOpening, rightEyeOpening, mouthDim } =
     leftEye.current.scale.z = 0.3;
     rightEye.current.scale.z = 0.3;
 
-    if (leftEyeOpening.current > 0.3) {
-      leftEye.current.scale.z = 1 + leftEyeOpening.current;
+    if (leftEyeOpening > 0.3) {
+      leftEye.current.scale.z = 1 + leftEyeOpening;
     }
-    if (rightEyeOpening.current > 0.3) {
-      rightEye.current.scale.z = 1 + rightEyeOpening.current;
+    if (rightEyeOpening > 0.3) {
+      rightEye.current.scale.z = 1 + rightEyeOpening;
     }
 
     //UPDATE MOUTH
