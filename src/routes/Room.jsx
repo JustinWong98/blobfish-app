@@ -47,6 +47,7 @@ function Room({ username }) {
   const socketRef = useRef();
   const [videoIsSet, setVideo] = useState(false);
   const [threeCanvasStarted, setThreeCStart] = useState(false);
+  const [userVideoIsSet, setUserVideo] = useState(false);
 
   const socket = useContext(SocketContext);
   console.log('socket :>> ', socket);
@@ -103,8 +104,11 @@ function Room({ username }) {
       .then((currentStream) => {
         stream.current = currentStream;
         //plays video in steam
-        console.log('myVideo :>> ', myVideo);
         myVideo.current.srcObject = currentStream;
+        console.log(
+          'myVideo.current.srcObject :>> ',
+          myVideo.current.srcObject
+        );
         socketRef.current.emit('joined room', roomID);
         setVideo(true);
         // person who joins connects to other peers
@@ -173,6 +177,12 @@ function Room({ username }) {
     peer.on('stream', (currentStream) => {
       console.log('getting stream from receiver :>> ', currentStream);
       userVideo.current.srcObject = currentStream;
+      console.log(
+        'userVideo.current.srcObject in create:>> ',
+        userVideo.current.srcObject
+      );
+      console.log('userVideo.current :>> ', userVideo.current);
+      setUserVideo(currentStream);
     });
     return peer;
   };
@@ -204,6 +214,13 @@ function Room({ username }) {
     peer.on('stream', (currentStream) => {
       console.log('getting stream from new peer :>> ', currentStream);
       userVideo.current.srcObject = currentStream;
+      console.log(
+        'userVideo.current.srcObject in add:>> ',
+        userVideo.current.srcObject
+      );
+      console.log('userVideo.current :>> ', userVideo.current);
+      // neeeded for updating other video frame
+      setUserVideo(currentStream);
     });
     // fires the above event to fire
     peer.signal(incomingSignal);
@@ -228,6 +245,7 @@ function Room({ username }) {
           />
         </Grid>
         <Grid item xs={4}>
+          {/* create an array of useRefs, apply srcObject by index */}
           {peers.map((peer, index) => (
             <OtherVideoFrame name="other person" videoRef={userVideo} />
           ))}
