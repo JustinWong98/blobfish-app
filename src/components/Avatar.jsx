@@ -36,9 +36,15 @@ export const Avatar = ({ faceCalculations }) => {
   );
 };
 
-export const ThreeCanvas = ({ threeCanvasRef, faceCalculations }) => {
+export const ThreeCanvas = ({
+  threeCanvasRef,
+  faceCalculations,
+  setThreeCStart,
+}) => {
   const styles = videoStyles();
-
+  if (setThreeCStart) {
+    setThreeCStart(true);
+  }
   console.log('running three');
   return (
     <div id="canvas-container" className={styles.avatar}>
