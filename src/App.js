@@ -43,7 +43,7 @@ export const AvatarJSONContext = createContext()
 function App() {
   const useStyles = makeStyles();
   const classes = useStyles(theme);
-  const [avatarJSON, setAvatarJSON] = useState({})
+  const [avatarJSON, setAvatarJSON] = useState('Blobfish')
   const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
   const [username, setUsername] = useState(getCookie('username').trim());
   const [userId, setUserId] = useState(Number(getCookie('userId').trim()));

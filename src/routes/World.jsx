@@ -1,5 +1,4 @@
 import { Suspense, useRef, useState, useEffect, useContext } from 'react';
-
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { VideoFrame } from '../components/VideoElements';
 // import { Physics, userBox } from 'use-cannon';
@@ -33,7 +32,11 @@ function World({ avatarModel }) {
   const videoRef = useRef();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
-
+  const [coordinates, setCoordinates] = useState({
+    x: 0,
+    y: 0,
+    z: 0
+  })
   const styles = videoStyles();
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
 
@@ -113,11 +116,11 @@ function World({ avatarModel }) {
         style={{ background: 'skyblue' }}
         camera={{ position: [0, 0, 0] }}
       >
-        <CameraController />
+        <CameraController setCoordinates={setCoordinates}/>
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
-          <group>
+          <group position={[coordinates.x, coordinates.y, coordinates.z]}>
             {faceCalculations.current && (
               <Avatar faceCalculations={faceCalculations} />
             )}

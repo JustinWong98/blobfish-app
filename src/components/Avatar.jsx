@@ -23,18 +23,20 @@ export const Avatar = ({ faceCalculations, avatarJSON, setAvatarJSON }) => {
         console.log('faceCalculations.current :>> ', faceCalculations.current);
       setChosenAvatar(<CubeHead faceCalculations={faceCalculations} headHeight={2.5} headWidth={2} headLength={2} earLength={2} headColor='#808080' earColor='#ffff00' eyeColor='#0000ff'/>)
     }
-    switch (avatarJSON.model) {
-      case 'Blobfish':
-        setChosenAvatar(<Blobfish faceCalculations={faceCalculations} xAxis={avatarJSON.xAxis} yAxis={avatarJSON.yAxis} zAxis={avatarJSON.zAxis} size={avatarJSON.size} />)
-        break
-      case 'CubeHead':
-         setChosenAvatar(<CubeHead faceCalculations={faceCalculations} headHeight={avatarJSON.headHeight} headWidth={avatarJSON.headWidth} headLength={avatarJSON.headLength} earLength={avatarJSON.earLength} headColor={avatarJSON.headColor} earColor={avatarJSON.earColor} eyeColor={avatarJSON.eyeColor}/>)
-        break
-      default:
-        return
-    }
+    else {
+    // switch (avatarJSON.model) {
+    //   case 'Blobfish':
+    //     setChosenAvatar(<Blobfish faceCalculations={faceCalculations} xAxis={avatarJSON.xAxis} yAxis={avatarJSON.yAxis} zAxis={avatarJSON.zAxis} size={avatarJSON.size} />)
+    //     break
+    //   case 'CubeHead':
+    //      setChosenAvatar(<CubeHead faceCalculations={faceCalculations} headHeight={avatarJSON.headHeight} headWidth={avatarJSON.headWidth} headLength={avatarJSON.headLength} earLength={avatarJSON.earLength} headColor={avatarJSON.headColor} earColor={avatarJSON.earColor} eyeColor={avatarJSON.eyeColor}/>)
+    //     break
+    //   default:
+    //     return
+    // }
+  }
+    setChosenAvatar(<Blobfish faceCalculations={faceCalculations} xAxis={2.5} yAxis={2.5} zAxis={2.5} size={1}/>)
   }, [avatarJSON])
-  // let chosenAvatar = <Blobfish faceCalculations={faceCalculations} />;
 
   const myMesh = useRef();
 

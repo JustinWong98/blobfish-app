@@ -1,10 +1,11 @@
 import { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Text, Stats } from '@react-three/drei'
 
 const keyPressed = {};
 
-export const CameraController = () => {
+export const CameraController = ({setCoordinates}) => {
   const { camera, gl } = useThree();
 
   useFrame((_, delta) => {
@@ -29,20 +30,40 @@ export const CameraController = () => {
       switch (key) {
         case 'w':
           camera.translateZ(-momentum);
-          camera.position.set(camera.position.x, 0, camera.position.z);
+          camera.position.set(camera.position.x, 0, camera.position.z)
+          setCoordinates({
+            x: camera.position.x,
+            y: 0,
+            z: camera.position.z + 5
+          });
 
           break;
         case 's':
           camera.translateZ(momentum);
           camera.position.set(camera.position.x, 0, camera.position.z);
+          setCoordinates({
+            x: camera.position.x,
+            y: 0,
+            z: camera.position.z + 5
+          });
           break;
         case 'd':
           camera.translateX(momentum);
           camera.position.set(camera.position.x, 0, camera.position.z);
+          setCoordinates({
+            x: camera.position.x,
+            y: 0,
+            z: camera.position.z + 5
+          });
           break;
         case 'a':
           camera.translateX(-momentum);
           camera.position.set(camera.position.x, 0, camera.position.z);
+          setCoordinates({
+            x: camera.position.x,
+            y: 0,
+            z: camera.position.z + 5
+          });
           break;
         default:
       }
