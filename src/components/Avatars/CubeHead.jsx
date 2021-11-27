@@ -6,29 +6,29 @@ const shape = new THREE.Shape();
 shape.lineTo(0, 1);
 shape.lineTo(1, 0);
 
-const Head = () => {
+const Head = ({headHeight, headWidth, headLength, headColor}) => {
   return (
     <>
       {' '}
-      <boxGeometry args={[2, 2.5, 2]} />
-      <meshStandardMaterial color="gray" />
+      <boxGeometry args={[headWidth, headHeight, headLength]} />
+      <meshStandardMaterial color={headColor} />
     </>
   );
 };
-const Ear = () => {
+const Ear = ({earLength, earColor}) => {
   return (
     <>
-      <boxGeometry args={[0.5, 2, 1]} />
-      <meshStandardMaterial color="yellow" />
+      <boxGeometry args={[0.5, earLength, 1]} />
+      <meshStandardMaterial color={earColor} />
     </>
   );
 };
 
-const Eye = () => {
+const Eye = ({eyeColor}) => {
   return (
     <>
       <cylinderGeometry args={[0.25, 0.25, 0.25]} />
-      <meshStandardMaterial color="blue" />
+      <meshStandardMaterial color={eyeColor} />
     </>
   );
 };
@@ -49,28 +49,36 @@ const Mouth = ({ mouthRef }) => {
     </>
   );
 };
-export const CubeHead = ({ leftEyeOpening, rightEyeOpening, mouthDim }) => {
+export const CubeHead = ({ faceCalculations,
+headHeight,
+headWidth,
+headLength,
+earLength,
+headColor,
+earColor,
+eyeColor }) => {
   const leftEye = useRef();
   const rightEye = useRef();
   const mouthRef = useRef();
 
   useFrame((state, delta) => {
     // console.log('delta :>> ', delta * 1000);
-
+const { leftEyeOpening, rightEyeOpening, mouthDim } =
+      faceCalculations.current;
     //UPDATE EYES
     leftEye.current.scale.z = 0.3;
     rightEye.current.scale.z = 0.3;
 
-    if (leftEyeOpening.current > 0.3) {
-      leftEye.current.scale.z = 1 + leftEyeOpening.current;
+    if (leftEyeOpening > 0.3) {
+      leftEye.current.scale.z = 1 + leftEyeOpening;
     }
-    if (rightEyeOpening.current > 0.3) {
-      rightEye.current.scale.z = 1 + rightEyeOpening.current;
+    if (rightEyeOpening > 0.3) {
+      rightEye.current.scale.z = 1 + rightEyeOpening;
     }
 
     //UPDATE MOUTH
     if (mouthRef.current !== undefined) {
-      const { length, topBotHeight, midBotHeight } = mouthDim.current;
+      const { length, topBotHeight, midBotHeight } = mouthDim;
 
       const mouthVertices = [
         // top left bottom right
@@ -88,33 +96,35 @@ export const CubeHead = ({ leftEyeOpening, rightEyeOpening, mouthDim }) => {
   return (
     <>
       <mesh>
-        <Head />
+        <Head headHeight={headHeight} headWidth={headWidth} headLength={headLength} headColor={headColor}/>
       </mesh>
       <mesh position={[1.25, 1.5, 0.0]}>
-        <Ear />
+        <Ear earLength={earLength} earColor={earColor}/>
       </mesh>
       <mesh position={[-1.25, 1.5, 0.0]}>
-        <Ear />
+        <Ear earLength={earLength} earColor={earColor}/>
       </mesh>
-      <mesh
-        ref={rightEye}
-        position={[-0.5, 0.5, 1]}
-        rotation={[Math.PI * 0.5, 0, 0]}
-        scale={[1, 1, 2]}
-      >
-        <Eye />
-      </mesh>
-      <mesh
-        ref={leftEye}
-        position={[0.5, 0.5, 1]}
-        rotation={[Math.PI * 0.5, 0, 0]}
-        scale={[1, 1, 2]}
-      >
-        <Eye />
-      </mesh>
-      <mesh position={[0, -0.25, 1.1]} ref={mouthRef}>
-        <Mouth />
-      </mesh>
+      <group position={[0,0,headLength/2]}>
+        <mesh
+          ref={rightEye}
+          position={[-0.5, 0.5, 0]}
+          rotation={[Math.PI * 0.5, 0, 0]}
+          scale={[1, 1, 2]}
+        >
+          <Eye eyeColor={eyeColor}/>
+        </mesh>
+        <mesh
+          ref={leftEye}
+          position={[0.5, 0.5, 0]}
+          rotation={[Math.PI * 0.5, 0, 0]}
+          scale={[1, 1, 2]}
+        >
+          <Eye eyeColor={eyeColor}/>
+        </mesh>
+        <mesh position={[0, -0.25, 0.1]} ref={mouthRef}>
+          <Mouth />
+        </mesh>
+      </group>
     </>
   );
 };

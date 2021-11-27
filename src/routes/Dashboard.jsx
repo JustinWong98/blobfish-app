@@ -1,9 +1,10 @@
-import { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import { VideoFrame } from '../components/VideoElements';
 import { Typography, Container, Box, Grid } from '@mui/material';
 import RoomRepo from '../components/Dashboard/RoomRepo';
 import AvatarPanel from '../components/Dashboard/AvatarPanel';
 import { getWebCamStream } from '../modules/webcam.jsx';
+import { AvatarJSONContext } from '../App';
 
 function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
   const myVideo = useRef();
@@ -11,7 +12,7 @@ function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
   const threeCanvasRef = useRef();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
-
+  const {avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext)
   // to update with default config, etc
 
   useEffect(() => {
