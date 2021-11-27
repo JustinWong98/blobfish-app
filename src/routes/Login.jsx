@@ -52,6 +52,7 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
   const [password, setPassword] = useState();
   const navigate = useNavigate();
 
+  console.log('in login');
   const handleClick = (e) => {
     e.preventDefault();
 

@@ -7,10 +7,8 @@ import React, {
 } from 'react';
 import { Grid, Typography, Paper } from '@material-ui/core';
 import { videoStyles } from '../modules/useStyles.jsx';
-
 import { ThreeCanvas } from './Avatar';
 import { AvatarJSONContext } from '../App.js';
-
 
 import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
@@ -29,7 +27,7 @@ export const VideoFrame = ({
   threeCanvasRef,
   setThreeCStart,
 }) => {
-  const {avatarJSON, setAvatarJSON} = useContext(AvatarJSONContext)
+  const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   const styles = videoStyles();
   const faceCalculations = useRef({

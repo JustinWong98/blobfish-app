@@ -24,12 +24,14 @@ import {
 } from '../components/face/facemesh.jsx';
 
 import { Avatar } from '../components/Avatar.jsx';
+import { AvatarJSONContext } from '../App.js';
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
 // get stream of playerAudio in the world, join them
 function World({ avatarModel }) {
   console.log('loading world');
+  const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
   const videoRef = useRef();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
@@ -53,10 +55,11 @@ function World({ avatarModel }) {
       mouthTopBot: 0,
     },
   });
+
   //redirect to a standard world with standard id for socket emits
 
   // decide on world dimensions
-
+  console.log('avatarJSON :>> ', avatarJSON);
   useEffect(() => {
     console.log('in world use efeect');
     document.addEventListener('keydown', handleKeyDown);
@@ -118,8 +121,17 @@ function World({ avatarModel }) {
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
           <group>
-            {faceCalculations.current && (
+            {/* {faceCalculations.current && (
               <Avatar faceCalculations={faceCalculations} />
+            )
+            } */}
+            {faceCalculations.current && (
+              <Avatar
+                faceCalculations={faceCalculations}
+                avatarJSON={avatarJSON}
+                // placeholder for now
+                setAvatarJSON={setAvatarJSON}
+              />
             )}
           </group>
           <Terrain />
