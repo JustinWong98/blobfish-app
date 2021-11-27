@@ -3,7 +3,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { VideoFrame } from '../components/VideoElements';
 // import { Physics, userBox } from 'use-cannon';
 import { Terrain, Box } from '../components/World/baseElements.jsx';
-
 import { SocketContext } from '../components/context/sockets.js';
 import {
   handleKeyDown,
@@ -11,19 +10,20 @@ import {
   CameraController,
 } from '../components/World/CameraController';
 import { getWebCamStream } from '../modules/webcam';
-
 import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 //  import
 import { videoStyles } from '../modules/useStyles.jsx';
-
 import {
   onResultsCalFace,
   faceMeshSetup,
 } from '../components/face/facemesh.jsx';
-
 import { Avatar } from '../components/Avatar.jsx';
 import { AvatarJSONContext } from '../App.js';
+import { Stars, Sky } from '@react-three/drei';
+// import {receiverSendSignal, getUsers, newUserJoins, createPeer, addPeer} from '../routes/Room.jsx'
+
+
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
@@ -31,6 +31,7 @@ import { AvatarJSONContext } from '../App.js';
 function World({ avatarModel }) {
   console.log('loading world');
   const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
+  const [peers, setPeers] = useState([]);
   const videoRef = useRef();
   const stream = useRef();
   const [videoIsSet, setVideo] = useState(false);
@@ -43,7 +44,8 @@ function World({ avatarModel }) {
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
 
   const socket = useContext(SocketContext);
-
+  const socketRef = useRef();
+  socketRef.current = socket;
   const faceCalculations = useRef({
     angle: {
       pitch: 0,
@@ -78,6 +80,8 @@ function World({ avatarModel }) {
   useEffect(() => {
     console.log('use effect in videoPlayer');
     getWebCamStream(stream, videoRef, setVideo);
+    
+    ;
     //socket to emit that room is joined
   }, [videoRef]);
 
@@ -116,9 +120,9 @@ function World({ avatarModel }) {
         style={{ display: 'none' }}
       />
       <Canvas
-        style={{ background: 'skyblue' }}
         camera={{ position: [0, 0, 0] }}
       >
+        <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
         <CameraController setCoordinates={setCoordinates}/>
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />

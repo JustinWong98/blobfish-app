@@ -48,7 +48,7 @@ function Room({ username }) {
   console.log('socketRef.current :>> ', socketRef.current);
   console.log('threeCanvasRef :>> ', threeCanvasRef);
 
-  const receiverSendSignal = (data) => {
+   const receiverSendSignal = (data) => {
     // find peer that we are receiving from since we are going to receive multiple peers.
     // we loop through the list of peers and match the id of the one trying to signal us
     const item = peersRef.current.find((p) => p.peerID === data.id);

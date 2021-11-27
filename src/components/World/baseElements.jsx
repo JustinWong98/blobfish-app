@@ -1,6 +1,7 @@
 import { Suspense, useRef, useState, useEffect } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
+import {Tree} from '../World/Tree.jsx'
+import { useTexture } from "@react-three/drei"
 export function Box(props) {
   // This reference gives us direct access to the THREE.Mesh object
   const ref = useRef();
@@ -26,10 +27,14 @@ export function Box(props) {
 }
 
 export const Terrain = () => {
+    const colorMap = useTexture( 'PavingStones092_2K_Color.jpg')
   return (
     <mesh visible position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
       <planeBufferGeometry attach="geometry" args={[5000, 5000, 128, 128]} />
-      <meshBasicMaterial color="gray" />
+      <group rotation={[-11,0,0]}>
+        <Tree args={[10,0,10]}/>
+      </group>
+      <meshBasicMaterial map={colorMap} />
       {/* <meshStandardMaterial
         attach="material"
         color="white"
