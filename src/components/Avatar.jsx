@@ -59,9 +59,13 @@ export const Avatar = ({ faceCalculations, avatarJSON, setAvatarJSON }) => {
   );
 };
 
-export const ThreeCanvas = ({ threeCanvasRef, faceCalculations, avatarJSON, setAvatarJSON }) => {
-  const styles = videoStyles();
 
+export const ThreeCanvas = ({ threeCanvasRef, faceCalculations, avatarJSON, setAvatarJSON, setThreeCStart }) => {
+
+  const styles = videoStyles();
+  if (setThreeCStart) {
+    setThreeCStart(true);
+  }
   console.log('running three');
   return (
     <div id="canvas-container" className={styles.avatar}>

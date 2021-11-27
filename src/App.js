@@ -39,7 +39,7 @@ const theme = createTheme({
   },
 });
 
-export const AvatarJSONContext = createContext()
+export const AvatarJSONContext = createContext();
 function App() {
   const useStyles = makeStyles();
   const classes = useStyles(theme);
@@ -56,49 +56,49 @@ function App() {
     <SocketContext.Provider value={socket}>
       <CookiesProvider>
         <ThemeProvider theme={theme}>
-          <AvatarJSONContext.Provider value={{avatarJSON, setAvatarJSON}}>
-          <BrowserRouter>
-            <NavBar />
-            <Routes>
-              <Route path="/front" element={<Front />} />
-              <Route
-                path="/signup"
-                element={
-                  <SignUp
-                    setIsLoggedIn={setIsLoggedIn}
-                    setUsername={setUsername}
-                  />
-                }
-              />
-              <Route
-                path="/login"
-                element={
-                  <Login
-                    setIsLoggedIn={setIsLoggedIn}
-                    setUsername={setUsername}
-                  />
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <Dashboard
-                    isLoggedIn={isLoggedIn}
-                    username={username}
-                    userId={userId}
-                    avatarModel={avatarModel}
-                    setAvatar={setAvatar}
-                  />
-                }
-              />
-              <Route path="/avatar" element={<AvatarEditor />} />
-              <Route path="/" element={<World avatarModel={avatarModel} />} />
-              <Route
-                path="/room/:roomID"
-                element={<Room key="videoPlayer" username={username} />}
-              />
-            </Routes>
-          </BrowserRouter>
+          <AvatarJSONContext.Provider value={{ avatarJSON, setAvatarJSON }}>
+            <BrowserRouter>
+              <NavBar />
+              <Routes>
+                <Route path="/front" element={<Front />} />
+                <Route
+                  path="/signup"
+                  element={
+                    <SignUp
+                      setIsLoggedIn={setIsLoggedIn}
+                      setUsername={setUsername}
+                    />
+                  }
+                />
+                <Route
+                  path="/login"
+                  element={
+                    <Login
+                      setIsLoggedIn={setIsLoggedIn}
+                      setUsername={setUsername}
+                    />
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <Dashboard
+                      isLoggedIn={isLoggedIn}
+                      username={username}
+                      userId={userId}
+                      avatarModel={avatarModel}
+                      setAvatar={setAvatar}
+                    />
+                  }
+                />
+                <Route path="/avatar" element={<AvatarEditor />} />
+                <Route path="/" element={<World avatarJSON={avatarJSON} />} />
+                <Route
+                  path="/room/:roomID"
+                  element={<Room key="videoPlayer" username={username} />}
+                />
+              </Routes>
+            </BrowserRouter>
           </AvatarJSONContext.Provider>
         </ThemeProvider>
       </CookiesProvider>

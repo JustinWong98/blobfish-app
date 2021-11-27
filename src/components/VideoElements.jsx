@@ -27,7 +27,7 @@ export const VideoFrame = ({
   threeCanvasRef,
   setThreeCStart,
 }) => {
-  const {avatarJSON, setAvatarJSON} = useContext(AvatarJSONContext)
+  const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   const styles = videoStyles();
   const faceCalculations = useRef({
@@ -92,9 +92,15 @@ export const VideoFrame = ({
             setAvatarJSON={setAvatarJSON}
           />
         )}
+        {/* {faceMeshStarted && (
+          <StreamedThreeCanvas
+            threeCanvasRef={threeCanvasRef}
+            styles={styles}
+            faceCalculations={faceCalculations}
+            className={'align-middle'}
+          />
+        )} */}
         {videoIsSet && <VidCanvas canvasRef={canvasRef} styles={styles} />}
-        {/* <Suspense fallback={null}> */}
-        {/* </Suspense> */}
         <Typography variant="h5" gutterBottom className="text-center">
           {name || ''}
         </Typography>
@@ -103,24 +109,31 @@ export const VideoFrame = ({
   );
 };
 
-export const OtherVideoFrame = ({ videoRef, name }) => {
-  try {
-    console.log(
-      'videoRef.current in otherVideoFrame:>> ',
-      videoRef.current.srcObject
-    );
-  } catch (e) {
-    console.log('no src object in other video frame');
-  }
-
+export const OtherVideoFrame = ({ videoRef, name, peer }) => {
+  // try {
+  //   console.log(
+  //     'videoRef.current in otherVideoFrame:>> ',
+  //     videoRef.current.srcObject
+  //   );
+  // } catch (e) {
+  //   console.log('no src object in other video frame');
+  // }
   const styles = videoStyles();
+
+  const ref = useRef();
+  useEffect(() => {
+    peer.on('stream', (stream) => {
+      ref.current.srcObject = stream;
+    });
+  }, []);
+  console.log('peer :>> ', peer);
   return (
     <Paper className={styles.paper} key="other">
       <Grid item xs={12} md={12} className={'m-2'}>
-        <video playsInline ref={videoRef} autoPlay className={styles.video} />
+        <video playsInline ref={ref} autoPlay className={styles.video} />
       </Grid>
       <Typography variant="h5" gutterBottom>
-        {name || ''}
+        {peer.channelName || ''}
       </Typography>
     </Paper>
   );
