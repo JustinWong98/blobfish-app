@@ -108,9 +108,12 @@ function Room({ username }) {
       })
       .then(() => {
         // when handshake is complete - receiver gives back a signal
-        socketRef.current.on('get users', getUsers);
+        socketRef.current.on('get users', getUsers); 
         socketRef.current.on('user joined', newUserJoins);
         socketRef.current.on('receiving returned signal', receiverSendSignal);
+
+        // on user disconnect remove them? get again
+        socketRef.current.on('');
       })
       .catch((err) => {
         console.log('error in getting stream', err);
@@ -164,6 +167,7 @@ function Room({ username }) {
       initiator: true,
       trickle: false,
       stream: userStream,
+  
     });
 
     peer.on('signal', (signal) => {
@@ -174,7 +178,6 @@ function Room({ username }) {
       });
       console.log('peer signal in create:>> ', signal);
     });
-    // needed?
     return peer;
   };
 
@@ -220,7 +223,7 @@ function Room({ username }) {
         <Grid item xs={4}>
           {peers.map((peer, index) => (
             <OtherVideoFrame name="other person" peer={peer} />
-          ))}
+            ))}
         </Grid>
       </Grid>
     </div>
