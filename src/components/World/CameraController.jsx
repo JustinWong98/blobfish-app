@@ -1,9 +1,12 @@
 import { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { Text, Stats } from '@react-three/drei';
-import * as THREE from 'three';
-import { playerControls } from './PlayerController';
+
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
+import { Text, Stats } from '@react-three/drei'
+import * as THREE from 'three'
+import {playerControls} from './PlayerController'
+
 
 const keyPressed = {};
 
@@ -63,13 +66,9 @@ export const CameraController = ({ setCoordinates, coordinates }) => {
     controls.minDistance = 3;
     controls.maxDistance = 20;
     controls.maxPolarAngle = Math.PI / 2;
-    // controls.target=[coordinates.x, coordinates.y, coordinates.z]
-    const newTarget = new THREE.Vector3(
-      coordinates.x,
-      coordinates.y,
-      coordinates.z
-    );
-    // camera.position.set(0, 0, 5);
+
+    camera.position.set(0, 0, 5);
+
     // for when avartar is facing others
     // camera.position.set(0, 0, -5);
     // camera.rotation.y = Math.PI;
