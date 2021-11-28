@@ -6,7 +6,7 @@ import { listener } from '../modules/sockets.mjs';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { VideoFrame } from '../components/VideoElements';
 // import { Physics, userBox } from 'use-cannon';
-import { Terrain, Box } from '../components/World/baseElements.jsx';
+import { Terrain, Box, extents } from '../components/World/baseElements.jsx';
 import { SocketContext } from '../components/context/sockets.js';
 import {
   handleKeyDown,
@@ -24,13 +24,14 @@ import {
 import { Avatar } from '../components/Avatar.jsx';
 import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
+import { extent } from '../components/World/baseElements.jsx';
 // import {receiverSendSignal, getUsers, newUserJoins, createPeer, addPeer} from '../routes/Room.jsx'
 
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
 // get stream of playerAudio in the world, join them
-function World({ }) {
+function World({}) {
   console.log('loading world');
   const { worldID } = useParams();
 
@@ -39,13 +40,18 @@ function World({ }) {
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   // AVATAR
   const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
+  // const [coordinates, setCoordinates] = useState({
+  //   x: 0,
+  //   y: 0,
+  //   z: 0,
+  // });
   const [coordinates, setCoordinates] = useState({
-    x: 0,
+    x: -extents / 10 + (Math.random() * extents) / 5,
     y: 0,
-
-    z: 0,
+    z: -extents / 10 + (Math.random() * extents) / 5,
   });
 
+  console.log('coordinates in world :>> ', coordinates);
   const faceCalculations = useRef({
     angle: {
       pitch: 0,
@@ -284,18 +290,27 @@ function World({ }) {
       <Canvas
         camera={{ position: [coordinates.x, coordinates.y, coordinates.z] }}
       >
-        <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
-        <CameraController setCoordinates={setCoordinates} coordinates={coordinates}/>
+        <Sky
+          distance={450000}
+          sunPosition={[0, 1, 0]}
+          inclination={0}
+          azimuth={0.25}
+        />
+        <CameraController
+          setCoordinates={setCoordinates}
+          coordinates={coordinates}
+        />
 
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
           <group position={[coordinates.x, coordinates.y, coordinates.z]}>
             {faceCalculations.current && (
-
-              <Avatar faceCalculations={faceCalculations} avatarJSON={avatarJSON}/>
-            )
-            }
+              <Avatar
+                faceCalculations={faceCalculations}
+                avatarJSON={avatarJSON}
+              />
+            )}
 
             {faceCalculations.current && (
               <Avatar
