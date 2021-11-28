@@ -106,7 +106,9 @@ function App() {
                   path="/world/:worldID"
                   // path="/world/:roomID"
                   // element={<Room key="videoPlayer" username={username} />}
-                  element={<World avatarJSON={avatarJSON} />}
+                  element={
+                    <World avatarJSON={avatarJSON} username={username} />
+                  }
                 />
                 <Route
                   path="/room/:roomID"
@@ -114,9 +116,16 @@ function App() {
                 />
                 <Route
                   path="/:worldID"
-                  element={<World avatarJSON={avatarJSON} />}
+                  element={
+                    <World avatarJSON={avatarJSON} username={username} />
+                  }
                 />
-                <Route path="/" element={<World avatarJSON={avatarJSON} />} />
+                <Route
+                  path="/"
+                  element={
+                    <World avatarJSON={avatarJSON} username={username} />
+                  }
+                />
               </Routes>
             </BrowserRouter>
           </AvatarJSONContext.Provider>
