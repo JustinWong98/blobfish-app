@@ -24,8 +24,8 @@ const RoomButton = ({ uuid }) => {
   const navigate = useNavigate();
   const handleClick = (e) => {
     e.preventDefault();
-    navigate(`/dashboard`);
-    navigate(`/room/${uuid}`);
+    // navigate(`/dashboard`);
+    navigate(`/world/${uuid}`);
   };
 
   return (
