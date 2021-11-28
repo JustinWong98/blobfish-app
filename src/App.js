@@ -112,6 +112,10 @@ function App() {
                   path="/room/:roomID"
                   element={<Room key="videoPlayer" username={username} />}
                 />
+                <Route
+                  path="/:worldID"
+                  element={<World avatarJSON={avatarJSON} />}
+                />
                 <Route path="/" element={<World avatarJSON={avatarJSON} />} />
               </Routes>
             </BrowserRouter>

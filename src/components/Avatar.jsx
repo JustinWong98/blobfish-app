@@ -81,8 +81,6 @@ export const Avatar = ({ faceCalculations, avatarJSON, coordinates }) => {
     myMesh.current.rotation.x = angle.pitch * 1.5; //up down tilt
     myMesh.current.rotation.y = -angle.yaw * 1.5;
     myMesh.current.rotation.z = -angle.roll * 0.5; //left right tilt
-    console.log('myMesh.current :>> ', myMesh.current);
-    console.log('coordinates:>> ', coordinates);
     if (coordinates !== undefined) {
       myMesh.current.position.set(
         coordinates.current.x,

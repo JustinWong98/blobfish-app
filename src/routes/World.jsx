@@ -1,4 +1,11 @@
-import { Suspense, useRef, useState, useEffect, useContext } from 'react';
+import {
+  Suspense,
+  useRef,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import { useParams } from 'react-router-dom';
 import Peer from 'simple-peer';
 import { listener } from '../modules/sockets.mjs';
@@ -25,6 +32,7 @@ import { Avatar } from '../components/Avatar.jsx';
 import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
 import { extent } from '../components/World/baseElements.jsx';
+import { OtherAudio } from '../components/World/audio.jsx';
 
 // import {receiverSendSignal, getUsers, newUserJoins, createPeer, addPeer} from '../routes/Room.jsx'
 
@@ -66,9 +74,9 @@ function World({}) {
   // VIDEO
   const myVideo = useRef();
   const [videoIsSet, setVideo] = useState(false);
-  const stream = useRef();
+  const stream = useRef(new MediaStream());
   const placeHolderMediaStream = new MediaStream();
-  const streamLocal = useRef(placeHolderMediaStream);
+  const audioStream = useRef(placeHolderMediaStream);
 
   // SOCKETS
   const socket = useContext(SocketContext);
@@ -101,7 +109,12 @@ function World({}) {
     users.forEach((userID) => {
       // for each user, create a peer and send in our id and stream
       // TODO: CHANGE STREAM TO DATA CHANNEL?? NOPE CHANGE TO AUDIO STREAM AND IMPLEMMENT SEPARATE DATA CHANNEL
-      const peer = createPeer(userID, socketRef.current.id, stream.current);
+      //TO MOD INTO AUDIO CHANNEL
+      const peer = createPeer(
+        userID,
+        socketRef.current.id,
+        audioStream.current
+      );
       // peersRef will handle collection of peers (all simple peer logic)
       peersRef.current.push({
         peerID: userID,
@@ -150,7 +163,7 @@ function World({}) {
     });
     // fires the above event to fire
     peer.signal(incomingSignal);
-    peer.send('whatever' + Math.random());
+    // peer.send('whatever' + Math.random());
     peer.on('data', (data) => {
       console.log('data: ' + data);
     });
@@ -160,13 +173,13 @@ function World({}) {
   const newUserJoins = ({ signal, callerID }) => {
     console.log('callId in user joined:>> ', callerID);
     // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
-    const peer = addPeer(signal, callerID, stream.current);
+    const peer = addPeer(signal, callerID, audioStream.current);
     peersRef.current.push({
       peerID: callerID,
       peer,
     });
 
-    peer.send('whatever' + Math.random());
+    // peer.send('whatever' + Math.random());
     peer.on('data', (data) => {
       console.log('data: ' + data);
     });
@@ -187,9 +200,26 @@ function World({}) {
     };
   }, []);
 
+  const getVideoAudioStream = useCallback(async () => {
+    await getWebCamStream(stream, videoRef, setVideo);
+
+    // console.log('userStream before :>> ', userStream);
+    // const audioTrack = userStream.getAudioTracks();
+    // console.log('audioTrack :>> ', audioTrack);
+    // audioStream.current.addTrack(audioTrack[0]);
+    // console.log('userStream :>> ', userStream);
+    // console.log('userStream before :>> ', userStream);
+    const audioTrack = stream.current.getAudioTracks();
+    console.log('audioTrack :>> ', audioTrack);
+    audioStream.current.addTrack(audioTrack[0]);
+    console.log('audioStream.current :>> ', audioStream.current);
+    // console.log('userStream :>> ', userStream);
+  });
   useEffect(() => {
     console.log('use effect in videoPlayer');
-    getWebCamStream(stream, videoRef, setVideo);
+    getVideoAudioStream();
+    // getWebCamStream(stream, videoRef, setVideo);
+
     //socket to emit that room is joined
     socketRef.current.emit('joined room', worldID);
     socketRef.current.on('get users', getUsers);
@@ -241,7 +271,7 @@ function World({}) {
         playsInline
         ref={videoRef}
         autoPlay
-        muted
+        // muted
         style={{ display: 'none' }}
       />
 
@@ -285,6 +315,10 @@ function World({}) {
         {/* The X axis is red. The Y axis is green. The Z axis is blue */}
         <axesHelper />
       </Canvas>
+      {peers.map((peer, index) => (
+        <OtherAudio name="other person" peer={peer} />
+      ))}
+      {/* audio from everyone */}
     </>
   );
 }
