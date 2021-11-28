@@ -43,7 +43,7 @@ export const AvatarJSONContext = createContext();
 function App() {
   const useStyles = makeStyles();
   const classes = useStyles(theme);
-  const [avatarJSON, setAvatarJSON] = useState('Blobfish')
+  const [avatarJSON, setAvatarJSON] = useState('Blobfish');
   const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
   const [username, setUsername] = useState(getCookie('username').trim());
   const [userId, setUserId] = useState(Number(getCookie('userId').trim()));
@@ -92,11 +92,17 @@ function App() {
                   }
                 />
                 <Route path="/avatar" element={<AvatarEditor />} />
-                <Route path="/" element={<World avatarJSON={avatarJSON} />} />
+                <Route
+                  path="/world/:worldID"
+                  // path="/world/:roomID"
+                  // element={<Room key="videoPlayer" username={username} />}
+                  element={<World avatarJSON={avatarJSON} />}
+                />
                 <Route
                   path="/room/:roomID"
                   element={<Room key="videoPlayer" username={username} />}
                 />
+                <Route path="/" element={<World avatarJSON={avatarJSON} />} />
               </Routes>
             </BrowserRouter>
           </AvatarJSONContext.Provider>

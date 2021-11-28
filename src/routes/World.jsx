@@ -1,4 +1,8 @@
 import { Suspense, useRef, useState, useEffect, useContext } from 'react';
+import { useParams } from 'react-router-dom';
+import Peer from 'simple-peer';
+import { listener } from '../modules/sockets.mjs';
+
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { VideoFrame } from '../components/VideoElements';
 // import { Physics, userBox } from 'use-cannon';
@@ -13,7 +17,6 @@ import { getWebCamStream } from '../modules/webcam';
 import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 //  import
-import { videoStyles } from '../modules/useStyles.jsx';
 import {
   onResultsCalFace,
   faceMeshSetup,
@@ -23,30 +26,26 @@ import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
 // import {receiverSendSignal, getUsers, newUserJoins, createPeer, addPeer} from '../routes/Room.jsx'
 
-
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
 // get stream of playerAudio in the world, join them
 function World({ }) {
   console.log('loading world');
-  const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
-  const [peers, setPeers] = useState([]);
+  const { worldID } = useParams();
+
+  // FACE MESH CALC
   const videoRef = useRef();
-  const stream = useRef();
-  const [videoIsSet, setVideo] = useState(false);
+  const [faceMeshStarted, setFaceMeshStart] = useState(false);
+  // AVATAR
+  const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
   const [coordinates, setCoordinates] = useState({
     x: 0,
     y: 0,
-    z: 0
-  })
-  const styles = videoStyles();
-  const [faceMeshStarted, setFaceMeshStart] = useState(false);
 
-  const socket = useContext(SocketContext);
-  const socketRef = useRef();
+    z: 0,
+  });
 
-  socketRef.current = socket;
   const faceCalculations = useRef({
     angle: {
       pitch: 0,
@@ -61,8 +60,154 @@ function World({ }) {
       mouthTopBot: 0,
     },
   });
+  // VIDEO
+  const myVideo = useRef();
+  const [videoIsSet, setVideo] = useState(false);
+  const stream = useRef();
+  const placeHolderMediaStream = new MediaStream();
+  const streamLocal = useRef(placeHolderMediaStream);
 
-  //redirect to a standard world with standard id for socket emits
+  // SOCKETS
+  const socket = useContext(SocketContext);
+  const socketRef = useRef();
+  socketRef.current = socket;
+
+  // PEERS
+  const [me, setMe] = useState('');
+  const [call, setCall] = useState({});
+  const [callAccepted, setCallAccepted] = useState(false);
+  const [callEnded, setCallEnded] = useState(false);
+  const [peers, setPeers] = useState([]);
+  const peersRef = useRef([]);
+
+  // CONNECTIONS
+
+  const receiverSendSignal = (data) => {
+    // find peer that we are receiving from since we are going to receive multiple peers.
+    // we loop through the list of peers and match the id of the one trying to signal us
+    const item = peersRef.current.find((p) => p.peerID === data.id);
+    item.peer.signal(data.signal);
+  };
+
+  const callUserSetCall = ({ from, name: callerName, signal }) => {
+    setCall({ isReceivingCall: true, from, name: callerName, signal });
+  };
+
+  const getUsers = (users) => {
+    const peers = [];
+    users.forEach((userID) => {
+      // for each user, create a peer and send in our id and stream
+      // TODO: CHANGE STREAM TO DATA CHANNEL?? NOPE CHANGE TO AUDIO STREAM AND IMPLEMMENT SEPARATE DATA CHANNEL
+      const peer = createPeer(userID, socketRef.current.id, stream.current);
+      // peersRef will handle collection of peers (all simple peer logic)
+      peersRef.current.push({
+        peerID: userID,
+        peer,
+      });
+      // setting state of array of peers for rendering purposes
+      peers.push(peer);
+    });
+    setPeers(peers);
+  };
+  const createPeer = (userToSignal, callerID, userStream) => {
+    console.log('streaming from create peer :>> ', userStream);
+    const peer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: userStream,
+    });
+
+    peer.on('signal', (signal) => {
+      socketRef.current.emit('sending signal', {
+        userToSignal,
+        callerID,
+        signal,
+      });
+      console.log('peer signal in create:>> ', signal);
+    });
+    return peer;
+  };
+
+  // incomingSignal is sent when new person comes into room, users wait for that signal before firing off their own signal back to the initiator(the one who joined the room)
+  const addPeer = (incomingSignal, callerID, userStream) => {
+    // when a peer's initiator is false, they only signal when they receive a signal
+
+    console.log('streaming from add peer :>> ', userStream);
+    const peer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: userStream,
+    });
+    console.log('callerId from add peer :>> ', callerID);
+
+    peer.on('signal', (signal) => {
+      // sends back to the server and then back to the callerID to complete handshake
+      socketRef.current.emit('returning signal', { signal, callerID });
+      console.log('peer signal in add:>> ', signal);
+    });
+    // fires the above event to fire
+    peer.signal(incomingSignal);
+
+    return peer;
+  };
+  const newUserJoins = ({ signal, callerID }) => {
+    console.log('callId in user joined:>> ', callerID);
+    // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
+    const peer = addPeer(signal, callerID, stream.current);
+    peersRef.current.push({
+      peerID: callerID,
+      peer,
+    });
+
+    setPeers((users) => [...users, peer]);
+  };
+  // useEffect(() => {
+  //   console.log('use effect in world for getting camera');
+  //   navigator.mediaDevices
+  //     .getUserMedia({ video: true, audio: true })
+  //     .then((currentStream) => {
+  //       stream.current = currentStream;
+  //       //plays video in steam
+  //       myVideo.current.srcObject = currentStream;
+  //       console.log(
+  //         'myVideo.current.srcObject :>> ',
+  //         myVideo.current.srcObject
+  //       );
+  //       socketRef.current.emit('joined room', worldID);
+  //       setVideo(true);
+  //       // person who joins connects to other peers
+  //     })
+  //     .then(() => {
+  //       // when handshake is complete - receiver gives back a signal
+  //       socketRef.current.on('get users', getUsers);
+  //       socketRef.current.on('user joined', newUserJoins);
+  //       socketRef.current.on('receiving returned signal', receiverSendSignal);
+
+  //       // on user disconnect remove them? get again
+  //       socketRef.current.on('');
+  //     })
+  //     .catch((err) => {
+  //       console.log('error in getting stream', err);
+  //     });
+
+  //   socket.on('me', setMe);
+  //   socket.on('callUser', callUserSetCall);
+  //   // socket.on('me', (id) => setMe(id));
+
+  //   // on the receiver end, this fires when a new user joins
+  //   //CHECKER
+  //   socket.onAny(listener);
+
+  //   return () => {
+  //     socketRef.current.off('receiving returned signal', receiverSendSignal);
+  //     socket.off('me', setMe);
+  //     socket.off('callUser', callUserSetCall);
+  //     socket.offAny(listener);
+
+  //     socketRef.current.off('get users', getUsers);
+  //     socketRef.current.off('user joined', newUserJoins);
+  //   };
+  // }, []);
 
   // decide on world dimensions
   console.log('avatarJSON :>> ', avatarJSON);
@@ -81,10 +226,26 @@ function World({ }) {
   useEffect(() => {
     console.log('use effect in videoPlayer');
     getWebCamStream(stream, videoRef, setVideo);
-    
-    ;
     //socket to emit that room is joined
-  }, [videoRef]);
+    socketRef.current.emit('joined room', worldID);
+    socketRef.current.on('get users', getUsers);
+    socketRef.current.on('user joined', newUserJoins);
+    socketRef.current.on('receiving returned signal', receiverSendSignal);
+    // on user disconnect remove them? get again
+    socketRef.current.on('');
+    socket.on('me', setMe);
+    socket.on('callUser', callUserSetCall);
+    socket.onAny(listener);
+
+    return () => {
+      socketRef.current.off('get users', getUsers);
+      socketRef.current.off('user joined', newUserJoins);
+      socketRef.current.off('receiving returned signal', receiverSendSignal);
+      socket.off('me', setMe);
+      socket.off('callUser', callUserSetCall);
+      socket.offAny(listener);
+    };
+  }, []);
 
   useEffect(() => {
     console.log('useEffect running in vid frame');
@@ -117,22 +278,25 @@ function World({ }) {
         ref={videoRef}
         autoPlay
         muted
-        className={styles.video}
         style={{ display: 'none' }}
       />
+
       <Canvas
         camera={{ position: [coordinates.x, coordinates.y, coordinates.z] }}
       >
         <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
         <CameraController setCoordinates={setCoordinates} coordinates={coordinates}/>
+
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
           <group position={[coordinates.x, coordinates.y, coordinates.z]}>
             {faceCalculations.current && (
+
               <Avatar faceCalculations={faceCalculations} avatarJSON={avatarJSON}/>
             )
             }
+
             {faceCalculations.current && (
               <Avatar
                 faceCalculations={faceCalculations}

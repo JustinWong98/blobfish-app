@@ -1,9 +1,9 @@
 import { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
-import {Tree} from '../World/Tree.jsx'
-import { useTexture } from "@react-three/drei"
+import { Tree } from '../World/Tree.jsx';
+import { useTexture } from '@react-three/drei';
 import { Texture } from '@material-ui/icons';
-import * as THREE from 'three'
+import * as THREE from 'three';
 export function Box(props) {
   // This reference gives us direct access to the THREE.Mesh object
   const ref = useRef();
@@ -29,6 +29,7 @@ export function Box(props) {
 }
 
 export const Terrain = () => {
+
     const texture = useTexture( 'grass_texture.jpg')
     if (texture) {
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
