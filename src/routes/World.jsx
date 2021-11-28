@@ -150,6 +150,10 @@ function World({}) {
     });
     // fires the above event to fire
     peer.signal(incomingSignal);
+    peer.send('whatever' + Math.random());
+    peer.on('data', (data) => {
+      console.log('data: ' + data);
+    });
 
     return peer;
   };
@@ -162,55 +166,12 @@ function World({}) {
       peer,
     });
 
+    peer.send('whatever' + Math.random());
+    peer.on('data', (data) => {
+      console.log('data: ' + data);
+    });
     setPeers((users) => [...users, peer]);
   };
-  // useEffect(() => {
-  //   console.log('use effect in world for getting camera');
-  //   navigator.mediaDevices
-  //     .getUserMedia({ video: true, audio: true })
-  //     .then((currentStream) => {
-  //       stream.current = currentStream;
-  //       //plays video in steam
-  //       myVideo.current.srcObject = currentStream;
-  //       console.log(
-  //         'myVideo.current.srcObject :>> ',
-  //         myVideo.current.srcObject
-  //       );
-  //       socketRef.current.emit('joined room', worldID);
-  //       setVideo(true);
-  //       // person who joins connects to other peers
-  //     })
-  //     .then(() => {
-  //       // when handshake is complete - receiver gives back a signal
-  //       socketRef.current.on('get users', getUsers);
-  //       socketRef.current.on('user joined', newUserJoins);
-  //       socketRef.current.on('receiving returned signal', receiverSendSignal);
-
-  //       // on user disconnect remove them? get again
-  //       socketRef.current.on('');
-  //     })
-  //     .catch((err) => {
-  //       console.log('error in getting stream', err);
-  //     });
-
-  //   socket.on('me', setMe);
-  //   socket.on('callUser', callUserSetCall);
-  //   // socket.on('me', (id) => setMe(id));
-
-  //   // on the receiver end, this fires when a new user joins
-  //   //CHECKER
-  //   socket.onAny(listener);
-
-  //   return () => {
-  //     socketRef.current.off('receiving returned signal', receiverSendSignal);
-  //     socket.off('me', setMe);
-  //     socket.off('callUser', callUserSetCall);
-  //     socket.offAny(listener);
-
-  //     socketRef.current.off('get users', getUsers);
-  //     socketRef.current.off('user joined', newUserJoins);
-  //   };
-  // }, []);
 
   // decide on world dimensions
   console.log('avatarJSON :>> ', avatarJSON);
@@ -299,12 +260,9 @@ function World({}) {
           inclination={0}
           azimuth={0.25}
         />
-        <CameraController
-          // setCoordinates={setCoordinates}
-          coordinates={coordinates}
-        />
+        <CameraController coordinates={coordinates} />
 
-        <ambientLight intensity={0.1} />
+        <ambientLight intensity={0.5} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
           <group
@@ -316,17 +274,9 @@ function World({}) {
           >
             {faceCalculations.current && (
               <Avatar
+                coordinates={coordinates}
                 faceCalculations={faceCalculations}
                 avatarJSON={avatarJSON}
-              />
-            )}
-
-            {faceCalculations.current && (
-              <Avatar
-                faceCalculations={faceCalculations}
-                avatarJSON={avatarJSON}
-                // placeholder for now
-                setAvatarJSON={setAvatarJSON}
               />
             )}
           </group>

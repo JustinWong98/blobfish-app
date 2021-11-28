@@ -54,11 +54,6 @@ export const CameraController = ({ setCoordinates, coordinates }) => {
       coordinates.current.y = 0;
       coordinates.current.z = camera.position.z + 5;
 
-      // setCoordinates({
-      //   x: camera.position.x,
-      //   y: 0,
-      //   z: camera.position.z + 5,
-      // });
       camera.lookAt(camera.position.x, 0, camera.position.z);
       console.log(playerControls);
     });

@@ -11,29 +11,66 @@ import { Stars, Sky } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
 // ability to fetch different types of avatars here
-export const Avatar = ({ faceCalculations, avatarJSON, setAvatarJSON }) => {
-  const [chosenAvatar, setChosenAvatar] = useState()
+export const Avatar = ({ faceCalculations, avatarJSON, coordinates }) => {
+  const [chosenAvatar, setChosenAvatar] = useState();
   console.log('faceCalculations.current :>> ', faceCalculations.current);
   useEffect(() => {
-    console.log(avatarJSON.model)
+    console.log(avatarJSON.model);
     switch (avatarJSON.model) {
-      case 'BlobfishDefault': 
-       setChosenAvatar(<Blobfish faceCalculations={faceCalculations} xAxis={2.5} yAxis={2.5} zAxis={2.5} size={1} />)
-       break;
+      case 'BlobfishDefault':
+        setChosenAvatar(
+          <Blobfish
+            faceCalculations={faceCalculations}
+            xAxis={2.5}
+            yAxis={2.5}
+            zAxis={2.5}
+            size={1}
+          />
+        );
+        break;
       case 'CubeHeadDefault':
-         setChosenAvatar(<CubeHead faceCalculations={faceCalculations} headHeight={2.5} headWidth={2} headLength={2} earLength={2} headColor='#808080' earColor='#ffff00' eyeColor='#0000ff'/>)
-         break;
+        setChosenAvatar(
+          <CubeHead
+            faceCalculations={faceCalculations}
+            headHeight={2.5}
+            headWidth={2}
+            headLength={2}
+            earLength={2}
+            headColor="#808080"
+            earColor="#ffff00"
+            eyeColor="#0000ff"
+          />
+        );
+        break;
       case 'Blobfish':
-        setChosenAvatar(<Blobfish faceCalculations={faceCalculations} xAxis={avatarJSON.xAxis} yAxis={avatarJSON.yAxis} zAxis={avatarJSON.zAxis} size={avatarJSON.size} />)
-        break
+        setChosenAvatar(
+          <Blobfish
+            faceCalculations={faceCalculations}
+            xAxis={avatarJSON.xAxis}
+            yAxis={avatarJSON.yAxis}
+            zAxis={avatarJSON.zAxis}
+            size={avatarJSON.size}
+          />
+        );
+        break;
       case 'CubeHead':
-         setChosenAvatar(<CubeHead faceCalculations={faceCalculations} headHeight={avatarJSON.headHeight} headWidth={avatarJSON.headWidth} headLength={avatarJSON.headLength} earLength={avatarJSON.earLength} headColor={avatarJSON.headColor} earColor={avatarJSON.earColor} eyeColor={avatarJSON.eyeColor}/>)
-        break
+        setChosenAvatar(
+          <CubeHead
+            faceCalculations={faceCalculations}
+            headHeight={avatarJSON.headHeight}
+            headWidth={avatarJSON.headWidth}
+            headLength={avatarJSON.headLength}
+            earLength={avatarJSON.earLength}
+            headColor={avatarJSON.headColor}
+            earColor={avatarJSON.earColor}
+            eyeColor={avatarJSON.eyeColor}
+          />
+        );
+        break;
       default:
-        return
-  }
-
-  }, [avatarJSON])
+        return;
+    }
+  }, [avatarJSON]);
 
   const myMesh = useRef();
 
@@ -44,10 +81,19 @@ export const Avatar = ({ faceCalculations, avatarJSON, setAvatarJSON }) => {
     myMesh.current.rotation.x = angle.pitch * 1.5; //up down tilt
     myMesh.current.rotation.y = -angle.yaw * 1.5;
     myMesh.current.rotation.z = -angle.roll * 0.5; //left right tilt
+    console.log('myMesh.current :>> ', myMesh.current);
+    console.log('coordinates:>> ', coordinates);
+    if (coordinates !== undefined) {
+      myMesh.current.position.set(
+        coordinates.current.x,
+        coordinates.current.y,
+        coordinates.current.z
+      );
+    }
   });
 
   return (
-    <group position={[0, 0, 0]} ref={myMesh}>
+    <group ref={myMesh}>
       {/* <Stars /> */}
       {chosenAvatar}
       {/* <GroundPlane />
@@ -56,9 +102,13 @@ export const Avatar = ({ faceCalculations, avatarJSON, setAvatarJSON }) => {
   );
 };
 
-
-export const ThreeCanvas = ({ threeCanvasRef, faceCalculations, avatarJSON, setAvatarJSON, setThreeCStart }) => {
-
+export const ThreeCanvas = ({
+  threeCanvasRef,
+  faceCalculations,
+  avatarJSON,
+  setAvatarJSON,
+  setThreeCStart,
+}) => {
   const styles = videoStyles();
   if (setThreeCStart) {
     setThreeCStart(true);
@@ -71,8 +121,11 @@ export const ThreeCanvas = ({ threeCanvasRef, faceCalculations, avatarJSON, setA
         {/* Light destroys blobfish color */}
         <directionalLight position={[0, 0, 5]} />
         <orthographicCamera makeDefault position={[0, 0, 0]} zoom={0} />
-        <Avatar faceCalculations={faceCalculations}             avatarJSON={avatarJSON}
-        setAvatarJSON={setAvatarJSON}/>
+        <Avatar
+          faceCalculations={faceCalculations}
+          avatarJSON={avatarJSON}
+          setAvatarJSON={setAvatarJSON}
+        />
       </Canvas>
     </div>
   );

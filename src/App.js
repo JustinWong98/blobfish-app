@@ -43,7 +43,17 @@ export const AvatarJSONContext = createContext();
 function App() {
   const useStyles = makeStyles();
   const classes = useStyles(theme);
-  const [avatarJSON, setAvatarJSON] = useState('Blobfish');
+  const [avatarJSON, setAvatarJSON] = useState({
+    model: 'CubeHead',
+    headHeight: 2.5,
+    headWidth: 2,
+    headLength: 2,
+    earLength: 2,
+    headColor: '#00d084',
+    earColor: '#fcb900',
+    eyeColor: '#fcb900',
+  });
+  // const [avatarJSON, setAvatarJSON] = useState('Blobfish');
   const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
   const [username, setUsername] = useState(getCookie('username').trim());
   const [userId, setUserId] = useState(Number(getCookie('userId').trim()));
