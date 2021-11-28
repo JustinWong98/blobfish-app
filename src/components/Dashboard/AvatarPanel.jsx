@@ -56,7 +56,9 @@ const AvatarDropDown = ({ userId, avatarModel, setAvatar }) => {
       })
     }
     else {
-      setAvatarJSON(event.target.value)
+      setAvatarJSON({
+        model: event.target.value
+      })
     }
     setChosenAvatar(event.target.value)
   };
@@ -76,8 +78,8 @@ const AvatarDropDown = ({ userId, avatarModel, setAvatar }) => {
           {userAvatar.map((avatar) => (
             <MenuItem value={avatar.id}>{avatar.name}</MenuItem>
           ))}
-          <MenuItem value='Blobfish'>Blobfish</MenuItem>
-          <MenuItem value='CubeHead'>CubeHead</MenuItem>
+          <MenuItem value='BlobfishDefault'>Blobfish</MenuItem>
+          <MenuItem value='CubeHeadDefault'>CubeHead</MenuItem>
         </Select>
       </FormControl>
     </Box>

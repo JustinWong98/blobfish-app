@@ -1,12 +1,13 @@
 import React, { useRef, useEffect, useState, useContext } from 'react';
 import { VideoFrame } from '../components/VideoElements';
-import { Typography, Container, Box, Grid } from '@mui/material';
+import { Typography, Container, Box, Grid, Button } from '@mui/material';
 import RoomRepo from '../components/Dashboard/RoomRepo';
 import AvatarPanel from '../components/Dashboard/AvatarPanel';
 import { getWebCamStream } from '../modules/webcam.jsx';
 import { AvatarJSONContext } from '../App';
-
+import { useNavigate } from 'react-router-dom';
 function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
+    const navigate = useNavigate();
   const myVideo = useRef();
   const myVideoModified = useRef();
   const threeCanvasRef = useRef();
@@ -47,6 +48,9 @@ function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
               avatarModel={avatarModel}
               setAvatar={setAvatar}
             />
+            <Button color="success" onClick={() => {navigate('/')}}>
+              Enter the metaverse
+            </Button>
           </Grid>
         </Grid>
       </Container>

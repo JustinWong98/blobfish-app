@@ -32,11 +32,11 @@ export const Terrain = () => {
     const texture = useTexture( 'grass_texture.jpg')
     if (texture) {
       texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(250, 250);
+      texture.repeat.set(5, 5);
     }
   return (
     <mesh visible position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeBufferGeometry attach="geometry" args={[1500, 1500, 128, 128]} />
+      <planeBufferGeometry attach="geometry" args={[50, 50, 128, 128]} />
       <group rotation={[Math.PI/2,0,0]}>
         <Tree position={[10,0,10]}/>
         <Tree position={[5,0,5]}/>

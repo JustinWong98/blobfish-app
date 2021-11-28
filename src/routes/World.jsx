@@ -28,7 +28,7 @@ import { Stars, Sky } from '@react-three/drei';
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
 // get stream of playerAudio in the world, join them
-function World({ avatarModel }) {
+function World({ }) {
   console.log('loading world');
   const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
   const [peers, setPeers] = useState([]);
@@ -45,6 +45,7 @@ function World({ avatarModel }) {
 
   const socket = useContext(SocketContext);
   const socketRef = useRef();
+
   socketRef.current = socket;
   const faceCalculations = useRef({
     angle: {
@@ -120,7 +121,7 @@ function World({ avatarModel }) {
         style={{ display: 'none' }}
       />
       <Canvas
-        camera={{ position: [0, 0, 0] }}
+        camera={{ position: [coordinates.x, coordinates.y, coordinates.z] }}
       >
         <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
         <CameraController setCoordinates={setCoordinates} coordinates={coordinates}/>
@@ -129,7 +130,7 @@ function World({ avatarModel }) {
         <Suspense fallback={null}>
           <group position={[coordinates.x, coordinates.y, coordinates.z]}>
             {faceCalculations.current && (
-              <Avatar faceCalculations={faceCalculations} />
+              <Avatar faceCalculations={faceCalculations} avatarJSON={avatarJSON}/>
             )
             }
             {faceCalculations.current && (
