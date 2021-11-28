@@ -25,6 +25,7 @@ import { Avatar } from '../components/Avatar.jsx';
 import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
 import { extent } from '../components/World/baseElements.jsx';
+
 // import {receiverSendSignal, getUsers, newUserJoins, createPeer, addPeer} from '../routes/Room.jsx'
 
 // gets stream of playermotions in the world
@@ -40,12 +41,7 @@ function World({}) {
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   // AVATAR
   const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
-  // const [coordinates, setCoordinates] = useState({
-  //   x: 0,
-  //   y: 0,
-  //   z: 0,
-  // });
-  const [coordinates, setCoordinates] = useState({
+  const coordinates = useRef({
     x: -extents / 10 + (Math.random() * extents) / 5,
     y: 0,
     z: -extents / 10 + (Math.random() * extents) / 5,
@@ -66,6 +62,7 @@ function World({}) {
       mouthTopBot: 0,
     },
   });
+
   // VIDEO
   const myVideo = useRef();
   const [videoIsSet, setVideo] = useState(false);
@@ -288,7 +285,13 @@ function World({}) {
       />
 
       <Canvas
-        camera={{ position: [coordinates.x, coordinates.y, coordinates.z] }}
+        camera={{
+          position: [
+            coordinates.current.x,
+            coordinates.current.y,
+            coordinates.current.z,
+          ],
+        }}
       >
         <Sky
           distance={450000}
@@ -297,14 +300,20 @@ function World({}) {
           azimuth={0.25}
         />
         <CameraController
-          setCoordinates={setCoordinates}
+          // setCoordinates={setCoordinates}
           coordinates={coordinates}
         />
 
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
-          <group position={[coordinates.x, coordinates.y, coordinates.z]}>
+          <group
+            position={[
+              coordinates.current.x,
+              coordinates.current.y,
+              coordinates.current.z,
+            ]}
+          >
             {faceCalculations.current && (
               <Avatar
                 faceCalculations={faceCalculations}
