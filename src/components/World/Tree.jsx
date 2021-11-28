@@ -1,11 +1,13 @@
 import React, { useRef } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { MeshBasicMaterial } from 'three'
 
-export const Tree = (props) => {
+export const Tree = ({position}) => {
   const group = useRef()
   const { nodes, materials } = useGLTF('/Tree.gltf')
+  // nodes.tree_collider.material.type = MeshBasicMaterial
   return (
-    <group ref={group} dispose={null}>
+    <group ref={group} dispose={null} position={position}>
       <mesh
         castShadow
         receiveShadow

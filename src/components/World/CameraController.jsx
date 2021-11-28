@@ -2,10 +2,12 @@ import { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Text, Stats } from '@react-three/drei'
+import * as THREE from 'three'
+import {playerControls} from './PlayerController'
 
 const keyPressed = {};
 
-export const CameraController = ({setCoordinates}) => {
+export const CameraController = ({setCoordinates, coordinates}) => {
   const { camera, gl } = useThree();
 
   useFrame((_, delta) => {
@@ -30,43 +32,30 @@ export const CameraController = ({setCoordinates}) => {
       switch (key) {
         case 'w':
           camera.translateZ(-momentum);
-          camera.position.set(camera.position.x, 0, camera.position.z)
-          setCoordinates({
-            x: camera.position.x,
-            y: 0,
-            z: camera.position.z + 5
-          });
-
+         
           break;
         case 's':
           camera.translateZ(momentum);
-          camera.position.set(camera.position.x, 0, camera.position.z);
-          setCoordinates({
-            x: camera.position.x,
-            y: 0,
-            z: camera.position.z + 5
-          });
+;
           break;
         case 'd':
           camera.translateX(momentum);
-          camera.position.set(camera.position.x, 0, camera.position.z);
-          setCoordinates({
-            x: camera.position.x,
-            y: 0,
-            z: camera.position.z + 5
-          });
+
           break;
         case 'a':
           camera.translateX(-momentum);
-          camera.position.set(camera.position.x, 0, camera.position.z);
-          setCoordinates({
-            x: camera.position.x,
-            y: 0,
-            z: camera.position.z + 5
-          });
+         
           break;
         default:
       }
+       camera.position.set(camera.position.x, 0, camera.position.z)
+      setCoordinates({
+        x: camera.position.x,
+        y: 0,
+        z: camera.position.z + 5
+          });
+      camera.lookAt(camera.position.x, 0, camera.position.z)
+      console.log(playerControls)
     });
   });
 
@@ -75,7 +64,9 @@ export const CameraController = ({setCoordinates}) => {
     controls.minDistance = 3;
     controls.maxDistance = 20;
     controls.maxPolarAngle = Math.PI / 2;
-    camera.position.set(0, 0, 5);
+    // controls.target=[coordinates.x, coordinates.y, coordinates.z]
+    const newTarget = new THREE.Vector3(coordinates.x, coordinates.y, coordinates.z)
+    // camera.position.set(0, 0, 5);
     // for when avartar is facing others
     // camera.position.set(0, 0, -5);
     // camera.rotation.y = Math.PI;

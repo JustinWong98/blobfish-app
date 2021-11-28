@@ -123,7 +123,7 @@ function World({ avatarModel }) {
         camera={{ position: [0, 0, 0] }}
       >
         <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
-        <CameraController setCoordinates={setCoordinates}/>
+        <CameraController setCoordinates={setCoordinates} coordinates={coordinates}/>
         <ambientLight intensity={0.1} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
@@ -131,7 +131,7 @@ function World({ avatarModel }) {
             {faceCalculations.current && (
               <Avatar faceCalculations={faceCalculations} />
             )
-            } */}
+            }
             {faceCalculations.current && (
               <Avatar
                 faceCalculations={faceCalculations}
