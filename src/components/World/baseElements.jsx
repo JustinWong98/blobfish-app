@@ -27,20 +27,22 @@ export function Box(props) {
     </mesh>
   );
 }
-
+export const extents = 50;
 export const Terrain = () => {
-
-    const texture = useTexture( 'grass_texture.jpg')
-    if (texture) {
-      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-      texture.repeat.set(5, 5);
-    }
+  const texture = useTexture('grass_texture.jpg');
+  if (texture) {
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(extents / 10, extents / 10);
+  }
   return (
     <mesh visible position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeBufferGeometry attach="geometry" args={[50, 50, 128, 128]} />
-      <group rotation={[Math.PI/2,0,0]}>
-        <Tree position={[10,0,10]}/>
-        <Tree position={[5,0,5]}/>
+      <planeBufferGeometry
+        attach="geometry"
+        args={[extents, extents, 128, 128]}
+      />
+      <group rotation={[Math.PI / 2, 0, 0]}>
+        <Tree position={[10, 0, 10]} />
+        <Tree position={[5, 0, 5]} />
       </group>
       <meshBasicMaterial map={texture} />
       {/* <meshStandardMaterial

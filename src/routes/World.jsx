@@ -1,4 +1,11 @@
-import { Suspense, useRef, useState, useEffect, useContext } from 'react';
+import {
+  Suspense,
+  useRef,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from 'react';
 import { useParams } from 'react-router-dom';
 import Peer from 'simple-peer';
 import { listener } from '../modules/sockets.mjs';
@@ -6,7 +13,7 @@ import { listener } from '../modules/sockets.mjs';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { VideoFrame } from '../components/VideoElements';
 // import { Physics, userBox } from 'use-cannon';
-import { Terrain, Box } from '../components/World/baseElements.jsx';
+import { Terrain, Box, extents } from '../components/World/baseElements.jsx';
 import { SocketContext } from '../components/context/sockets.js';
 import {
   handleKeyDown,
@@ -24,28 +31,29 @@ import {
 import { Avatar } from '../components/Avatar.jsx';
 import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
-// import {receiverSendSignal, getUsers, newUserJoins, createPeer, addPeer} from '../routes/Room.jsx'
+import { extent } from '../components/World/baseElements.jsx';
+import { OtherAudio } from '../components/World/audio.jsx';
 
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
 // get stream of playerAudio in the world, join them
-function World({ }) {
+function World({ username }) {
   console.log('loading world');
   const { worldID } = useParams();
-
+  console.log('username in world :>> ', username);
   // FACE MESH CALC
   const videoRef = useRef();
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
   // AVATAR
   const { avatarJSON, setAvatarJSON } = useContext(AvatarJSONContext);
-  const [coordinates, setCoordinates] = useState({
-    x: 0,
+  const coordinates = useRef({
+    x: -extents / 10 + (Math.random() * extents) / 5,
     y: 0,
-
-    z: 0,
+    z: -extents / 10 + (Math.random() * extents) / 5,
   });
 
+  console.log('coordinates in world :>> ', coordinates);
   const faceCalculations = useRef({
     angle: {
       pitch: 0,
@@ -60,12 +68,13 @@ function World({ }) {
       mouthTopBot: 0,
     },
   });
+
   // VIDEO
   const myVideo = useRef();
   const [videoIsSet, setVideo] = useState(false);
-  const stream = useRef();
+  const stream = useRef(new MediaStream());
   const placeHolderMediaStream = new MediaStream();
-  const streamLocal = useRef(placeHolderMediaStream);
+  const audioStream = useRef(placeHolderMediaStream);
 
   // SOCKETS
   const socket = useContext(SocketContext);
@@ -95,15 +104,22 @@ function World({ }) {
 
   const getUsers = (users) => {
     const peers = [];
-    users.forEach((userID) => {
+    users.forEach(({ userID, username }) => {
       // for each user, create a peer and send in our id and stream
       // TODO: CHANGE STREAM TO DATA CHANNEL?? NOPE CHANGE TO AUDIO STREAM AND IMPLEMMENT SEPARATE DATA CHANNEL
-      const peer = createPeer(userID, socketRef.current.id, stream.current);
+      //TO MOD INTO AUDIO CHANNEL
+      const peer = createPeer(
+        userID,
+        socketRef.current.id,
+        audioStream.current
+      );
       // peersRef will handle collection of peers (all simple peer logic)
       peersRef.current.push({
+        username,
         peerID: userID,
         peer,
       });
+      console.log('peersRef in get users :>> ', peersRef);
       // setting state of array of peers for rendering purposes
       peers.push(peer);
     });
@@ -120,10 +136,17 @@ function World({ }) {
     peer.on('signal', (signal) => {
       socketRef.current.emit('sending signal', {
         userToSignal,
+        username,
         callerID,
         signal,
       });
       console.log('peer signal in create:>> ', signal);
+    });
+    //sending something
+    peer.on('data', (data) => {
+      // this person is who <-> callerID
+      console.log('data in create: ' + data);
+      peer.send('data sent in return from peer ' + data);
     });
     return peer;
   };
@@ -147,67 +170,38 @@ function World({ }) {
     });
     // fires the above event to fire
     peer.signal(incomingSignal);
+    peer.on('connect', () => {
+      console.log('CONNECT in add peer');
+      peer.send('send from add peer' + Math.random());
+    });
 
     return peer;
   };
-  const newUserJoins = ({ signal, callerID }) => {
+  const newUserJoins = ({ signal, callerID, username }) => {
     console.log('callId in user joined:>> ', callerID);
     // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
-    const peer = addPeer(signal, callerID, stream.current);
+    const peer = addPeer(signal, callerID, audioStream.current);
+    console.log('peer._id :>> ', peer._id);
     peersRef.current.push({
+      username,
       peerID: callerID,
       peer,
     });
+    console.log('peersRef in newUserJoins :>> ', peersRef);
+    peer.on('connect', () => {
+      console.log('CONNECT in newUserJoins');
+      //send avatar info, json, socket id?
 
+      peer.send('sending from newUser' + Math.random());
+    });
+    //sending something
+    //send position, send face dims
+    peer.on('data', (data) => {
+      console.log('data: in new user joins ' + data);
+      // peer.send('received' + data);
+    });
     setPeers((users) => [...users, peer]);
   };
-  // useEffect(() => {
-  //   console.log('use effect in world for getting camera');
-  //   navigator.mediaDevices
-  //     .getUserMedia({ video: true, audio: true })
-  //     .then((currentStream) => {
-  //       stream.current = currentStream;
-  //       //plays video in steam
-  //       myVideo.current.srcObject = currentStream;
-  //       console.log(
-  //         'myVideo.current.srcObject :>> ',
-  //         myVideo.current.srcObject
-  //       );
-  //       socketRef.current.emit('joined room', worldID);
-  //       setVideo(true);
-  //       // person who joins connects to other peers
-  //     })
-  //     .then(() => {
-  //       // when handshake is complete - receiver gives back a signal
-  //       socketRef.current.on('get users', getUsers);
-  //       socketRef.current.on('user joined', newUserJoins);
-  //       socketRef.current.on('receiving returned signal', receiverSendSignal);
-
-  //       // on user disconnect remove them? get again
-  //       socketRef.current.on('');
-  //     })
-  //     .catch((err) => {
-  //       console.log('error in getting stream', err);
-  //     });
-
-  //   socket.on('me', setMe);
-  //   socket.on('callUser', callUserSetCall);
-  //   // socket.on('me', (id) => setMe(id));
-
-  //   // on the receiver end, this fires when a new user joins
-  //   //CHECKER
-  //   socket.onAny(listener);
-
-  //   return () => {
-  //     socketRef.current.off('receiving returned signal', receiverSendSignal);
-  //     socket.off('me', setMe);
-  //     socket.off('callUser', callUserSetCall);
-  //     socket.offAny(listener);
-
-  //     socketRef.current.off('get users', getUsers);
-  //     socketRef.current.off('user joined', newUserJoins);
-  //   };
-  // }, []);
 
   // decide on world dimensions
   console.log('avatarJSON :>> ', avatarJSON);
@@ -223,11 +217,23 @@ function World({ }) {
     };
   }, []);
 
+  const getVideoAudioStream = useCallback(async () => {
+    await getWebCamStream(stream, videoRef, setVideo);
+
+    const audioTrack = stream.current.getAudioTracks();
+    console.log('audioTrack :>> ', audioTrack);
+    audioStream.current.addTrack(audioTrack[0]);
+    console.log('audioStream.current :>> ', audioStream.current);
+  });
   useEffect(() => {
     console.log('use effect in videoPlayer');
-    getWebCamStream(stream, videoRef, setVideo);
-    //socket to emit that room is joined
+    getVideoAudioStream();
+
+    // socket to emit that room is joined
+    // send in a username
+    socketRef.current.emit('joined room', { roomID: worldID, username });
     socketRef.current.emit('joined room', worldID);
+
     socketRef.current.on('get users', getUsers);
     socketRef.current.on('user joined', newUserJoins);
     socketRef.current.on('receiving returned signal', receiverSendSignal);
@@ -252,7 +258,6 @@ function World({ }) {
     const faceMesh = faceMeshSetup();
     faceMesh.onResults((results) => {
       onResultsCalFace(results, videoRef, setFaceMeshStart, faceCalculations);
-      // console.log('faceCalculations.current :>> ', faceCalculations.current);
     });
     if (
       typeof videoRef.current.srcObject !== 'undefined' &&
@@ -277,40 +282,55 @@ function World({ }) {
         playsInline
         ref={videoRef}
         autoPlay
-        muted
+        // muted
         style={{ display: 'none' }}
       />
 
       <Canvas
-        camera={{ position: [coordinates.x, coordinates.y, coordinates.z] }}
+        camera={{
+          position: [
+            coordinates.current.x,
+            coordinates.current.y,
+            coordinates.current.z,
+          ],
+        }}
       >
-        <Sky distance={450000} sunPosition={[0, 1, 0]} inclination={0} azimuth={0.25} />
-        <CameraController setCoordinates={setCoordinates} coordinates={coordinates}/>
+        <Sky
+          distance={450000}
+          sunPosition={[0, 1, 0]}
+          inclination={0}
+          azimuth={0.25}
+        />
+        <CameraController coordinates={coordinates} />
 
-        <ambientLight intensity={0.1} />
+        <ambientLight intensity={0.5} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
-          <group position={[coordinates.x, coordinates.y, coordinates.z]}>
-            {faceCalculations.current && (
-
-              <Avatar faceCalculations={faceCalculations} avatarJSON={avatarJSON}/>
-            )
-            }
-
+          <group
+            position={[
+              coordinates.current.x,
+              coordinates.current.y,
+              coordinates.current.z,
+            ]}
+          >
             {faceCalculations.current && (
               <Avatar
+                coordinates={coordinates}
                 faceCalculations={faceCalculations}
                 avatarJSON={avatarJSON}
-                // placeholder for now
-                setAvatarJSON={setAvatarJSON}
               />
             )}
           </group>
+          {/* componet renders all other avatars, it should use peerRef */}
           <Terrain />
         </Suspense>
         {/* The X axis is red. The Y axis is green. The Z axis is blue */}
         <axesHelper />
       </Canvas>
+      {peers.map((peer, index) => (
+        <OtherAudio name="other person" peer={peer} />
+      ))}
+      {/* audio from everyone */}
     </>
   );
 }

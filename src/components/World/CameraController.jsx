@@ -3,10 +3,9 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
-import { Text, Stats } from '@react-three/drei'
-import * as THREE from 'three'
-import {playerControls} from './PlayerController'
-
+import { Text, Stats } from '@react-three/drei';
+import * as THREE from 'three';
+import { playerControls } from './PlayerController';
 
 const keyPressed = {};
 
@@ -51,13 +50,12 @@ export const CameraController = ({ setCoordinates, coordinates }) => {
         default:
       }
       camera.position.set(camera.position.x, 0, camera.position.z);
-      setCoordinates({
-        x: camera.position.x,
-        y: 0,
-        z: camera.position.z + 5,
-      });
+      coordinates.current.x = camera.position.x;
+      coordinates.current.y = 0;
+      coordinates.current.z = camera.position.z + 5;
+
       camera.lookAt(camera.position.x, 0, camera.position.z);
-      console.log(playerControls);
+      // console.log(playerControls);
     });
   });
 
