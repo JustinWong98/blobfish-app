@@ -80,13 +80,16 @@ function World({ username }) {
   const socketRef = useRef();
   socketRef.current = socket;
 
-  // PEERS
+  // PEERS FOR AUDIO STREAM
   const [call, setCall] = useState({});
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [peers, setPeers] = useState([]);
-  // const peerRef= useRef();
   const peersRef = useRef([]);
+
+  //PEERS FOR DATA CHANNEL
+  const [dataPeers, setDataPeers] = useState([]);
+  const dataPeersRef = useRef([]);
 
   console.log('peersRef in world :>> ', peersRef);
   // CONNECTIONS
@@ -97,6 +100,13 @@ function World({ username }) {
     const item = peersRef.current.find((p) => p.peerID === data.id);
     item.peer.signal(data.signal);
   };
+  const receiverDataSendSignal = (data) => {
+    console.log('in receiver data send signal');
+    // find peer that we are receiving from since we are going to receive multiple peers.
+    // we loop through the list of peers and match the id of the one trying to signal us
+    const item = dataPeersRef.current.find((p) => p.peerID === data.id);
+    item.peer.signal(data.signal);
+  };
 
   const callUserSetCall = ({ from, name: callerName, signal }) => {
     setCall({ isReceivingCall: true, from, name: callerName, signal });
@@ -104,6 +114,7 @@ function World({ username }) {
 
   const getUsers = (users) => {
     const peers = [];
+    const dataPeers = [];
     // iterate through users list received from server
     console.log('users in getusers :>> ', users);
     users.forEach(({ userID, username, avatarJSON, coordinates }) => {
@@ -116,6 +127,8 @@ function World({ username }) {
         socketRef.current.id,
         audioStream.current
       );
+      const dataPeer = createDataPeer(userID, socketRef.current.id);
+
       // peersRef will handle collection of peers (all simple peer logic)
       // pass in user info, remote peers
       console.log('peersRef in get users before:>> ', peersRef);
@@ -131,22 +144,44 @@ function World({ username }) {
         peer,
       });
 
+      const filterDataPeerRef = dataPeersRef.current.filter(
+        (peer) => peer.username !== username
+      );
+      filterDataPeerRef.push({
+        username,
+        avatarJSON,
+        coordinates,
+        peerID: userID,
+        peer,
+      });
+
       peersRef.current = filterPeersRef;
+      dataPeersRef.current = filterDataPeerRef;
       // peersRef.current.push();
       console.log('peersRef in get users :>> ', peersRef);
       // setting state of array of peers for rendering purposes
       // remove previous instances of peers
       peers.push(peer);
+      dataPeers.push(dataPeer);
     });
     setPeers(peers);
+    setDataPeers(dataPeers);
   };
   const createPeer = (userToSignal, callerID, userStream) => {
     console.log('streaming from create peer :>> ', userStream);
+    //create all otejr peers? this is not loacal?
     const peer = new Peer({
       initiator: true,
       trickle: false,
       stream: userStream,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+        ],
+      },
     });
+
     // send local user's info
     peer.on('signal', (signal) => {
       socketRef.current.emit('sending signal', {
@@ -162,13 +197,44 @@ function World({ username }) {
 
     peer.on('connect', () => {});
 
+    return peer;
+  };
+  const createDataPeer = (userToSignal, callerID) => {
+    console.log('in createDataPeer');
+
+    //create all otejr peers? this is not loacal?
+    const dataPeer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: false,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+        ],
+      },
+    });
+
+    // send local user's info
+    dataPeer.on('signal', (signal) => {
+      socketRef.current.emit('sending data signal', {
+        avatarJSON,
+        username,
+        coordinates: coordinates.current,
+        userToSignal,
+        callerID,
+        signal,
+      });
+      console.log('peer signal in create:>> ', signal);
+    });
+
     //sending something
-    peer.on('data', (data) => {
+    dataPeer.on('data', (data) => {
       // this person is who <-> callerID
       console.log('received in create: ' + JSON.parse(data));
       // peer.send('data sent in return from peer ' + data);
     });
-    return peer;
+    return dataPeer;
   };
 
   // incomingSignal is sent when new person comes into room, users wait for that signal before firing off their own signal back to the initiator(the one who joined the room)
@@ -181,6 +247,7 @@ function World({ username }) {
       trickle: false,
       stream: userStream,
     });
+
     console.log('callerId from add peer :>> ', callerID);
 
     peer.on('signal', (signal) => {
@@ -192,11 +259,44 @@ function World({ username }) {
     peer.signal(incomingSignal);
     peer.on('connect', () => {
       console.log('CONNECT in add peer');
-      peer.send('send from add peer' + Math.random());
     });
 
     return peer;
   };
+  const addDataPeer = (incomingSignal, callerID) => {
+    console.log('in addDataPeer');
+    // when a peer's initiator is false, they only signal when they receive a signal
+
+    const dataPeer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: false,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+        ],
+      },
+    });
+
+    console.log('callerId from add peer :>> ', callerID);
+
+    dataPeer.on('signal', (signal) => {
+      // sends back to the server and then back to the callerID to complete handshake
+      socketRef.current.emit('returning data signal', { signal, callerID });
+      console.log('peer signal in add:>> ', signal);
+    });
+    // fires the above event to fire
+    dataPeer.signal(incomingSignal);
+    dataPeer.on('connect', () => {
+      console.log('CONNECT in add peer');
+      dataPeer.send('send from add peer' + Math.random());
+    });
+
+    return dataPeer;
+  };
+
+  //just one user
   const newUserJoins = ({
     signal,
     callerID,
@@ -234,10 +334,51 @@ function World({ username }) {
     //sending something
     //send position, send face dims
     peer.on('data', (data) => {
-      console.log('receive new user', JSON.stringify(data));
+      console.log('receive new user', JSON.parse(data));
       // peer.send('received' + data);
     });
     setPeers((users) => [...users, peer]);
+  };
+  const newDataUserJoins = ({
+    signal,
+    callerID,
+    username,
+    avatarJSON,
+    coordinates,
+  }) => {
+    console.log('in newDataUserJoins');
+    // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
+    const dataPeer = addDataPeer(signal, callerID);
+
+    // clean list of previous instances before pushing
+    const filterPeerRef = dataPeersRef.current.filter(
+      (peer) => peer.username !== username
+    );
+    filterPeerRef.push({
+      username,
+      avatarJSON,
+      coordinates,
+      peerID: callerID,
+      peer: dataPeer,
+    });
+    dataPeersRef.current = filterPeerRef;
+    // peersRef.current.push();
+    console.log('dataPeersRef in newUserJoins :>> ', dataPeersRef);
+    // peer.on('connect', () => {
+    //   console.log('CONNECT in newUserJoins');
+    //   //send avatar info, json, socket id?
+
+    //   // this peer is sending
+    //   // peer.send(JSON.stringify())
+    //   peer.send('sending from newUser' + Math.random());
+    // });
+    //sending something
+    //send position, send face dims
+    dataPeer.on('data', (data) => {
+      console.log('receive new user', JSON.parse(data));
+      // peer.send('received' + data);
+    });
+    setDataPeers((users) => [...users, dataPeer]);
   };
 
   const disconnectUser = (user) => {
@@ -276,32 +417,50 @@ function World({ username }) {
     const audioTrack = stream.current.getAudioTracks();
     console.log('audioTrack :>> ', audioTrack);
     audioStream.current.addTrack(audioTrack[0]);
+    const peer = new Peer({
+      initiator: true,
+      // stream: audioStream.current,
+      trickle: false,
+    });
     console.log('audioStream.current :>> ', audioStream.current);
   });
   const sendUserMovement = () => {
-    console.log('interbal');
     const avatarMovement = {
       faceCalculations: faceCalculations.current,
       coordinates: coordinates.current,
       username,
     };
-    console.log('peers :>> ', peers);
     const avatarMoveStr = JSON.stringify(avatarMovement);
-    peers.forEach((peer) => {
+    // if (peerRef.current !== undefined && peerRef.current._channel) {
+    //   const state = peerRef.current._channel.readyState;
+    //   if (state === 'open') {
+    //     peerRef.current.send(avatarMoveStr);
+    //     console.log('sent data : ' + avatarMoveStr);
+    //   }
+    // }
+    console.log('dataPeers :>> ', dataPeers);
+    dataPeers.forEach((peer) => {
       //check readystate
       if (peer._channel) {
         const state = peer._channel.readyState;
         if (state === 'open') {
           peer.send(avatarMoveStr);
           console.log('sent data in create: ' + avatarMoveStr);
+        } else {
+          console.log('channel is not open', peer);
         }
+      } else {
+        console.log('peer in undefined', peer);
       }
     });
   };
 
   useEffect(() => {
-    const interval = setInterval(sendUserMovement, 5);
-  }, [peers]);
+    const interval = setInterval(sendUserMovement, 1);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [dataPeers]);
   useEffect(() => {
     console.log('use effect in videoPlayer');
 
@@ -319,7 +478,12 @@ function World({ username }) {
 
     socketRef.current.on('get users', getUsers);
     socketRef.current.on('user joined', newUserJoins);
+    socketRef.current.on('user data joined', newDataUserJoins);
     socketRef.current.on('receiving returned signal', receiverSendSignal);
+    socketRef.current.on(
+      'receiving data returned signal',
+      receiverDataSendSignal
+    );
     // on user disconnect remove them? get again
     socketRef.current.on('');
     socket.on('callUser', callUserSetCall);
@@ -328,10 +492,15 @@ function World({ username }) {
     return () => {
       socketRef.current.off('get users', getUsers);
       socketRef.current.off('user joined', newUserJoins);
+      socketRef.current.off('user data joined', newDataUserJoins);
       socketRef.current.off('receiving returned signal', receiverSendSignal);
       socket.off('callUser', callUserSetCall);
       socket.offAny(listener);
       socket.off('disconnect user', disconnectUser);
+      socketRef.current.off(
+        'receiving data returned signal',
+        receiverDataSendSignal
+      );
     };
   }, []);
 
