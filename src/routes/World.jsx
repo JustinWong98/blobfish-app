@@ -558,21 +558,26 @@ function World({ username }) {
               coordinates.current.y,
               coordinates.current.z,
             ]}
-          > 
-            <Text
-            color="black" // default
-            anchorX="center" // default
-            anchorY="middle" // default
-            position={[coordinates.current.x, coordinates.current.y+5, coordinates.current.z]}
-            scale={[10, 10, 10]}
           >
-           {username}
-          </Text>
+            {/* <Text
+              color="black" // default
+              anchorX="center" // default
+              anchorY="middle" // default
+              position={[
+                coordinates.current.x,
+                coordinates.current.y + 5,
+                coordinates.current.z,
+              ]}
+              scale={[10, 10, 10]}
+            >
+              {username}
+            </Text> */}
             {faceCalculations.current && (
               <Avatar
                 coordinates={coordinates}
                 faceCalculations={faceCalculations}
                 avatarJSON={avatarJSON}
+                username={username}
               />
             )}
           </group>

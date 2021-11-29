@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useContext, useState } from 'react';
 
 import { Avatar } from './Avatar.jsx';
+import { Stars, Sky, Text } from '@react-three/drei';
 
 // import { OrthographicCamera } from 'three';
 
@@ -45,11 +46,27 @@ export const AvatarPeer = ({
   }, []);
 
   return (
-    <Avatar
-      avatarJSON={avatarJSON}
-      coordinates={coordinates}
-      faceCalculations={faceCalc}
-      time={time}
-    />
+    <group>
+      {/* <Text
+        color="black" // default
+        anchorX="center" // default
+        anchorY="middle" // default
+        position={[
+          coordinates.current.x,
+          coordinates.current.y + 5,
+          coordinates.current.z,
+        ]}
+        scale={[10, 10, 10]}
+      >
+        {username}
+      </Text> */}
+      <Avatar
+        avatarJSON={avatarJSON}
+        coordinates={coordinates}
+        faceCalculations={faceCalc}
+        time={time}
+        username={username}
+      />
+    </group>
   );
 };
