@@ -4,11 +4,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Text, Stats } from '@react-three/drei';
 import * as THREE from 'three';
 
-
 const keyPressed = {};
-function PlayerController({coordinates}) {
-   const { camera, gl } = useThree();
-   useFrame((_, delta) => {
+export const PlayerController = ({ coordinates }) => {
+  const { camera, gl } = useThree();
+  useFrame((_, delta) => {
     // console.log('camera :>> ', camera);
     // console.log('camera.position :>> ', camera.position);
     // camera.position.set(camera.position.x, 0, camera.position.z);
@@ -18,52 +17,39 @@ function PlayerController({coordinates}) {
       const duration = new Date().getTime() - start;
 
       // increase momentum if key pressed longer
-      let momentum = Math.sqrt(duration + 200) * 0.01 + 0.05;
+      // let momentum = Math.sqrt(duration + 200) * 0.01 + 0.05;
+      let momentum = 0.25;
 
       // adjust for actual time passed
       momentum = (momentum * delta) / 0.016;
 
       // increase momentum if camera higher
-      momentum = momentum + camera.position.z * 0.02;
+      // momentum = momentum + camera.position.z * 0.02;
       //get these to move the character too
       // console.log('camera.position :>> ', camera.position);
+      console.log('coordinates.current before :>> ', coordinates.current);
       switch (key) {
-        case 'd':
-          camera.translateX(momentum);
-
-          break;
         case 'a':
-          camera.translateX(-momentum);
-
+          coordinates.current.x = coordinates.current.x - momentum;
           break;
+        // camera.translateX(-momentum);
+        case 'w':
+          coordinates.current.z = coordinates.current.z + momentum;
+          break;
+        case 's':
+          coordinates.current.z = coordinates.current.z - momentum;
+          break;
+        case 'd':
+          coordinates.current.x = coordinates.current.x + momentum;
+          // camera.translateX(momentum);
+          break;
+
         default:
       }
-      camera.position.set(camera.position.x, 0, camera.position.z);
-      coordinates.current.x = camera.position.x;
-      coordinates.current.y = 0;
-      coordinates.current.z = camera.position.z + 5;
-
-      camera.lookAt(camera.position.x, 0, camera.position.z);
-      // console.log(playerControls);
+      console.log('coordinates.current after :>> ', coordinates.current);
     });
   });
 
-  useEffect(() => {
-    const controls = new OrbitControls(camera, gl.domElement);
-    controls.minDistance = 3;
-    controls.maxDistance = 20;
-    controls.maxPolarAngle = Math.PI / 2;
-
-    camera.position.set(0, 0, 5);
-
-    // for when avartar is facing others
-    // camera.position.set(0, 0, -5);
-    // camera.rotation.y = Math.PI;
-    controls.minPolarAngle = Math.PI / 3;
-    return () => {
-      controls.dispose();
-    };
-  }, [camera, gl]);
   return null;
 };
 
@@ -77,5 +63,3 @@ export const handleKeyDown = (e) => {
 export const handleKeyUp = (e) => {
   delete keyPressed[e.key];
 };
-
-export default PlayerController
