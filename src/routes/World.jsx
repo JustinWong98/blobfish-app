@@ -24,7 +24,7 @@ import {
 import { Avatar } from '../components/Avatar.jsx';
 import { OtherAvatars } from '../components/World/OtherAvatars.jsx';
 import { AvatarJSONContext } from '../App.js';
-import { Stars, Sky } from '@react-three/drei';
+import { Stars, Sky, Text } from '@react-three/drei';
 import { extent } from '../components/World/baseElements.jsx';
 import { OtherAudio } from '../components/World/audio.jsx';
 import {
@@ -33,6 +33,7 @@ import {
   handleKeyUp,
 } from '../components/World/PlayerController.jsx';
 import { PermMediaRounded } from '@material-ui/icons';
+import SpriteText from 'three-spritetext';
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
@@ -174,12 +175,6 @@ function World({ username }) {
       initiator: true,
       trickle: false,
       stream: userStream,
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
-        ],
-      },
     });
 
     // send local user's info
@@ -207,12 +202,6 @@ function World({ username }) {
       initiator: true,
       trickle: false,
       stream: false,
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
-        ],
-      },
     });
 
     // send local user's info
@@ -271,12 +260,6 @@ function World({ username }) {
       initiator: false,
       trickle: false,
       stream: false,
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
-        ],
-      },
     });
 
     console.log('callerId from add peer :>> ', callerID);
@@ -524,9 +507,7 @@ function World({ username }) {
   });
   // HEAD ROTATION IS CAMERA ROTATION. BAD IDEA
   // NAME TAG FOR EACH AVATAR
-
   //STREAM FACE CALCULATIONS AND AUDIO
-
   return (
     <>
       <video
@@ -536,7 +517,6 @@ function World({ username }) {
         // muted
         style={{ display: 'none' }}
       />
-
       <Canvas camera={{}}>
         <Sky
           distance={450000}
@@ -556,7 +536,16 @@ function World({ username }) {
               coordinates.current.y,
               coordinates.current.z,
             ]}
+          > 
+            <Text
+            color="black" // default
+            anchorX="center" // default
+            anchorY="middle" // default
+            position={[coordinates.current.x, coordinates.current.y+5, coordinates.current.z]}
+            scale={[10, 10, 10]}
           >
+           {username}
+          </Text>
             {faceCalculations.current && (
               <Avatar
                 coordinates={coordinates}
