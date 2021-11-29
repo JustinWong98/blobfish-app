@@ -1,67 +1,44 @@
 import React, { useRef, useEffect, useContext, useState } from 'react';
 import { AvatarPeer } from '../AvatarPeer.jsx';
 import { Terrain, Box, extents } from '../World/baseElements.jsx';
+import AvatarContainer from '../BaseAvatars/AvatarContainer';
+import { Canvas, useFrame } from '@react-three/fiber';
+
 // ability to fetch different types of avatars here
-export const OtherAvatars = ({ peersRef, peers }) => {
-  const faceCalculations = useRef({
-    angle: {
-      pitch: 0,
-      yaw: 0,
-      roll: 0,
-    },
-    leftEyeOpening: 1,
-    rightEyeOpening: 1,
-    mouthDim: {
-      mouthLen: 0,
-      mouthMidBot: 0,
-      mouthTopBot: 0,
-    },
-  });
-  // send face calculations, positions through datastream with username and socket id -> changes from frame to frame
-  //get face calculations from datastream
+export const OtherAvatars = ({
+  dataPeersRef,
+  dataPeers,
+  avatarCollection,
+  username,
+}) => {
+  const [time, setTime] = useState(Date.now());
 
-  //get unique set
-  //get all peers wjere readbale:true
-  //useFrame for latest updates
-  // const uniquePeers = Array.from(new Set(peersRef.current));
+  useEffect(() => {
+    const interval = setInterval(() => setTime(Date.now()), 100);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
-  // console.log('uniquePeers :>> ', uniquePeers);
+  console.log(
+    'avatarCollection.current in otherAvatars :>> ',
+    avatarCollection.current
+  );
+  const avatarObjs = Object.entries(avatarCollection.current);
+  console.log('avatarObjs :>> ', avatarObjs);
+  const avatarNames = Object.keys(avatarCollection.current);
+  const otherAvatarNames = avatarNames.filter((name) => name !== username);
 
-  const readablePeers = peersRef.current.filter((peer) => peer.peer.readable);
-  console.log('readablePeers :>> ', readablePeers);
-  console.log('peers in OtherAvatar :>> ', peers);
-  console.log('peersRef.current :>> ', peersRef.current);
-  const peersLst = peersRef.current;
-  const avatars = peersLst.map((peer) => (
+  const avatars = otherAvatarNames.map((avatar) => (
     <AvatarPeer
-      username={peer.username}
-      avatarJSON={peer.avatarJSON}
-      coord={peer.coordinates}
-      peer={peer.peer}
-      peerID={peer.peerID}
+      username={avatar}
+      avatarJSON={avatarCollection.current[avatar].avatarJSON}
+      coord={avatarCollection.current[avatar].coordinates}
+      faceCalculations={avatarCollection.current[avatar].faceCalculations}
+      time={time}
     />
   ));
-  let peer = peersRef.current[0];
-  let boxes = [0, 1, 2].map((peer) => (
-    <mesh>
-      <boxGeometry args={[10, 10, 10]} />
-      <meshStandardMaterial />
-    </mesh>
-  ));
-  console.log('boxes :>> ', boxes);
+
   //face calculations from peer sends
-  return (
-    <group>
-      {avatars}
-      {/* {peer && (
-        <AvatarPeer
-          username={peer.username}
-          avatarJSON={peer.avatarJSON}
-          coord={peer.coordinates}
-          peer={peers[0]}
-          peerID={peer.peerID}
-        />
-      )} */}
-    </group>
-  );
+  return <group>{avatars}</group>;
 };
