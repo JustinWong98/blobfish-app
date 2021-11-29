@@ -11,15 +11,12 @@ import Peer from 'simple-peer';
 import { listener } from '../modules/sockets.mjs';
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { VideoFrame } from '../components/VideoElements';
-// import { Physics, userBox } from 'use-cannon';
 import { Terrain, Box, extents } from '../components/World/baseElements.jsx';
 import { SocketContext } from '../components/context/sockets.js';
 import {
   CameraController,
 } from '../components/World/CameraController';
 import { getWebCamStream } from '../modules/webcam';
-import { FaceMesh } from '@mediapipe/face_mesh';
 import * as cam from '@mediapipe/camera_utils';
 //  import
 import {
@@ -104,18 +101,23 @@ function World({ username }) {
 
   const getUsers = (users) => {
     const peers = [];
-    users.forEach(({ userID, username }) => {
+    // iterate through users list received from server
+    users.forEach(({ userID, username, avatarJSON, coordinates }) => {
       // for each user, create a peer and send in our id and stream
       // TODO: CHANGE STREAM TO DATA CHANNEL?? NOPE CHANGE TO AUDIO STREAM AND IMPLEMMENT SEPARATE DATA CHANNEL
       //TO MOD INTO AUDIO CHANNEL
+      // connect local peer to remote peer
       const peer = createPeer(
         userID,
         socketRef.current.id,
         audioStream.current
       );
       // peersRef will handle collection of peers (all simple peer logic)
+      // pass in user info, remote peers
       peersRef.current.push({
         username,
+        avatarJSON,
+        coordinates,
         peerID: userID,
         peer,
       });
@@ -132,11 +134,13 @@ function World({ username }) {
       trickle: false,
       stream: userStream,
     });
-
+    // send local user's info
     peer.on('signal', (signal) => {
       socketRef.current.emit('sending signal', {
-        userToSignal,
+        avatarJSON,
         username,
+        coordinates: coordinates.current,
+        userToSignal,
         callerID,
         signal,
       });
@@ -177,13 +181,21 @@ function World({ username }) {
 
     return peer;
   };
-  const newUserJoins = ({ signal, callerID, username }) => {
+  const newUserJoins = ({
+    signal,
+    callerID,
+    username,
+    avatarJSON,
+    coordinates,
+  }) => {
     console.log('callId in user joined:>> ', callerID);
     // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
     const peer = addPeer(signal, callerID, audioStream.current);
     console.log('peer._id :>> ', peer._id);
     peersRef.current.push({
       username,
+      avatarJSON,
+      coordinates,
       peerID: callerID,
       peer,
     });
@@ -231,8 +243,12 @@ function World({ username }) {
 
     // socket to emit that room is joined
     // send in a username
-    socketRef.current.emit('joined room', { roomID: worldID, username });
-    socketRef.current.emit('joined room', worldID);
+    socketRef.current.emit('joined room', {
+      roomID: worldID,
+      username,
+      avatarJSON,
+      coordinates: coordinates.current,
+    });
 
     socketRef.current.on('get users', getUsers);
     socketRef.current.on('user joined', newUserJoins);
