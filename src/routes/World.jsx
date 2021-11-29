@@ -32,7 +32,6 @@ import {
   handleKeyDown,
   handleKeyUp,
 } from '../components/World/PlayerController.jsx';
-
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
@@ -217,6 +216,18 @@ function World({ username }) {
     setPeers((users) => [...users, peer]);
   };
 
+  const disconnectUser = (user) => {
+    //remove peer from peersRef by id first
+    console.log('peersRef.current before removal :>> ', peersRef.current);
+    const disconnectingID = user[0].userID;
+    const peersLeft = peersRef.current.filter(
+      (peer) => peer.peerID !== disconnectingID
+    );
+    peersRef.current = peersLeft;
+    console.log('peersRef.current :>> ', peersRef.current);
+    //remove peer by name
+  };
+
   // decide on world dimensions
   console.log('avatarJSON :>> ', avatarJSON);
   useEffect(() => {
@@ -260,6 +271,7 @@ function World({ username }) {
     socket.on('me', setMe);
     socket.on('callUser', callUserSetCall);
     socket.onAny(listener);
+    socket.on('disconnect user', disconnectUser);
 
     return () => {
       socketRef.current.off('get users', getUsers);
@@ -268,6 +280,7 @@ function World({ username }) {
       socket.off('me', setMe);
       socket.off('callUser', callUserSetCall);
       socket.offAny(listener);
+      socket.off('disconnect user', disconnectUser);
     };
   }, []);
 

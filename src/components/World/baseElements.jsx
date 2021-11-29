@@ -45,13 +45,6 @@ export const Terrain = () => {
         <Tree position={[5, 0, 5]} />
       </group>
       <meshBasicMaterial map={texture} />
-      {/* <meshStandardMaterial
-        attach="material"
-        color="white"
-        roughness={1}
-        metalness={0}
-        wireframe
-      /> */}
     </mesh>
   );
 };
