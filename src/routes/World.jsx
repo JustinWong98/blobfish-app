@@ -33,7 +33,6 @@ import {
   handleKeyUp,
 } from '../components/World/PlayerController.jsx';
 import { PermMediaRounded } from '@material-ui/icons';
-import SpriteText from 'three-spritetext';
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename

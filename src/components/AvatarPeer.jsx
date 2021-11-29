@@ -7,7 +7,7 @@ import { CubeHead } from './Avatars/CubeHead';
 import { Blobfish } from './Avatars/Blobfish.jsx';
 import { Light } from './Avatars/Light';
 import { GroundPlane, BackDrop } from './Avatars/Background';
-import { Stars, Sky } from '@react-three/drei';
+import { Stars, Sky, Text } from '@react-three/drei';
 import { Avatar } from './Avatar.jsx';
 
 // import { OrthographicCamera } from 'three';
@@ -51,10 +51,21 @@ export const AvatarPeer = ({ username, avatarJSON, coord, peer, peerID }) => {
   // });
 
   return (
+    <group>
+           <Text
+            color="black" // default
+            anchorX="center" // default
+            anchorY="middle" // default
+            position={[coordinates.current.x, coordinates.current.y+5, coordinates.current.z]}
+            scale={[10, 10, 10]}
+          >
+          {username}
+          </Text>
     <Avatar
       avatarJSON={avatarJSON}
       coordinates={coordinates}
       faceCalculations={faceCalculations}
     />
+    </group>
   );
 };

@@ -70,7 +70,7 @@ function App() {
             <BrowserRouter>
               <NavBar />
               <Routes>
-                <Route path="/front" element={<Front />} />
+                <Route path="/world" element={ <World avatarJSON={avatarJSON} username={username} />} />
                 <Route
                   path="/signup"
                   element={
@@ -115,16 +115,8 @@ function App() {
                   element={<Room key="videoPlayer" username={username} />}
                 />
                 <Route
-                  path="/:worldID"
-                  element={
-                    <World avatarJSON={avatarJSON} username={username} />
-                  }
-                />
-                <Route
                   path="/"
-                  element={
-                    <World avatarJSON={avatarJSON} username={username} />
-                  }
+                  element={<Front />}
                 />
               </Routes>
             </BrowserRouter>

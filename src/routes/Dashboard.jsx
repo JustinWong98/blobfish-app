@@ -48,7 +48,7 @@ function Dashboard({ isLoggedIn, username, userId, avatarModel, setAvatar }) {
               avatarModel={avatarModel}
               setAvatar={setAvatar}
             />
-            <Button color="success" onClick={() => {navigate('/')}}>
+            <Button color="success" onClick={() => {navigate('/world/1')}}>
               Enter the metaverse
             </Button>
           </Grid>
