@@ -32,7 +32,7 @@ export const Terrain = () => {
   const texture = useTexture('grass_texture.jpg');
   if (texture) {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(extents / 10, extents / 10);
+    texture.repeat.set(extents / 30, extents / 30);
   }
   return (
     <mesh visible position={[0, -3, 0]} rotation={[-Math.PI / 2, 0, 0]}>
