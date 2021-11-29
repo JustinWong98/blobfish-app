@@ -32,6 +32,7 @@ import {
   handleKeyDown,
   handleKeyUp,
 } from '../components/World/PlayerController.jsx';
+import { PermMediaRounded } from '@material-ui/icons';
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
@@ -80,11 +81,11 @@ function World({ username }) {
   socketRef.current = socket;
 
   // PEERS
-  const [me, setMe] = useState('');
   const [call, setCall] = useState({});
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [peers, setPeers] = useState([]);
+  // const peerRef= useRef();
   const peersRef = useRef([]);
 
   console.log('peersRef in world :>> ', peersRef);
@@ -115,7 +116,6 @@ function World({ username }) {
         socketRef.current.id,
         audioStream.current
       );
-
       // peersRef will handle collection of peers (all simple peer logic)
       // pass in user info, remote peers
       console.log('peersRef in get users before:>> ', peersRef);
@@ -160,22 +160,12 @@ function World({ username }) {
       console.log('peer signal in create:>> ', signal);
     });
 
-    peer.on('connect', () => {
-      const avatarMovement = {
-        faceCalculations: faceCalculations.current,
-        coordinates: coordinates.current,
-        username,
-        peerID: callerID,
-      };
-      peer.send(JSON.stringify(avatarMovement));
-      console.log('sent data in create: ' + JSON.stringify(avatarMovement));
-    });
+    peer.on('connect', () => {});
 
     //sending something
     peer.on('data', (data) => {
       // this person is who <-> callerID
-
-      console.log('data in create: ' + data);
+      console.log('received in create: ' + JSON.parse(data));
       // peer.send('data sent in return from peer ' + data);
     });
     return peer;
@@ -244,7 +234,7 @@ function World({ username }) {
     //sending something
     //send position, send face dims
     peer.on('data', (data) => {
-      console.log('data: in new user joins ' + data);
+      console.log('receive new user', JSON.stringify(data));
       // peer.send('received' + data);
     });
     setPeers((users) => [...users, peer]);
@@ -288,10 +278,35 @@ function World({ username }) {
     audioStream.current.addTrack(audioTrack[0]);
     console.log('audioStream.current :>> ', audioStream.current);
   });
+  const sendUserMovement = () => {
+    console.log('interbal');
+    const avatarMovement = {
+      faceCalculations: faceCalculations.current,
+      coordinates: coordinates.current,
+      username,
+    };
+    console.log('peers :>> ', peers);
+    const avatarMoveStr = JSON.stringify(avatarMovement);
+    peers.forEach((peer) => {
+      //check readystate
+      if (peer._channel) {
+        const state = peer._channel.readyState;
+        if (state === 'open') {
+          peer.send(avatarMoveStr);
+          console.log('sent data in create: ' + avatarMoveStr);
+        }
+      }
+    });
+  };
+
+  useEffect(() => {
+    const interval = setInterval(sendUserMovement, 5);
+  }, [peers]);
   useEffect(() => {
     console.log('use effect in videoPlayer');
 
     getVideoAudioStream();
+    //everytime faceCalculates, or player moves, peers will send
 
     // socket to emit that room is joined
     // send in a username
@@ -307,16 +322,13 @@ function World({ username }) {
     socketRef.current.on('receiving returned signal', receiverSendSignal);
     // on user disconnect remove them? get again
     socketRef.current.on('');
-    socket.on('me', setMe);
     socket.on('callUser', callUserSetCall);
     socket.onAny(listener);
     socket.on('disconnect user', disconnectUser);
-
     return () => {
       socketRef.current.off('get users', getUsers);
       socketRef.current.off('user joined', newUserJoins);
       socketRef.current.off('receiving returned signal', receiverSendSignal);
-      socket.off('me', setMe);
       socket.off('callUser', callUserSetCall);
       socket.offAny(listener);
       socket.off('disconnect user', disconnectUser);
