@@ -24,7 +24,7 @@ import {
 import { Avatar } from '../components/Avatar.jsx';
 import { OtherAvatars } from '../components/World/OtherAvatars.jsx';
 import { AvatarJSONContext } from '../App.js';
-import { Stars, Sky } from '@react-three/drei';
+import { Stars, Sky, Text } from '@react-three/drei';
 import { extent } from '../components/World/baseElements.jsx';
 import { OtherAudio } from '../components/World/audio.jsx';
 import {
@@ -32,7 +32,6 @@ import {
   handleKeyDown,
   handleKeyUp,
 } from '../components/World/PlayerController.jsx';
-import { PermMediaRounded } from '@material-ui/icons';
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
@@ -40,7 +39,6 @@ import { PermMediaRounded } from '@material-ui/icons';
 function World({ username }) {
   console.log('loading world');
   const { worldID } = useParams();
-  console.log('username in world :>> ', username);
   // FACE MESH CALC
   const videoRef = useRef();
   const [faceMeshStarted, setFaceMeshStart] = useState(false);
@@ -52,7 +50,6 @@ function World({ username }) {
     z: -extents / 10 + (Math.random() * extents) / 5,
   });
 
-  console.log('coordinates in world :>> ', coordinates);
   const faceCalculations = useRef({
     angle: {
       pitch: 0,
@@ -67,6 +64,8 @@ function World({ username }) {
       mouthTopBot: 0,
     },
   });
+  const avatarCollection = useRef({});
+  const [avatarsChanged, setAvatarsChanged] = useState(false);
 
   // VIDEO
   const myVideo = useRef();
@@ -80,21 +79,30 @@ function World({ username }) {
   const socketRef = useRef();
   socketRef.current = socket;
 
-  // PEERS
+  // PEERS FOR AUDIO STREAM
   const [call, setCall] = useState({});
   const [callAccepted, setCallAccepted] = useState(false);
   const [callEnded, setCallEnded] = useState(false);
   const [peers, setPeers] = useState([]);
-  // const peerRef= useRef();
   const peersRef = useRef([]);
 
-  console.log('peersRef in world :>> ', peersRef);
+  //PEERS FOR DATA CHANNEL
+  const [dataPeers, setDataPeers] = useState([]);
+  const dataPeersRef = useRef([]);
+
   // CONNECTIONS
 
   const receiverSendSignal = (data) => {
     // find peer that we are receiving from since we are going to receive multiple peers.
     // we loop through the list of peers and match the id of the one trying to signal us
     const item = peersRef.current.find((p) => p.peerID === data.id);
+    item.peer.signal(data.signal);
+  };
+  const receiverDataSendSignal = (data) => {
+    console.log('in receiver data send signal');
+    // find peer that we are receiving from since we are going to receive multiple peers.
+    // we loop through the list of peers and match the id of the one trying to signal us
+    const item = dataPeersRef.current.find((p) => p.peerID === data.id);
     item.peer.signal(data.signal);
   };
 
@@ -116,23 +124,30 @@ function World({ username }) {
         socketRef.current.id,
         audioStream.current
       );
+
       // peersRef will handle collection of peers (all simple peer logic)
       // pass in user info, remote peers
       console.log('peersRef in get users before:>> ', peersRef);
       // remove previous instances of peers
-      const filterPeersRef = peersRef.current.filter(
-        (peer) => peer.username !== username
-      );
-      filterPeersRef.push({
+      // const filterPeersRef = peersRef.current.filter(
+      //   (peer) => peer.username !== username
+      // );
+      // filterPeersRef.push({
+      //   username,
+      //   avatarJSON,
+      //   coordinates,
+      //   peerID: userID,
+      //   peer,
+      // });
+
+      // peersRef.current = filterPeersRef;
+      peersRef.current.push({
         username,
         avatarJSON,
         coordinates,
         peerID: userID,
         peer,
       });
-
-      peersRef.current = filterPeersRef;
-      // peersRef.current.push();
       console.log('peersRef in get users :>> ', peersRef);
       // setting state of array of peers for rendering purposes
       // remove previous instances of peers
@@ -140,13 +155,60 @@ function World({ username }) {
     });
     setPeers(peers);
   };
+
+  const getDataUsers = (users) => {
+    const dataPeers = [];
+    // iterate through users list received from server
+    console.log('users in getusers :>> ', users);
+    users.forEach(({ userID, username, avatarJSON, coordinates }) => {
+      // for each user, create a peer and send in our id and stream
+      // TODO: CHANGE STREAM TO DATA CHANNEL?? NOPE CHANGE TO AUDIO STREAM AND IMPLEMMENT SEPARATE DATA CHANNEL
+      //TO MOD INTO AUDIO CHANNEL
+      // connect local peer to remote peer
+      const dataPeer = createDataPeer(userID, socketRef.current.id);
+
+      // peersRef will handle collection of peers (all simple peer logic)
+      // pass in user info, remote peers
+      console.log('peersRef in get users before:>> ', dataPeersRef);
+      // remove previous instances of peers
+
+      // const filterDataPeerRef = dataPeersRef.current.filter(
+      //   (peer) => peer.username !== username
+      // );
+      // filterDataPeerRef.push({
+      //   username,
+      //   avatarJSON,
+      //   coordinates,
+      //   peerID: userID,
+      //   peer: dataPeer,
+      // });
+
+      // dataPeersRef.current = filterDataPeerRef;
+      dataPeersRef.current.push({
+        username,
+        avatarJSON,
+        coordinates,
+        peerID: userID,
+        peer: dataPeer,
+      });
+      console.log('peersRef in get users :>> ', peersRef);
+      // setting state of array of peers for rendering purposes
+      // remove previous instances of peers
+      dataPeers.push(dataPeer);
+      avatarCollection.current[username] = { avatarJSON, coordinates };
+      // avatarCollection.current[username] = { avatarJSON};
+    });
+    setDataPeers(dataPeers);
+  };
   const createPeer = (userToSignal, callerID, userStream) => {
     console.log('streaming from create peer :>> ', userStream);
+    //create all otejr peers? this is not loacal?
     const peer = new Peer({
       initiator: true,
       trickle: false,
       stream: userStream,
     });
+
     // send local user's info
     peer.on('signal', (signal) => {
       socketRef.current.emit('sending signal', {
@@ -160,15 +222,48 @@ function World({ username }) {
       console.log('peer signal in create:>> ', signal);
     });
 
-    peer.on('connect', () => {});
+    peer.on('connect', () => {
+      console.log('CONNECT on createPeer');
+    });
+
+    return peer;
+  };
+  const createDataPeer = (userToSignal, callerID) => {
+    console.log('in createDataPeer');
+
+    //create all otejr peers? this is not loacal?
+    const dataPeer = new Peer({
+      initiator: true,
+      trickle: false,
+      stream: false,
+    });
+
+    // send local user's info
+    dataPeer.on('signal', (signal) => {
+      socketRef.current.emit('sending data signal', {
+        avatarJSON,
+        username,
+        coordinates: coordinates.current,
+        userToSignal,
+        callerID,
+        signal,
+      });
+      console.log('peer signal in create: dataPeer>> ', signal);
+    });
 
     //sending something
-    peer.on('data', (data) => {
-      // this person is who <-> callerID
-      console.log('received in create: ' + JSON.parse(data));
-      // peer.send('data sent in return from peer ' + data);
+    dataPeer.on('data', (data) => {
+      const avatarObj = JSON.parse(data);
+      console.log('receive new create dataPeer', avatarObj);
+      avatarCollection.current[avatarObj.username] = {
+        ...avatarCollection.current[avatarObj.username],
+        faceCalculations: avatarObj.faceCalculations,
+        coordinates: avatarObj.coordinates,
+      };
+      console.log('avatarCollection.current :>> ', avatarCollection.current);
+      // setAvatarsChanged(avatarCollection.current);
     });
-    return peer;
+    return dataPeer;
   };
 
   // incomingSignal is sent when new person comes into room, users wait for that signal before firing off their own signal back to the initiator(the one who joined the room)
@@ -181,6 +276,7 @@ function World({ username }) {
       trickle: false,
       stream: userStream,
     });
+
     console.log('callerId from add peer :>> ', callerID);
 
     peer.on('signal', (signal) => {
@@ -192,11 +288,37 @@ function World({ username }) {
     peer.signal(incomingSignal);
     peer.on('connect', () => {
       console.log('CONNECT in add peer');
-      peer.send('send from add peer' + Math.random());
     });
 
     return peer;
   };
+  const addDataPeer = (incomingSignal, callerID) => {
+    console.log('in addDataPeer');
+    // when a peer's initiator is false, they only signal when they receive a signal
+
+    const dataPeer = new Peer({
+      initiator: false,
+      trickle: false,
+      stream: false,
+    });
+
+    console.log('callerId from add peer :>> ', callerID);
+
+    dataPeer.on('signal', (signal) => {
+      // sends back to the server and then back to the callerID to complete handshake
+      socketRef.current.emit('returning data signal', { signal, callerID });
+      console.log('peer signal in add data peer:>> ', signal);
+    });
+    // fires the above event to fire
+    dataPeer.signal(incomingSignal);
+    dataPeer.on('connect', () => {
+      console.log('CONNECT in add dataPeer');
+    });
+
+    return dataPeer;
+  };
+
+  //just one user
   const newUserJoins = ({
     signal,
     callerID,
@@ -205,7 +327,6 @@ function World({ username }) {
     coordinates,
   }) => {
     console.log('callId in user joined:>> ', callerID);
-    // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
     const peer = addPeer(signal, callerID, audioStream.current);
     console.log('peer._id :>> ', peer._id);
     console.log('peersRef in newUserJoins before :>> ', peersRef);
@@ -225,19 +346,52 @@ function World({ username }) {
     console.log('peersRef in newUserJoins :>> ', peersRef);
     peer.on('connect', () => {
       console.log('CONNECT in newUserJoins');
-      //send avatar info, json, socket id?
+    });
 
-      // this peer is sending
-      // peer.send(JSON.stringify())
-      peer.send('sending from newUser' + Math.random());
+    setPeers((users) => [...users, peer]);
+  };
+  const newDataUserJoins = ({
+    signal,
+    callerID,
+    username,
+    avatarJSON,
+    coordinates,
+  }) => {
+    console.log('in newDataUserJoins');
+    // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
+    const dataPeer = addDataPeer(signal, callerID);
+
+    // clean list of previous instances before pushing
+    const filterPeerRef = dataPeersRef.current.filter(
+      (peer) => peer.username !== username
+    );
+    filterPeerRef.push({
+      username,
+      avatarJSON,
+      coordinates,
+      peerID: callerID,
+      peer: dataPeer,
+    });
+    dataPeersRef.current = filterPeerRef;
+    console.log('dataPeersRef in newUserJoins :>> ', dataPeersRef);
+    dataPeer.on('connect', () => {
+      console.log('CONNECT in newDataUserJoins');
     });
     //sending something
     //send position, send face dims
-    peer.on('data', (data) => {
-      console.log('receive new user', JSON.stringify(data));
-      // peer.send('received' + data);
+    dataPeer.on('data', (data) => {
+      const avatarObj = JSON.parse(data);
+      console.log('receive new user', avatarObj);
+      avatarCollection.current[avatarObj.username] = {
+        ...avatarCollection.current[avatarObj.username],
+        faceCalculations: avatarObj.faceCalculations,
+        coordinates: avatarObj.coordinates,
+      };
+      console.log('avatarCollection.current :>> ', avatarCollection.current);
+      // setAvatarsChanged(avatarCollection.current);
     });
-    setPeers((users) => [...users, peer]);
+
+    setDataPeers((users) => [...users, dataPeer]);
   };
 
   const disconnectUser = (user) => {
@@ -247,7 +401,6 @@ function World({ username }) {
     const disconnectingPeer = peersRef.current.filter(
       (peer) => peer.peerID === disconnectingID
     );
-    // disconnectingPeer.destroy();
     const peersLeft = peersRef.current.filter(
       (peer) => peer.peerID !== disconnectingID
     );
@@ -276,32 +429,36 @@ function World({ username }) {
     const audioTrack = stream.current.getAudioTracks();
     console.log('audioTrack :>> ', audioTrack);
     audioStream.current.addTrack(audioTrack[0]);
-    console.log('audioStream.current :>> ', audioStream.current);
   });
   const sendUserMovement = () => {
-    console.log('interbal');
     const avatarMovement = {
       faceCalculations: faceCalculations.current,
       coordinates: coordinates.current,
       username,
     };
-    console.log('peers :>> ', peers);
     const avatarMoveStr = JSON.stringify(avatarMovement);
-    peers.forEach((peer) => {
+    dataPeers.forEach((peer) => {
       //check readystate
       if (peer._channel) {
         const state = peer._channel.readyState;
         if (state === 'open') {
           peer.send(avatarMoveStr);
-          console.log('sent data in create: ' + avatarMoveStr);
+          // console.log('sent data in create: ' + avatarMoveStr);
+        } else {
+          console.log('channel is not open', peer);
         }
+      } else {
+        console.log('peer in undefined', peer);
       }
     });
   };
 
   useEffect(() => {
-    const interval = setInterval(sendUserMovement, 5);
-  }, [peers]);
+    const interval = setInterval(sendUserMovement, 100);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [dataPeers]);
   useEffect(() => {
     console.log('use effect in videoPlayer');
 
@@ -316,10 +473,22 @@ function World({ username }) {
       avatarJSON,
       coordinates: coordinates.current,
     });
+    socketRef.current.emit('joined data room', {
+      roomID: worldID,
+      username,
+      avatarJSON,
+      coordinates: coordinates.current,
+    });
 
     socketRef.current.on('get users', getUsers);
+    socketRef.current.on('get data users', getDataUsers);
     socketRef.current.on('user joined', newUserJoins);
+    socketRef.current.on('user data joined', newDataUserJoins);
     socketRef.current.on('receiving returned signal', receiverSendSignal);
+    socketRef.current.on(
+      'receiving data returned signal',
+      receiverDataSendSignal
+    );
     // on user disconnect remove them? get again
     socketRef.current.on('');
     socket.on('callUser', callUserSetCall);
@@ -328,10 +497,15 @@ function World({ username }) {
     return () => {
       socketRef.current.off('get users', getUsers);
       socketRef.current.off('user joined', newUserJoins);
+      socketRef.current.off('user data joined', newDataUserJoins);
       socketRef.current.off('receiving returned signal', receiverSendSignal);
       socket.off('callUser', callUserSetCall);
       socket.offAny(listener);
       socket.off('disconnect user', disconnectUser);
+      socketRef.current.off(
+        'receiving data returned signal',
+        receiverDataSendSignal
+      );
     };
   }, []);
 
@@ -355,9 +529,7 @@ function World({ username }) {
   });
   // HEAD ROTATION IS CAMERA ROTATION. BAD IDEA
   // NAME TAG FOR EACH AVATAR
-
   //STREAM FACE CALCULATIONS AND AUDIO
-
   return (
     <>
       <video
@@ -367,7 +539,6 @@ function World({ username }) {
         // muted
         style={{ display: 'none' }}
       />
-
       <Canvas camera={{}}>
         <Sky
           distance={450000}
@@ -388,15 +559,35 @@ function World({ username }) {
               coordinates.current.z,
             ]}
           >
+            {/* <Text
+              color="black" // default
+              anchorX="center" // default
+              anchorY="middle" // default
+              position={[
+                coordinates.current.x,
+                coordinates.current.y + 5,
+                coordinates.current.z,
+              ]}
+              scale={[10, 10, 10]}
+            >
+              {username}
+            </Text> */}
             {faceCalculations.current && (
               <Avatar
                 coordinates={coordinates}
                 faceCalculations={faceCalculations}
                 avatarJSON={avatarJSON}
+                username={username}
               />
             )}
           </group>
-          <OtherAvatars peersRef={peersRef} peers={peers} />
+          <OtherAvatars
+            dataPeersRef={dataPeersRef}
+            dataPeers={dataPeers}
+            avatarCollection={avatarCollection}
+            username={username}
+            // avatarsChanged={avatarsChanged}
+          />
           {/* componet renders all other avatars, it should use peerRef 
           peers for update of avatar models in map */}
           <Terrain />

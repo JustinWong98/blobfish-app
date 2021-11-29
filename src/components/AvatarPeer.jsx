@@ -1,22 +1,16 @@
 import React, { useRef, useEffect, useContext, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { videoStyles } from '../modules/useStyles.jsx';
-import { AvatarJSONContext } from '../App.js';
-import * as THREE from 'three';
-import { CubeHead } from './Avatars/CubeHead';
-import { Blobfish } from './Avatars/Blobfish.jsx';
-import { Light } from './Avatars/Light';
-import { GroundPlane, BackDrop } from './Avatars/Background';
-import { Stars, Sky } from '@react-three/drei';
+
 import { Avatar } from './Avatar.jsx';
+import { Stars, Sky, Text } from '@react-three/drei';
 
 // import { OrthographicCamera } from 'three';
 
 // ability to fetch different types of avatars here
-export const AvatarPeer = ({ username, avatarJSON, coord, peer, peerID }) => {
-  console.log('running in AvatarPeer');
-  const coordinates = useRef(coord);
-  const faceCalculations = useRef({
+export const AvatarPeer = ({
+  username,
+  avatarJSON,
+  coord,
+  faceCalculations = {
     angle: {
       pitch: 0,
       yaw: 0,
@@ -29,32 +23,50 @@ export const AvatarPeer = ({ username, avatarJSON, coord, peer, peerID }) => {
       mouthMidBot: 0,
       mouthTopBot: 0,
     },
-  });
-  //get face calculations and coordinates from peer
-  //peer.receive?
-  //check if username, id is the same
+  },
+}) => {
+  const [time, setTime] = useState(Date.now());
+  const coordinates = useRef(coord);
+  const faceCalc = useRef(faceCalculations);
+  console.log(
+    'running in AvatarPeer',
+    coord,
+    faceCalculations,
+    avatarJSON,
+    username
+  );
+  coordinates.current = { x: coord.x, y: coord.y, z: coord.z };
+  faceCalc.current = { ...faceCalculations };
 
-  // useFrame((state, delta) => {
-  //   const { angle } = faceCalculations.current;
-  //   // console.log('state in useFrame :>> ', state);
-  //   // console.log('delta in useFrame :>> ', delta * 1000);
-  //   myMesh.current.rotation.x = angle.pitch * 1.5; //up down tilt
-  //   myMesh.current.rotation.y = -angle.yaw * 1.5;
-  //   myMesh.current.rotation.z = -angle.roll * 0.5; //left right tilt
-  //   if (coordinates !== undefined) {
-  //     myMesh.current.position.set(
-  //       coordinates.current.x,
-  //       coordinates.current.y,
-  //       coordinates.current.z
-  //     );
-  //   }
-  // });
+  useEffect(() => {
+    const interval = setInterval(setTime(Date.now()), 100);
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
-    <Avatar
-      avatarJSON={avatarJSON}
-      coordinates={coordinates}
-      faceCalculations={faceCalculations}
-    />
+    <group>
+      {/* <Text
+        color="black" // default
+        anchorX="center" // default
+        anchorY="middle" // default
+        position={[
+          coordinates.current.x,
+          coordinates.current.y + 5,
+          coordinates.current.z,
+        ]}
+        scale={[10, 10, 10]}
+      >
+        {username}
+      </Text> */}
+      <Avatar
+        avatarJSON={avatarJSON}
+        coordinates={coordinates}
+        faceCalculations={faceCalc}
+        time={time}
+        username={username}
+      />
+    </group>
   );
 };

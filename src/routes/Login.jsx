@@ -7,6 +7,10 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Container from '@mui/material/Container';
 import axios from 'axios';
+import Alert from '@mui/material/Alert';
+import IconButton from '@mui/material/IconButton';
+import Collapse from '@mui/material/Collapse';
+import CloseIcon from '@mui/icons-material/Close';
 
 import { BACKEND_URL } from '../BACKEND_URL';
 import * as successes from '../modules/successes.mjs';
@@ -50,12 +54,14 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
   const [username, setUserName] = useState();
   // const [email, setEmail] = useState();
   const [password, setPassword] = useState();
+  const [errorOpen, setErrorOpen] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
   const navigate = useNavigate();
 
   console.log('in login');
   const handleClick = (e) => {
     e.preventDefault();
-
+    
     let usernameInvalid = '';
     let passwordInvalid = '';
 
@@ -63,24 +69,19 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
     axios
       .post(`${BACKEND_URL}/login`, { username, password })
       .then((response) => {
-        console.log('response from login :>> ', response);
+        console.log('response from login :>> ', response.data);
         if (response.data.error) {
           window.scrollTo(0, 0);
           if (
-            response.data.error === errors.LOGIN_INPUT_VALIDATION_ERROR_MESSAGE
+            response.data.error === errors.LOGIN_GLOBAL_ERROR_MESSAGE
           ) {
-            if (response.data.username_invalid) {
-              usernameInvalid = response.data.username_invalid;
-            }
-
-            if (response.data.password_invalid) {
-              passwordInvalid = response.data.password_invalid;
-            }
+            setErrorMessage('Your username or password is invalid! Please try again!')
+            setErrorOpen(true)
           }
 
           setUsernameInvalidMessage(usernameInvalid);
           setPasswordInvalidMessage(passwordInvalid);
-          setGlobalErrorMessage(errors.LOGIN_GLOBAL_ERROR_MESSAGE);
+          // setGlobalErrorMessage(errors.LOGIN_GLOBAL_ERROR_MESSAGE);
         } else {
           console.log('setIsLoggedIn :>> ', setIsLoggedIn);
           setIsLoggedIn(true);
@@ -115,6 +116,26 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
           noValidate
           autoComplete="off"
         >
+                  <Collapse in={errorOpen}>
+        <Alert
+          action={
+            <IconButton
+              aria-label="close"
+              color="inherit"
+              size="small"
+              onClick={() => {
+                setErrorOpen(false);
+              }}
+              severity="error"
+            >
+              <CloseIcon fontSize="inherit" />
+            </IconButton>
+          }
+          sx={{ mb: 2 }}
+        >
+          {errorMessage}
+        </Alert>
+      </Collapse>
           <Typography variant="body1" color="initial">
             Login
           </Typography>

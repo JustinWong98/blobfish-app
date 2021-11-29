@@ -7,7 +7,7 @@ import { CubeHead } from './Avatars/CubeHead';
 import { Blobfish } from './Avatars/Blobfish.jsx';
 import { Light } from './Avatars/Light';
 import { GroundPlane, BackDrop } from './Avatars/Background';
-import { Stars, Sky } from '@react-three/drei';
+import { Stars, Sky, Text } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
 // ability to fetch different types of avatars here
@@ -15,6 +15,7 @@ export const Avatar = ({
   avatarJSON,
   coordinates,
   faceCalculations,
+  username,
   // faceCalculations = {
   //   angle: {
   //     pitch: 0,
@@ -31,7 +32,7 @@ export const Avatar = ({
   // },
 }) => {
   const [chosenAvatar, setChosenAvatar] = useState();
-  console.log('faceCalculations.current :>> ', faceCalculations.current);
+  // console.log('faceCalculations.current :>> ', faceCalculations.current);
   useEffect(() => {
     console.log(avatarJSON.model);
     switch (avatarJSON.model) {
@@ -110,6 +111,16 @@ export const Avatar = ({
 
   return (
     <group ref={myMesh}>
+      <Text
+        color="black" // default
+        anchorX="center" // default
+        anchorY="middle" // default
+        position={[0, 3.5, 1]}
+        scale={[7, 7, 7]}
+        // scale={[10, 10, 10]}
+      >
+        {username}
+      </Text>
       {/* <Stars /> */}
       {chosenAvatar}
       {/* <GroundPlane />
