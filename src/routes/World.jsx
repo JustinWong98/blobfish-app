@@ -196,6 +196,7 @@ function World({ username }) {
       // remove previous instances of peers
       dataPeers.push(dataPeer);
       avatarCollection.current[username] = { avatarJSON, coordinates };
+      setAvatarJSON(avatarJSON);
       // avatarCollection.current[username] = { avatarJSON};
     });
     setDataPeers(dataPeers);
@@ -257,6 +258,7 @@ function World({ username }) {
       console.log('receive new create dataPeer', avatarObj);
       avatarCollection.current[avatarObj.username] = {
         ...avatarCollection.current[avatarObj.username],
+        avatarJSON: avatarObj.avatarJSON,
         faceCalculations: avatarObj.faceCalculations,
         coordinates: avatarObj.coordinates,
       };
@@ -386,6 +388,7 @@ function World({ username }) {
         ...avatarCollection.current[avatarObj.username],
         faceCalculations: avatarObj.faceCalculations,
         coordinates: avatarObj.coordinates,
+        avatarJSON: avatarObj.avatarJSON,
       };
       console.log('avatarCollection.current :>> ', avatarCollection.current);
       // setAvatarsChanged(avatarCollection.current);
@@ -398,14 +401,32 @@ function World({ username }) {
     //remove peer from peersRef by id first
     console.log('peersRef.current before removal :>> ', peersRef.current);
     const disconnectingID = user[0].userID;
-    const disconnectingPeer = peersRef.current.filter(
-      (peer) => peer.peerID === disconnectingID
-    );
+    // const disconnectingPeer = peersRef.current.filter(
+    //   (peer) => peer.peerID === disconnectingID
+    // );
     const peersLeft = peersRef.current.filter(
       (peer) => peer.peerID !== disconnectingID
     );
     peersRef.current = peersLeft;
     console.log('peersRef.current :>> ', peersRef.current);
+    //remove peer by name
+  };
+
+  const disconnectDataUser = (user) => {
+    //remove peer from peersRef by id first
+    console.log(
+      'dataPeersRef.current before removal :>> ',
+      dataPeersRef.current
+    );
+    const disconnectingID = user[0].userID;
+    // const disconnectingPeer = peersRef.current.filter(
+    //   (peer) => peer.peerID === disconnectingID
+    // );
+    const peersLeft = dataPeersRef.current.filter(
+      (peer) => peer.peerID !== disconnectingID
+    );
+    dataPeersRef.current = peersLeft;
+    console.log('peersRef.current :>> ', dataPeersRef.current);
     //remove peer by name
   };
 
@@ -494,6 +515,7 @@ function World({ username }) {
     socket.on('callUser', callUserSetCall);
     socket.onAny(listener);
     socket.on('disconnect user', disconnectUser);
+    socket.on('disconnect data user', disconnectDataUser);
     return () => {
       socketRef.current.off('get users', getUsers);
       socketRef.current.off('user joined', newUserJoins);
@@ -502,6 +524,7 @@ function World({ username }) {
       socket.off('callUser', callUserSetCall);
       socket.offAny(listener);
       socket.off('disconnect user', disconnectUser);
+      socket.off('disconnect data user', disconnectDataUser);
       socketRef.current.off(
         'receiving data returned signal',
         receiverDataSendSignal
