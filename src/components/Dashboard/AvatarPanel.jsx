@@ -56,9 +56,27 @@ const AvatarDropDown = ({ userId, avatarModel, setAvatar }) => {
       })
     }
     else {
+      if (event.target.value === 'BlobfishDefault') {
       setAvatarJSON({
-        model: event.target.value
+        model: event.target.value,
+        xAxis:2.5,
+            yAxis:2.5,
+            zAxis:2.5,
+            size:1
       })
+      }
+      else if (event.target.value === 'CubeHeadDefault') {
+        setAvatarJSON({
+        model: event.target.value,
+        headHeight:2.5,
+        headWidth:2.5,
+        headLength:2.5,
+        earLength:1,
+        headColor:"#808080",
+        earColor:"#ffff00",
+        eyeColor:"#0000ff",
+      })
+      }
     }
     setChosenAvatar(event.target.value)
   };

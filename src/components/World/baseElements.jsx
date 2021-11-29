@@ -43,6 +43,9 @@ export const Terrain = () => {
       <group rotation={[Math.PI / 2, 0, 0]}>
         <Tree position={[10, 0, 10]} />
         <Tree position={[5, 0, 5]} />
+        <Tree position={[7, 0, 7]} />
+        <Tree position={[20, 0, 10]} />
+        <Tree position={[17, 0, 15]} />
       </group>
       <meshBasicMaterial map={texture} />
       {/* <meshStandardMaterial
