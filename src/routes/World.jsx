@@ -119,15 +119,23 @@ function World({ username }) {
       // peersRef will handle collection of peers (all simple peer logic)
       // pass in user info, remote peers
       console.log('peersRef in get users before:>> ', peersRef);
-      peersRef.current.push({
+      // remove previous instances of peers
+      const filterPeersRef = peersRef.current.filter(
+        (peer) => peer.username !== username
+      );
+      filterPeersRef.push({
         username,
         avatarJSON,
         coordinates,
         peerID: userID,
         peer,
       });
+
+      peersRef.current = filterPeersRef;
+      // peersRef.current.push();
       console.log('peersRef in get users :>> ', peersRef);
       // setting state of array of peers for rendering purposes
+      // remove previous instances of peers
       peers.push(peer);
     });
     setPeers(peers);
@@ -151,11 +159,24 @@ function World({ username }) {
       });
       console.log('peer signal in create:>> ', signal);
     });
+
+    peer.on('connect', () => {
+      const avatarMovement = {
+        faceCalculations: faceCalculations.current,
+        coordinates: coordinates.current,
+        username,
+        peerID: callerID,
+      };
+      peer.send(JSON.stringify(avatarMovement));
+      console.log('sent data in create: ' + JSON.stringify(avatarMovement));
+    });
+
     //sending something
     peer.on('data', (data) => {
       // this person is who <-> callerID
+
       console.log('data in create: ' + data);
-      peer.send('data sent in return from peer ' + data);
+      // peer.send('data sent in return from peer ' + data);
     });
     return peer;
   };
@@ -198,18 +219,26 @@ function World({ username }) {
     const peer = addPeer(signal, callerID, audioStream.current);
     console.log('peer._id :>> ', peer._id);
     console.log('peersRef in newUserJoins before :>> ', peersRef);
-    peersRef.current.push({
+    // clean list of previous instances before pushing
+    const filterPeerRef = peersRef.current.filter(
+      (peer) => peer.username !== username
+    );
+    filterPeerRef.push({
       username,
       avatarJSON,
       coordinates,
       peerID: callerID,
       peer,
     });
+    peersRef.current = filterPeerRef;
+    // peersRef.current.push();
     console.log('peersRef in newUserJoins :>> ', peersRef);
     peer.on('connect', () => {
       console.log('CONNECT in newUserJoins');
       //send avatar info, json, socket id?
 
+      // this peer is sending
+      // peer.send(JSON.stringify())
       peer.send('sending from newUser' + Math.random());
     });
     //sending something
