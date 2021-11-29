@@ -32,7 +32,6 @@ import {
   handleKeyDown,
   handleKeyUp,
 } from '../components/World/PlayerController.jsx';
-
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
 // player model, player usename
@@ -88,6 +87,7 @@ function World({ username }) {
   const [peers, setPeers] = useState([]);
   const peersRef = useRef([]);
 
+  console.log('peersRef in world :>> ', peersRef);
   // CONNECTIONS
 
   const receiverSendSignal = (data) => {
@@ -104,6 +104,7 @@ function World({ username }) {
   const getUsers = (users) => {
     const peers = [];
     // iterate through users list received from server
+    console.log('users in getusers :>> ', users);
     users.forEach(({ userID, username, avatarJSON, coordinates }) => {
       // for each user, create a peer and send in our id and stream
       // TODO: CHANGE STREAM TO DATA CHANNEL?? NOPE CHANGE TO AUDIO STREAM AND IMPLEMMENT SEPARATE DATA CHANNEL
@@ -114,8 +115,10 @@ function World({ username }) {
         socketRef.current.id,
         audioStream.current
       );
+
       // peersRef will handle collection of peers (all simple peer logic)
       // pass in user info, remote peers
+      console.log('peersRef in get users before:>> ', peersRef);
       peersRef.current.push({
         username,
         avatarJSON,
@@ -194,6 +197,7 @@ function World({ username }) {
     // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
     const peer = addPeer(signal, callerID, audioStream.current);
     console.log('peer._id :>> ', peer._id);
+    console.log('peersRef in newUserJoins before :>> ', peersRef);
     peersRef.current.push({
       username,
       avatarJSON,
@@ -215,6 +219,22 @@ function World({ username }) {
       // peer.send('received' + data);
     });
     setPeers((users) => [...users, peer]);
+  };
+
+  const disconnectUser = (user) => {
+    //remove peer from peersRef by id first
+    console.log('peersRef.current before removal :>> ', peersRef.current);
+    const disconnectingID = user[0].userID;
+    const disconnectingPeer = peersRef.current.filter(
+      (peer) => peer.peerID === disconnectingID
+    );
+    // disconnectingPeer.destroy();
+    const peersLeft = peersRef.current.filter(
+      (peer) => peer.peerID !== disconnectingID
+    );
+    peersRef.current = peersLeft;
+    console.log('peersRef.current :>> ', peersRef.current);
+    //remove peer by name
   };
 
   // decide on world dimensions
@@ -241,6 +261,7 @@ function World({ username }) {
   });
   useEffect(() => {
     console.log('use effect in videoPlayer');
+
     getVideoAudioStream();
 
     // socket to emit that room is joined
@@ -260,6 +281,7 @@ function World({ username }) {
     socket.on('me', setMe);
     socket.on('callUser', callUserSetCall);
     socket.onAny(listener);
+    socket.on('disconnect user', disconnectUser);
 
     return () => {
       socketRef.current.off('get users', getUsers);
@@ -268,6 +290,7 @@ function World({ username }) {
       socket.off('me', setMe);
       socket.off('callUser', callUserSetCall);
       socket.offAny(listener);
+      socket.off('disconnect user', disconnectUser);
     };
   }, []);
 
@@ -332,8 +355,9 @@ function World({ username }) {
               />
             )}
           </group>
-          {/* <OtherAvatars peersRef={peersRef} /> */}
-          {/* componet renders all other avatars, it should use peerRef */}
+          <OtherAvatars peersRef={peersRef} peers={peers} />
+          {/* componet renders all other avatars, it should use peerRef 
+          peers for update of avatar models in map */}
           <Terrain />
         </Suspense>
         {/* The X axis is red. The Y axis is green. The Z axis is blue */}

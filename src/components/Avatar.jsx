@@ -11,7 +11,25 @@ import { Stars, Sky } from '@react-three/drei';
 // import { OrthographicCamera } from 'three';
 
 // ability to fetch different types of avatars here
-export const Avatar = ({ faceCalculations, avatarJSON, coordinates }) => {
+export const Avatar = ({
+  avatarJSON,
+  coordinates,
+  faceCalculations,
+  // faceCalculations = {
+  //   angle: {
+  //     pitch: 0,
+  //     yaw: 0,
+  //     roll: 0,
+  //   },
+  //   leftEyeOpening: 1,
+  //   rightEyeOpening: 1,
+  //   mouthDim: {
+  //     mouthLen: 0,
+  //     mouthMidBot: 0,
+  //     mouthTopBot: 0,
+  //   },
+  // },
+}) => {
   const [chosenAvatar, setChosenAvatar] = useState();
   console.log('faceCalculations.current :>> ', faceCalculations.current);
   useEffect(() => {

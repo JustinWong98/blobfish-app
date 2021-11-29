@@ -27,12 +27,10 @@ export const PlayerController = ({ coordinates }) => {
       // momentum = momentum + camera.position.z * 0.02;
       //get these to move the character too
       // console.log('camera.position :>> ', camera.position);
-      console.log('coordinates.current before :>> ', coordinates.current);
       switch (key) {
         case 'a':
           coordinates.current.x = coordinates.current.x - momentum;
           break;
-        // camera.translateX(-momentum);
         case 'w':
           coordinates.current.z = coordinates.current.z + momentum;
           break;
@@ -41,12 +39,10 @@ export const PlayerController = ({ coordinates }) => {
           break;
         case 'd':
           coordinates.current.x = coordinates.current.x + momentum;
-          // camera.translateX(momentum);
           break;
 
         default:
       }
-      console.log('coordinates.current after :>> ', coordinates.current);
     });
   });
 
@@ -57,7 +53,6 @@ export const handleKeyDown = (e) => {
   if (!keyPressed[e.key]) {
     keyPressed[e.key] = new Date().getTime();
   }
-  // console.log('keyPressed[e.key] :>> ', keyPressed[e.key]);
 };
 
 export const handleKeyUp = (e) => {

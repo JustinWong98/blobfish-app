@@ -59,13 +59,6 @@ export const Terrain = () => {
         <Stone02 position={[-9, 0, 15]}/>
       </group>
       <meshBasicMaterial map={texture} />
-      {/* <meshStandardMaterial
-        attach="material"
-        color="white"
-        roughness={1}
-        metalness={0}
-        wireframe
-      /> */}
     </mesh>
   );
 };

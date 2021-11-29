@@ -1,8 +1,6 @@
 import { useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 
-const keyPressed = {};
-
 export const CameraController = ({ coordinates }) => {
   const { camera, gl } = useThree();
 
