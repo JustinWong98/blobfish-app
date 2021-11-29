@@ -24,6 +24,7 @@ import {
   faceMeshSetup,
 } from '../components/face/facemesh.jsx';
 import { Avatar } from '../components/Avatar.jsx';
+import { OtherAvatars } from '../components/World/OtherAvatars.jsx';
 import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
 import { extent } from '../components/World/baseElements.jsx';
@@ -337,6 +338,7 @@ function World({ username }) {
               />
             )}
           </group>
+          {/* <OtherAvatars peersRef={peersRef} /> */}
           {/* componet renders all other avatars, it should use peerRef */}
           <Terrain />
         </Suspense>
