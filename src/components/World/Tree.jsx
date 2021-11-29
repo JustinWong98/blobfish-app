@@ -4,7 +4,7 @@ import { MeshBasicMaterial } from 'three'
 
 export const Tree = ({position}) => {
   const group = useRef()
-  const { nodes, materials } = useGLTF('/Tree.gltf')
+  const { nodes, materials } = useGLTF('/models/Tree.gltf')
   // nodes.tree_collider.material.type = MeshBasicMaterial
   return (
     <group ref={group} dispose={null} position={position}>
@@ -28,4 +28,4 @@ export const Tree = ({position}) => {
   )
 }
 
-useGLTF.preload('/Tree.gltf')
+useGLTF.preload('/models/Tree.gltf')
