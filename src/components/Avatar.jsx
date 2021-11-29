@@ -31,7 +31,7 @@ export const Avatar = ({
   // },
 }) => {
   const [chosenAvatar, setChosenAvatar] = useState();
-  console.log('faceCalculations.current :>> ', faceCalculations.current);
+  // console.log('faceCalculations.current :>> ', faceCalculations.current);
   useEffect(() => {
     console.log(avatarJSON.model);
     switch (avatarJSON.model) {
