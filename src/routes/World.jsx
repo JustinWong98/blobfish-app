@@ -16,8 +16,6 @@ import { VideoFrame } from '../components/VideoElements';
 import { Terrain, Box, extents } from '../components/World/baseElements.jsx';
 import { SocketContext } from '../components/context/sockets.js';
 import {
-  handleKeyDown,
-  handleKeyUp,
   CameraController,
 } from '../components/World/CameraController';
 import { getWebCamStream } from '../modules/webcam';
@@ -33,6 +31,8 @@ import { AvatarJSONContext } from '../App.js';
 import { Stars, Sky } from '@react-three/drei';
 import { extent } from '../components/World/baseElements.jsx';
 import { OtherAudio } from '../components/World/audio.jsx';
+import { PlayerController, handleKeyDown,
+  handleKeyUp, } from '../components/World/PlayerController.jsx';
 
 // gets stream of playermotions in the world
 // head rotation, eye and mouth motion, position in xz space
