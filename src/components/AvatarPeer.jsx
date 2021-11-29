@@ -34,8 +34,6 @@ export const AvatarPeer = ({ username, avatarJSON, coord, peer, peerID }) => {
   //peer.receive?
   //check if username, id is the same
 
-  const myMesh = useRef();
-
   // useFrame((state, delta) => {
   //   const { angle } = faceCalculations.current;
   //   // console.log('state in useFrame :>> ', state);

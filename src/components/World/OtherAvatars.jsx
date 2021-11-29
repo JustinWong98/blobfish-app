@@ -32,20 +32,27 @@ export const OtherAvatars = ({ peersRef, peers }) => {
   console.log('peers in OtherAvatar :>> ', peers);
   console.log('peersRef.current :>> ', peersRef.current);
   const peersLst = peersRef.current;
+  const avatars = peersLst.map((peer) => (
+    <AvatarPeer
+      username={peer.username}
+      avatarJSON={peer.avatarJSON}
+      coord={peer.coordinates}
+      peer={peer.peer}
+      peerID={peer.peerID}
+    />
+  ));
   let peer = peersRef.current[0];
+  let boxes = [0, 1, 2].map((peer) => (
+    <mesh>
+      <boxGeometry args={[10, 10, 10]} />
+      <meshStandardMaterial />
+    </mesh>
+  ));
+  console.log('boxes :>> ', boxes);
   //face calculations from peer sends
   return (
     <group>
-      {peersLst.map((peer) => {
-        <AvatarPeer
-          username={peer.username}
-          avatarJSON={peer.avatarJSON}
-          coord={peer.coordinates}
-          peer={peer.peer}
-          peerID={peer.peerID}
-        />;
-        // <Box />;
-      })}
+      {avatars}
       {/* {peer && (
         <AvatarPeer
           username={peer.username}
