@@ -38,6 +38,8 @@ export const AvatarPeer = ({
   coordinates.current = { x: coord.x, y: coord.y, z: coord.z };
   faceCalc.current = { ...faceCalculations };
 
+  console.log('coordinates.current :>> ', coordinates.current);
+  console.log('faceCalc.current :>> ', coordinates.current);
   useEffect(() => {
     const interval = setInterval(setTime(Date.now()), 100);
     return () => {
