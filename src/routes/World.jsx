@@ -96,14 +96,19 @@ function World({ username }) {
     // find peer that we are receiving from since we are going to receive multiple peers.
     // we loop through the list of peers and match the id of the one trying to signal us
     const item = peersRef.current.find((p) => p.peerID === data.id);
-    item.peer.signal(data.signal);
+    console.log('item.peer :>> ', item.peer);
+    if (!item.peer.destroyed) {
+      item.peer.signal(data.signal);
+    }
   };
   const receiverDataSendSignal = (data) => {
     console.log('in receiver data send signal');
     // find peer that we are receiving from since we are going to receive multiple peers.
     // we loop through the list of peers and match the id of the one trying to signal us
     const item = dataPeersRef.current.find((p) => p.peerID === data.id);
-    item.peer.signal(data.signal);
+    if (!item.peer.destroyed) {
+      item.peer.signal(data.signal);
+    }
   };
 
   const callUserSetCall = ({ from, name: callerName, signal }) => {
@@ -196,7 +201,11 @@ function World({ username }) {
       // remove previous instances of peers
       dataPeers.push(dataPeer);
       avatarCollection.current[username] = { avatarJSON, coordinates };
-      setAvatarJSON(avatarJSON);
+      // setAvatarJSON(avatarJSON);
+      console.log(
+        'avatarCollection.current in get Data :>> ',
+        avatarCollection.current
+      );
       // avatarCollection.current[username] = { avatarJSON};
     });
     setDataPeers(dataPeers);
@@ -258,7 +267,7 @@ function World({ username }) {
       console.log('receive new create dataPeer', avatarObj);
       avatarCollection.current[avatarObj.username] = {
         ...avatarCollection.current[avatarObj.username],
-        avatarJSON: avatarObj.avatarJSON,
+        // avatarJSON: avatarObj.avatarJSON,
         faceCalculations: avatarObj.faceCalculations,
         coordinates: avatarObj.coordinates,
       };
@@ -333,18 +342,24 @@ function World({ username }) {
     console.log('peer._id :>> ', peer._id);
     console.log('peersRef in newUserJoins before :>> ', peersRef);
     // clean list of previous instances before pushing
-    const filterPeerRef = peersRef.current.filter(
-      (peer) => peer.username !== username
-    );
-    filterPeerRef.push({
+    // const filterPeerRef = peersRef.current.filter(
+    //   (peer) => peer.username !== username
+    // );
+    // filterPeerRef.push({
+    //   username,
+    //   avatarJSON,
+    //   coordinates,
+    //   peerID: callerID,
+    //   peer,
+    // });
+    // peersRef.current = filterPeerRef;
+    peersRef.current.push({
       username,
       avatarJSON,
       coordinates,
       peerID: callerID,
       peer,
     });
-    peersRef.current = filterPeerRef;
-    // peersRef.current.push();
     console.log('peersRef in newUserJoins :>> ', peersRef);
     peer.on('connect', () => {
       console.log('CONNECT in newUserJoins');
@@ -364,21 +379,30 @@ function World({ username }) {
     const dataPeer = addDataPeer(signal, callerID);
 
     // clean list of previous instances before pushing
-    const filterPeerRef = dataPeersRef.current.filter(
-      (peer) => peer.username !== username
-    );
-    filterPeerRef.push({
+    // const filterPeerRef = dataPeersRef.current.filter(
+    //   (peer) => peer.username !== username
+    // );
+    // filterPeerRef.push({
+    //   username,
+    //   avatarJSON,
+    //   coordinates,
+    //   peerID: callerID,
+    //   peer: dataPeer,
+    // });
+    // dataPeersRef.current = filterPeerRef;
+    dataPeersRef.current.push({
       username,
       avatarJSON,
       coordinates,
       peerID: callerID,
       peer: dataPeer,
     });
-    dataPeersRef.current = filterPeerRef;
     console.log('dataPeersRef in newUserJoins :>> ', dataPeersRef);
     dataPeer.on('connect', () => {
       console.log('CONNECT in newDataUserJoins');
     });
+    avatarCollection.current[username] = { avatarJSON, coordinates };
+
     //sending something
     //send position, send face dims
     dataPeer.on('data', (data) => {
@@ -388,7 +412,7 @@ function World({ username }) {
         ...avatarCollection.current[avatarObj.username],
         faceCalculations: avatarObj.faceCalculations,
         coordinates: avatarObj.coordinates,
-        avatarJSON: avatarObj.avatarJSON,
+        // avatarJSON: avatarObj.avatarJSON,
       };
       console.log('avatarCollection.current :>> ', avatarCollection.current);
       // setAvatarsChanged(avatarCollection.current);
@@ -456,6 +480,7 @@ function World({ username }) {
       faceCalculations: faceCalculations.current,
       coordinates: coordinates.current,
       username,
+      avatarJSON,
     };
     const avatarMoveStr = JSON.stringify(avatarMovement);
     dataPeers.forEach((peer) => {
