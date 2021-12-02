@@ -140,8 +140,8 @@ function Login({ isLoggedIn, setIsLoggedIn, setUsername }) {
             Login
           </Typography>
           Don't have an account?
-          <Link href="/signup" variant="body2" color="secondary">
-            {'Sign up'}
+          <Link onClick={() => {navigate('/signup')}} variant="body2" color="secondary">
+            Sign up
           </Link>
           <Username username={username} setUserName={setUserName} />
           <Password password={password} setPassword={setPassword} />

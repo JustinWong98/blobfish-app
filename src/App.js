@@ -17,6 +17,7 @@ import Login from './routes/Login';
 import Dashboard from './routes/Dashboard';
 import { Route, NavLink, BrowserRouter, Routes } from 'react-router-dom';
 import World from './routes/World';
+import axios from 'axios';
 
 const theme = createTheme({
   typography: {
@@ -41,6 +42,7 @@ const theme = createTheme({
 
 export const AvatarJSONContext = createContext();
 function App() {
+  axios.defaults.withCredentials = true;
   const useStyles = makeStyles();
   const classes = useStyles(theme);
   const [avatarJSON, setAvatarJSON] = useState({

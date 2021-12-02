@@ -58,6 +58,7 @@ const Password = ({ password, setPassword }) => {
   );
 };
 function SignUp({ isLoggedIn, setIsLoggedIn, setUsername }) {
+  console.log(BACKEND_URL)
   const [cookies, setCookie] = useCookies(['userId', 'isLoggedIn', 'username']);
   const [globalErrorMessage, setGlobalErrorMessage] = useState('');
   const [usernameInvalidMessage, setUsernameInvalidMessage] = useState('');
