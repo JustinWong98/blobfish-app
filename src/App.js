@@ -55,7 +55,6 @@ function App() {
     earColor: '#fcb900',
     eyeColor: '#fcb900',
   });
-  // const [avatarJSON, setAvatarJSON] = useState('Blobfish');
   const [isLoggedIn, setIsLoggedIn] = useState(hasLoginCookie());
   const [username, setUsername] = useState(getCookie('username').trim());
   const [userId, setUserId] = useState(Number(getCookie('userId').trim()));
@@ -72,7 +71,12 @@ function App() {
             <BrowserRouter>
               <NavBar />
               <Routes>
-                <Route path="/world" element={ <World avatarJSON={avatarJSON} username={username} />} />
+                <Route
+                  path="/world"
+                  element={
+                    <World avatarJSON={avatarJSON} username={username} />
+                  }
+                />
                 <Route
                   path="/signup"
                   element={
@@ -116,10 +120,7 @@ function App() {
                   path="/room/:roomID"
                   element={<Room key="videoPlayer" username={username} />}
                 />
-                <Route
-                  path="/"
-                  element={<Front />}
-                />
+                <Route path="/" element={<Front />} />
               </Routes>
             </BrowserRouter>
           </AvatarJSONContext.Provider>

@@ -130,22 +130,7 @@ function World({ username }) {
         audioStream.current
       );
 
-      // peersRef will handle collection of peers (all simple peer logic)
-      // pass in user info, remote peers
       console.log('peersRef in get users before:>> ', peersRef);
-      // remove previous instances of peers
-      // const filterPeersRef = peersRef.current.filter(
-      //   (peer) => peer.username !== username
-      // );
-      // filterPeersRef.push({
-      //   username,
-      //   avatarJSON,
-      //   coordinates,
-      //   peerID: userID,
-      //   peer,
-      // });
-
-      // peersRef.current = filterPeersRef;
       peersRef.current.push({
         username,
         avatarJSON,
@@ -177,18 +162,6 @@ function World({ username }) {
       console.log('peersRef in get users before:>> ', dataPeersRef);
       // remove previous instances of peers
 
-      // const filterDataPeerRef = dataPeersRef.current.filter(
-      //   (peer) => peer.username !== username
-      // );
-      // filterDataPeerRef.push({
-      //   username,
-      //   avatarJSON,
-      //   coordinates,
-      //   peerID: userID,
-      //   peer: dataPeer,
-      // });
-
-      // dataPeersRef.current = filterDataPeerRef;
       dataPeersRef.current.push({
         username,
         avatarJSON,
@@ -201,12 +174,10 @@ function World({ username }) {
       // remove previous instances of peers
       dataPeers.push(dataPeer);
       avatarCollection.current[username] = { avatarJSON, coordinates };
-      // setAvatarJSON(avatarJSON);
       console.log(
         'avatarCollection.current in get Data :>> ',
         avatarCollection.current
       );
-      // avatarCollection.current[username] = { avatarJSON};
     });
     setDataPeers(dataPeers);
   };
@@ -241,7 +212,6 @@ function World({ username }) {
   const createDataPeer = (userToSignal, callerID) => {
     console.log('in createDataPeer');
 
-    //create all otejr peers? this is not loacal?
     const dataPeer = new Peer({
       initiator: true,
       trickle: false,
@@ -267,12 +237,10 @@ function World({ username }) {
       console.log('receive new create dataPeer', avatarObj);
       avatarCollection.current[avatarObj.username] = {
         ...avatarCollection.current[avatarObj.username],
-        // avatarJSON: avatarObj.avatarJSON,
         faceCalculations: avatarObj.faceCalculations,
         coordinates: avatarObj.coordinates,
       };
       console.log('avatarCollection.current :>> ', avatarCollection.current);
-      // setAvatarsChanged(avatarCollection.current);
     });
     return dataPeer;
   };
@@ -341,18 +309,6 @@ function World({ username }) {
     const peer = addPeer(signal, callerID, audioStream.current);
     console.log('peer._id :>> ', peer._id);
     console.log('peersRef in newUserJoins before :>> ', peersRef);
-    // clean list of previous instances before pushing
-    // const filterPeerRef = peersRef.current.filter(
-    //   (peer) => peer.username !== username
-    // );
-    // filterPeerRef.push({
-    //   username,
-    //   avatarJSON,
-    //   coordinates,
-    //   peerID: callerID,
-    //   peer,
-    // });
-    // peersRef.current = filterPeerRef;
     peersRef.current.push({
       username,
       avatarJSON,
@@ -378,18 +334,6 @@ function World({ username }) {
     // TODO: CHANGE TO AUDIO STREAM, DATA CHANEL FOR PLAYER MOVEMENTS
     const dataPeer = addDataPeer(signal, callerID);
 
-    // clean list of previous instances before pushing
-    // const filterPeerRef = dataPeersRef.current.filter(
-    //   (peer) => peer.username !== username
-    // );
-    // filterPeerRef.push({
-    //   username,
-    //   avatarJSON,
-    //   coordinates,
-    //   peerID: callerID,
-    //   peer: dataPeer,
-    // });
-    // dataPeersRef.current = filterPeerRef;
     dataPeersRef.current.push({
       username,
       avatarJSON,
@@ -415,7 +359,6 @@ function World({ username }) {
         // avatarJSON: avatarObj.avatarJSON,
       };
       console.log('avatarCollection.current :>> ', avatarCollection.current);
-      // setAvatarsChanged(avatarCollection.current);
     });
 
     setDataPeers((users) => [...users, dataPeer]);
@@ -443,9 +386,6 @@ function World({ username }) {
       dataPeersRef.current
     );
     const disconnectingID = user[0].userID;
-    // const disconnectingPeer = peersRef.current.filter(
-    //   (peer) => peer.peerID === disconnectingID
-    // );
     const peersLeft = dataPeersRef.current.filter(
       (peer) => peer.peerID !== disconnectingID
     );
@@ -600,44 +540,20 @@ function World({ username }) {
         <ambientLight intensity={0.5} />
         <directionalLight position={[0, 0, 5]} />
         <Suspense fallback={null}>
-          <group
-            position={[
-              coordinates.current.x,
-              coordinates.current.y,
-              coordinates.current.z,
-            ]}
-          >
-            {/* <Text
-              color="black" // default
-              anchorX="center" // default
-              anchorY="middle" // default
-              position={[
-                coordinates.current.x,
-                coordinates.current.y + 5,
-                coordinates.current.z,
-              ]}
-              scale={[10, 10, 10]}
-            >
-              {username}
-            </Text> */}
-            {faceCalculations.current && (
-              <Avatar
-                coordinates={coordinates}
-                faceCalculations={faceCalculations}
-                avatarJSON={avatarJSON}
-                username={username}
-              />
-            )}
-          </group>
+          {faceCalculations.current && (
+            <Avatar
+              coordinates={coordinates}
+              faceCalculations={faceCalculations}
+              avatarJSON={avatarJSON}
+              username={username}
+            />
+          )}
           <OtherAvatars
             dataPeersRef={dataPeersRef}
             dataPeers={dataPeers}
             avatarCollection={avatarCollection}
             username={username}
-            // avatarsChanged={avatarsChanged}
           />
-          {/* componet renders all other avatars, it should use peerRef 
-          peers for update of avatar models in map */}
           <Terrain />
         </Suspense>
         {/* The X axis is red. The Y axis is green. The Z axis is blue */}
