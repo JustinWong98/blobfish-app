@@ -16,20 +16,6 @@ export const Avatar = ({
   coordinates,
   faceCalculations,
   username,
-  // faceCalculations = {
-  //   angle: {
-  //     pitch: 0,
-  //     yaw: 0,
-  //     roll: 0,
-  //   },
-  //   leftEyeOpening: 1,
-  //   rightEyeOpening: 1,
-  //   mouthDim: {
-  //     mouthLen: 0,
-  //     mouthMidBot: 0,
-  //     mouthTopBot: 0,
-  //   },
-  // },
 }) => {
   const [chosenAvatar, setChosenAvatar] = useState();
   // console.log('faceCalculations.current :>> ', faceCalculations.current);
@@ -95,8 +81,6 @@ export const Avatar = ({
 
   useFrame((state, delta) => {
     const { angle } = faceCalculations.current;
-    // console.log('state in useFrame :>> ', state);
-    // console.log('delta in useFrame :>> ', delta * 1000);
     myMesh.current.rotation.x = angle.pitch * 1.5; //up down tilt
     myMesh.current.rotation.y = -angle.yaw * 1.5;
     myMesh.current.rotation.z = -angle.roll * 0.5; //left right tilt
@@ -117,7 +101,6 @@ export const Avatar = ({
         anchorY="middle" // default
         position={[0, 3.5, 1]}
         scale={[7, 7, 7]}
-        // scale={[10, 10, 10]}
       >
         {username}
       </Text>
