@@ -97,7 +97,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 
 ## Contact
 
-[Jia En](https://github.com/Ennnm "Jia En")  - www.linkedin.com/in/en-chiew
+[Jia En](https://github.com/Ennnm "Jia En")  - [@ennnm_](https://twitter.com/ennnm_) - jiaen.1sc4@gmail.com
 [Justin Wong](https://github.com/JustinWong98) - https://www.linkedin.com/in/justin-wong-445b5b20a/
 
 <!-- ACKNOWLEDGMENTS -->
