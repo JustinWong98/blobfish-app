@@ -22,6 +22,7 @@ Do remember to enable your browser to access your webcam and your microphone.
 
 - Create or join a 3D world
 - Avatars can be moved using the WASD keys inside the 3D world.
+
 ![](https://user-images.githubusercontent.com/84217227/148069785-69cff984-41b9-438b-a9ba-5ce80fef82f2.gif)
 ## Technical Stack and Description
 For our project, we used:
