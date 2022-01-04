@@ -17,7 +17,9 @@ You can find our deployed app [here](https://blobfish-app.netlify.app "here").
 Do remember to enable your browser to access your webcam and your microphone.
 - Create an account [here](https://blobfish-app.netlify.app/signup "here"), you should then be redirected to the dashboard.
 - Create a new avatar in our [avatar creation page](https://blobfish-app.netlify.app/avatar "avatar creation page") or choose a default model.
+
 ![](https://user-images.githubusercontent.com/84217227/148069742-94bda24b-327a-48f9-9685-4e009117fcc5.gif)
+
 - Create or join a 3D world
 - Avatars can be moved using the WASD keys inside the 3D world.
 ![](https://user-images.githubusercontent.com/84217227/148069785-69cff984-41b9-438b-a9ba-5ce80fef82f2.gif)
