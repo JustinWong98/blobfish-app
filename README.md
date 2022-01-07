@@ -7,11 +7,11 @@ Blobfish is a 3D "Metaverse" world in which users can create their own avatars, 
 
 This project was created and developed by [Jia En](https://github.com/Ennnm "Jia En") and [Justin Wong](https://github.com/JustinWong98 "Justin Wong"), as a project for their bootcamp.
 
+It spanned 2weeks (13 Nov - 29 Nov 2021)
+
 You can find our deployed app [here](https://blobfish-app.netlify.app "here").
 
-[frontend repo](https://github.com/JustinWong98/blobfish-app)
 
-[backend repo](https://github.com/Ennnm/blobfish-app-backend)
 
 ## Usage steps
 Do remember to enable your browser to access your webcam and your microphone.
@@ -63,6 +63,32 @@ For our project, we used:
 
 - [notion planning docs](https://economic-brand-644.notion.site/Project-5-75672b3502cb412297501b1db87bdcff)
 
+  
+
+[frontend repo](https://github.com/JustinWong98/blobfish-app)
+
+[backend repo](https://github.com/Ennnm/blobfish-app-backend)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+## Challenges
+
+##### MediaPipe
+
+- Getting head orientation from facemesh coordinates returned by MediaPipe.
+- Mapping facemesh data to eye and mouth expression on the 3D avatar.
+
+##### React-Three-Fiber
+
+- Creation of avatar models, making them customizable and reloadable by users.
+- Positioning of avatars, objects, and camera.
+- Updating facial expression using useFrame
+
+##### Simple-peer
+
+- Typically used for client-client video conferencing. Had to adapt this for transmitting user's position and head data.
+- Tried using the audio channel for transmitting both audio and avatar JSON data including avatar positioning and expression. Figured that a dedicated data channel has to be created between peers, this cannot be piggybacked.
+
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- ROADMAP -->
@@ -109,7 +135,7 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 ## Contact
 
 [Jia En](https://github.com/Ennnm "Jia En")  - [@ennnm_](https://twitter.com/ennnm_) - jiaen.1sc4@gmail.com
-[Justin Wong](https://github.com/JustinWong98) - https://www.linkedin.com/in/justin-wong-445b5b20a/
+[Justin Wong](https://github.com/JustinWong98) - justinwong8991@gmail.com
 
 <!-- ACKNOWLEDGMENTS -->
 
