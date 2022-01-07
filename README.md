@@ -83,11 +83,13 @@ For our project, we used:
 - Creation of avatar models, making them customizable and reloadable by users.
 - Positioning of avatars, objects, and camera.
 - Updating facial expression using useFrame
+- FPS issues rendering 3D world in browser together with avatars in a browser environment
 
 ##### Simple-peer
 
 - Typically used for client-client video conferencing. Had to adapt this for transmitting user's position and head data.
 - Tried using the audio channel for transmitting both audio and avatar JSON data including avatar positioning and expression. Figured that a dedicated data channel has to be created between peers, this cannot be piggybacked.
+- Handling disconnection of peers
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
