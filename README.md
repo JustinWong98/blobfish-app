@@ -8,9 +8,7 @@ It spanned 2weeks (13 Nov - 29 Nov 2021)
 
 You can find our deployed app [here](https://blobfish-app.netlify.app "here").
 
-[frontend repo](https://github.com/JustinWong98/blobfish-app)
 
-[backend repo](https://github.com/Ennnm/blobfish-app-backend)
 
 ## Usage steps
 Do remember to enable your browser to access your webcam and your microphone.
@@ -53,6 +51,12 @@ For our project, we used:
 ##### Planning 
 
 - [notion planning docs](https://economic-brand-644.notion.site/Project-5-75672b3502cb412297501b1db87bdcff)
+
+  
+
+[frontend repo](https://github.com/JustinWong98/blobfish-app)
+
+[backend repo](https://github.com/Ennnm/blobfish-app-backend)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
